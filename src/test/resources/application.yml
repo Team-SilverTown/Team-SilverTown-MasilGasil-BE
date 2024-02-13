@@ -1,19 +1,9 @@
 spring:
-  profiles:
-    active: local
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
-    url: ${MYSQL_URL}
-    hikari:
-      maximum-pool-size: 100
-      minimum-idle: 10
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL;
+    username: sa
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     open-in-view: false
-flyway:
-  enabled: true
-server:
-  port: ${SERVER_PORT}
