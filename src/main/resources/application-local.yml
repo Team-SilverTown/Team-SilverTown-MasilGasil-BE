@@ -1,0 +1,9 @@
+logging:
+  level:
+    root: info
+  org:
+    hibernate:
+      SQL: debug
+      type:
+        descriptor:
+          sql: trace

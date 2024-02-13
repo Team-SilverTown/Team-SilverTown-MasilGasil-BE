@@ -1,0 +1,13 @@
+logging:
+  org:
+    hibernate:
+      SQL: debug
+  threshold:
+    file: ERROR
+  file:
+    name: logs/masil.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: logs/ddudu.%d{yyyy-MM-dd}.%i.log
+      max-file-size: 1MB
+      total-size-cap: 5MB
