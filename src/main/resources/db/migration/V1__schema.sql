@@ -90,7 +90,7 @@ CREATE TABLE posts
 
 CREATE TABLE post_pins
 (
-    id            BIGINT auto_increment,
+    id            BIGINT AUTO_INCREMENT,
     post_id       BIGINT        NOT NULL,
     user_id       BIGINT        NULL,
     point         POINT         NOT NULL,
