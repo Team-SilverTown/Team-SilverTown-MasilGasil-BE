@@ -34,7 +34,7 @@
 
   <!--- Suppression -->
   <module name="SuppressionFilter">
-    <property name="file" value="${config_loc}\suppressions.xml"/>
+    <property name="file" value="${config_loc}/suppressions.xml"/>
   </module>
 
   <!-- Checks for whitespace                               -->
