@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class MasilApplicationTests {
 
     @Test
-	void 애플리케이션을_실행할_수_있다() {
+    void 애플리케이션을_실행할_수_있다() {
         // given
         String[] args = new String[0];
 
