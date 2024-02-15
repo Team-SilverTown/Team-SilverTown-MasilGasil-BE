@@ -2,6 +2,8 @@ package team.silvertown.masil.user.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,8 +24,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Getter
+@Getter()
 public class UserAuthority {
+
+    private static final String ROLE_PREFIX = "ROLE_";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +37,12 @@ public class UserAuthority {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Column(name = "authority", length = 20)
-    private String authority;
+    @Column(name = "authority", columnDefinition = "VARCHAR(20)")
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
 
     public GrantedAuthority getAuthority() {
-        return new SimpleGrantedAuthority(this.authority);
+        return new SimpleGrantedAuthority(ROLE_PREFIX + authority.name());
     }
 
 }
