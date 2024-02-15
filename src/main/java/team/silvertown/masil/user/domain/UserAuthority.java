@@ -12,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,9 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Entity
 @Table(name = "user_authorities")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Getter()
+@Getter
 public class UserAuthority {
 
     private static final String ROLE_PREFIX = "ROLE_";
@@ -40,6 +37,12 @@ public class UserAuthority {
     @Column(name = "authority", columnDefinition = "VARCHAR(20)")
     @Enumerated(EnumType.STRING)
     private Authority authority;
+
+    @Builder
+    private UserAuthority(User user, Authority authority) {
+        this.user = user;
+        this.authority = authority;
+    }
 
     public GrantedAuthority getAuthority() {
         return new SimpleGrantedAuthority(ROLE_PREFIX + authority.name());

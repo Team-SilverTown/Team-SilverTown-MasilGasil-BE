@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +19,6 @@ import team.silvertown.masil.common.BaseEntity;
 @Entity
 @Table(name = "masil_pins")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Getter
 public class MasilPin extends BaseEntity {
 
@@ -44,5 +41,20 @@ public class MasilPin extends BaseEntity {
 
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
+
+    @Builder
+    private MasilPin(
+        Masil masil,
+        Long userId,
+        Point point,
+        String content,
+        String thumbnailUrl
+    ) {
+        this.masil = masil;
+        this.userId = userId;
+        this.point = point;
+        this.content = content;
+        this.thumbnailUrl = thumbnailUrl;
+    }
 
 }

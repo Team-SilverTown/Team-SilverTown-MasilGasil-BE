@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,8 +22,6 @@ import team.silvertown.masil.user.domain.User;
 @Entity
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Getter
 public class Post extends BaseEntity {
 
@@ -46,7 +43,7 @@ public class Post extends BaseEntity {
     private String title;
 
     @Column(name = "content", columnDefinition = "TEXT")
-    private String text;
+    private String content;
 
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
@@ -57,13 +54,38 @@ public class Post extends BaseEntity {
     @Column(name = "total_time", nullable = false)
     private Integer totalTime;
 
-    @Column(name = "is_public", nullable = false, columnDefinition = "DEFAULT 1")
-    private boolean isPublic = true;
+    @Column(name = "is_public", nullable = false)
+    private boolean isPublic;
 
-    @Column(name = "view_count", nullable = false, columnDefinition = "DEFAULT 0")
-    private int viewCount = 0;
+    @Column(name = "view_count", nullable = false)
+    private int viewCount;
 
-    @Column(name = "like_count", nullable = false, columnDefinition = "DEFAULT 1")
-    private int likeCount = 0;
+    @Column(name = "like_count", nullable = false)
+    private int likeCount;
+
+
+    @Builder
+    private Post(
+        User user,
+        Address address,
+        LineString path,
+        String title,
+        String content,
+        String thumbnailUrl,
+        Integer distance,
+        Integer totalTime
+    ) {
+        this.user = user;
+        this.address = address;
+        this.path = path;
+        this.title = title;
+        this.content = content;
+        this.thumbnailUrl = thumbnailUrl;
+        this.distance = distance;
+        this.totalTime = totalTime;
+        this.viewCount = 0;
+        this.likeCount = 0;
+        this.isPublic = true;
+    }
 
 }

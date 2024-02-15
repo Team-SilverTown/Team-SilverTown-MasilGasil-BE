@@ -12,7 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +23,6 @@ import team.silvertown.masil.user.domain.User;
 @Entity
 @Table(name = "masils")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Getter
 public class Masil extends BaseEntity {
 
@@ -63,5 +60,30 @@ public class Masil extends BaseEntity {
 
     @Column(name = "started_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     private OffsetDateTime startedAt;
+
+    @Builder
+    private Masil(
+        User user,
+        Long postId,
+        Address address,
+        LineString path,
+        String title,
+        String text,
+        String thumbnailUrl,
+        Integer distance,
+        Integer totalTime,
+        OffsetDateTime startedAt
+    ) {
+        this.user = user;
+        this.postId = postId;
+        this.address = address;
+        this.path = path;
+        this.title = title;
+        this.text = text;
+        this.thumbnailUrl = thumbnailUrl;
+        this.distance = distance;
+        this.totalTime = totalTime;
+        this.startedAt = startedAt;
+    }
 
 }

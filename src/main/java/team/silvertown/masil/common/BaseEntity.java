@@ -13,18 +13,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 public class BaseEntity {
 
-    @Column(
-        name = "created_at", nullable = false,
-        columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)"
-    )
+    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
     private OffsetDateTime createdAt;
 
-    @Column(
-        name = "updated_at", nullable = false,
-        columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)"
-    )
+    @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
     private OffsetDateTime updatedAt;

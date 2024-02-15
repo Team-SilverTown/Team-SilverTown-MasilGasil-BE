@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +19,6 @@ import team.silvertown.masil.common.BaseEntity;
 @Entity
 @Table(name = "post_pins")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Getter
 public class PostPin extends BaseEntity {
 
@@ -44,5 +41,14 @@ public class PostPin extends BaseEntity {
 
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
+
+    @Builder
+    public PostPin(Post post, Long userId, Point point, String content, String thumbnailUrl) {
+        this.post = post;
+        this.userId = userId;
+        this.point = point;
+        this.content = content;
+        this.thumbnailUrl = thumbnailUrl;
+    }
 
 }
