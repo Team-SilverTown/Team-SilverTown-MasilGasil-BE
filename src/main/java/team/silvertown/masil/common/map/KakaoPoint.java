@@ -1,11 +1,9 @@
 package team.silvertown.masil.common.map;
 
-import lombok.Getter;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
-@Getter
 public record KakaoPoint(double lat, double lng) {
 
     public Point toPoint(WKTReader wktReader) {
