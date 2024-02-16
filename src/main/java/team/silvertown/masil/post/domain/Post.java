@@ -15,8 +15,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
-import team.silvertown.masil.common.Address;
 import team.silvertown.masil.common.BaseEntity;
+import team.silvertown.masil.common.map.Address;
 import team.silvertown.masil.user.domain.User;
 
 @Entity

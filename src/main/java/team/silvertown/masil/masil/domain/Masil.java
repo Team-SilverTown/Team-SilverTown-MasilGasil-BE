@@ -16,8 +16,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
-import team.silvertown.masil.common.Address;
 import team.silvertown.masil.common.BaseEntity;
+import team.silvertown.masil.common.map.Address;
 import team.silvertown.masil.user.domain.User;
 
 @Entity
@@ -47,7 +47,7 @@ public class Masil extends BaseEntity {
     private String title;
 
     @Column(name = "content", columnDefinition = "TEXT")
-    private String text;
+    private String content;
 
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
@@ -68,7 +68,7 @@ public class Masil extends BaseEntity {
         Address address,
         LineString path,
         String title,
-        String text,
+        String content,
         String thumbnailUrl,
         Integer distance,
         Integer totalTime,
@@ -79,7 +79,7 @@ public class Masil extends BaseEntity {
         this.address = address;
         this.path = path;
         this.title = title;
-        this.text = text;
+        this.content = content;
         this.thumbnailUrl = thumbnailUrl;
         this.distance = distance;
         this.totalTime = totalTime;
