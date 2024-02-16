@@ -1,4 +1,4 @@
-package team.silvertown.masil.common;
+package team.silvertown.masil.common.map;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
