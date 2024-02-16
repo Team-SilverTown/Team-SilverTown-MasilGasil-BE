@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private static final int NOT_YET_HANDLED_EXCEPTION_CODE = 9998;
-    private static final int UNKNOWN_EXCEPTION_CODE = 9999;
+    private static final int UNKNOWN_EXCEPTION_CODE = -1;
+    private static final int NOT_YET_HANDLED_EXCEPTION_CODE = -2;
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
