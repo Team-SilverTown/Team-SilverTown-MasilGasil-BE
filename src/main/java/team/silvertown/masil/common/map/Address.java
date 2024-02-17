@@ -8,13 +8,13 @@ import lombok.Getter;
 @Getter
 public class Address {
 
-    @Column(name = "address_depth1", length = 20)
+    @Column(name = "address_depth1", length = 20, nullable = false)
     private String depth1;
 
-    @Column(name = "address_depth2", length = 20)
+    @Column(name = "address_depth2", length = 20, nullable = false)
     private String depth2;
 
-    @Column(name = "address_depth3", length = 20)
+    @Column(name = "address_depth3", length = 20, nullable = false)
     private String depth3;
 
 }

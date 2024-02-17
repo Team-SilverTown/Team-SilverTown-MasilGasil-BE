@@ -35,7 +35,7 @@ CREATE TABLE masils
     user_id        BIGINT        NOT NULL,
     post_id        BIGINT        NULL,
     address_depth1 VARCHAR(20)   NOT NULL,
-    address_depth2 VARCHAR(20)   NOT NULL,
+    address_depth2 VARCHAR(20),
     address_depth3 VARCHAR(20)   NOT NULL,
     path           LINESTRING    NOT NULL,
     title          VARCHAR(30)   NOT NULL,
