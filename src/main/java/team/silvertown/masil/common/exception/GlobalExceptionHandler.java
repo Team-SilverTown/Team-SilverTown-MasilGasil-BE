@@ -13,6 +13,16 @@ public class GlobalExceptionHandler {
     private static final int UNKNOWN_EXCEPTION_CODE = -1;
     private static final int NOT_YET_HANDLED_EXCEPTION_CODE = -2;
 
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BaseException e) {
+        log.warn(e.getMessage(), e);
+
+        ErrorResponse response = new ErrorResponse(NOT_YET_HANDLED_EXCEPTION_CODE, e.getMessage());
+
+        return ResponseEntity.badRequest()
+            .body(response);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
         log.warn(e.getMessage(), e);
@@ -54,16 +64,6 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.from(e);
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(response);
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(BaseException e) {
-        log.warn(e.getMessage(), e);
-
-        ErrorResponse response = new ErrorResponse(NOT_YET_HANDLED_EXCEPTION_CODE, e.getMessage());
-
-        return ResponseEntity.badRequest()
             .body(response);
     }
 
