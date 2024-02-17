@@ -1,87 +1,95 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.2'
-	id 'io.spring.dependency-management' version '1.1.4'
-	id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'jacoco'
+    id 'checkstyle'
 }
 
 group = 'team.silver-town'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// flyway
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-mysql'
+    // flyway
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
 
-	// h2
-	testImplementation 'com.h2database:h2:2.2.224'
+    // h2
+    testImplementation 'com.h2database:h2:2.2.224'
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 
-	finalizedBy jacocoTestReport
+    finalizedBy jacocoTestReport
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
 
 jacoco {
-	toolVersion = "0.8.11"
+    toolVersion = "0.8.11"
 }
 
 jacocoTestReport {
-	reports {
-		html.required = true
-		xml.required = true
-		csv.required = false
-	}
+    reports {
+        html.required = true
+        xml.required = true
+        csv.required = false
+    }
 
-	finalizedBy jacocoTestCoverageVerification
-	dependsOn test
+    finalizedBy jacocoTestCoverageVerification
+    dependsOn test
 }
 
 jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			element = 'CLASS'
+    violationRules {
+        rule {
+            element = 'CLASS'
 
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.50
-			}
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.50
+            }
 
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.50
-			}
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.50
+            }
 
-			includes = [
-					'*.domain.*',
-					'*.service.*'
-			]
-		}
-	}
+            includes = [
+                    '*.domain.*',
+                    '*.service.*'
+            ]
+        }
+    }
 
-	dependsOn jacocoTestReport
+    dependsOn jacocoTestReport
 }
