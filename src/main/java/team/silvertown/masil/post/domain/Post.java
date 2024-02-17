@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,8 @@ import team.silvertown.masil.user.domain.User;
 @Entity
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Getter
 public class Post extends BaseEntity {
 
@@ -55,37 +58,12 @@ public class Post extends BaseEntity {
     private Integer totalTime;
 
     @Column(name = "is_public", nullable = false)
-    private boolean isPublic;
+    private Boolean isPublic;
 
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
     @Column(name = "like_count", nullable = false)
     private int likeCount;
-
-
-    @Builder
-    private Post(
-        User user,
-        Address address,
-        LineString path,
-        String title,
-        String content,
-        String thumbnailUrl,
-        Integer distance,
-        Integer totalTime
-    ) {
-        this.user = user;
-        this.address = address;
-        this.path = path;
-        this.title = title;
-        this.content = content;
-        this.thumbnailUrl = thumbnailUrl;
-        this.distance = distance;
-        this.totalTime = totalTime;
-        this.viewCount = 0;
-        this.likeCount = 0;
-        this.isPublic = true;
-    }
 
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.sql.Date;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,8 @@ import team.silvertown.masil.common.BaseEntity;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Getter
 public class User extends BaseEntity {
 
@@ -52,7 +55,7 @@ public class User extends BaseEntity {
     private Integer totalCount;
 
     @Column(name = "is_public")
-    private boolean isPublic;
+    private Boolean isPublic;
 
     @Column(name = "is_allowing_notification")
     private boolean isAllowingNotification;
@@ -63,32 +66,5 @@ public class User extends BaseEntity {
 
     @Column(name = "social_id", length = 50)
     private String socialId;
-
-    @Builder
-    private User(
-        String nickname,
-        Sex sex,
-        Date birthDate,
-        Integer height,
-        Integer weight,
-        ExerciseIntensity exerciseIntensity,
-        Integer totalDistance,
-        Integer totalCount,
-        Provider provider,
-        String socialId
-    ) {
-        this.nickname = nickname;
-        this.sex = sex;
-        this.birthDate = birthDate;
-        this.height = height;
-        this.weight = weight;
-        this.exerciseIntensity = exerciseIntensity;
-        this.totalDistance = totalDistance;
-        this.totalCount = totalCount;
-        this.provider = provider;
-        this.socialId = socialId;
-        this.isPublic = true;
-        this.isAllowingNotification = true;
-    }
 
 }
