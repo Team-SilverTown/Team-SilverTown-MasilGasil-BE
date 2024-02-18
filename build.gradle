@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.2'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'jacoco'
+    id 'checkstyle'
 }
 
 group = 'team.silver-town'
@@ -46,6 +47,13 @@ test {
     useJUnitPlatform()
 
     finalizedBy jacocoTestReport
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
 
 jacoco {
