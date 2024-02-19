@@ -1,4 +1,4 @@
-package team.silvertown.masil.common;
+package team.silvertown.masil.common.validator;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -6,8 +6,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Validator {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Validator {
 
     public static void throwIf(boolean state, Supplier<RuntimeException> exceptionSupplier) {
         if (state) {
