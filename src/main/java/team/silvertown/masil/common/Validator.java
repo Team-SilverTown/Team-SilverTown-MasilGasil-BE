@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Validator {
+public class Validator {
 
     public static void throwIf(boolean state, Supplier<RuntimeException> exceptionSupplier) {
         if (state) {
