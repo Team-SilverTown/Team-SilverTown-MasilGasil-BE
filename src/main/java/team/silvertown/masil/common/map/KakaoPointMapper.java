@@ -7,39 +7,45 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
-import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.validator.Validator;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class KakaoPointMapper {
 
-    private static final int MIN_POINT_NUM = 2;
     private static final WKTReader wktReader = new WKTReader();
+    private static final int MIN_POINT_NUM = 3;
+    private static final String POINT_PREFIX = "POINT(";
+    private static final String LINESTRING_PREFIX = "LINESTRING(";
+    private static final String LINESTRING_DELIM = ", ";
+    private static final String GEOMETRY_SUFFIX = ")";
+    private static final String POINT_MAPPING_FAILED = "Point 변환을 실패했습니다";
+    private static final String LINESTRING_MAPPING_FAILED = "LineString 변환을 실패했습니다";
 
     public static Point mapToPoint(KakaoPoint point) {
-        Validator.notNull(point, () -> new BadRequestException(MapErrorCode.NULL_KAKAO_POINT));
+        Validator.notNull(point, MapErrorCode.NULL_KAKAO_POINT);
 
         try {
-            return (Point) wktReader.read("POINT(" + point.toRawString() + ")");
+            return (Point) wktReader.read(POINT_PREFIX + point.toRawString() + GEOMETRY_SUFFIX);
         } catch (ParseException e) {
-            throw new RuntimeException("Point 변환을 실패했습니다");
+            throw new RuntimeException(POINT_MAPPING_FAILED);
         }
     }
 
     public static LineString mapToLineString(List<KakaoPoint> path) {
-        Validator.throwIf(path.size() < MIN_POINT_NUM,
-            () -> new BadRequestException(MapErrorCode.INSUFFICIENT_PATH_POINTS));
+        Validator.notNull(path, MapErrorCode.NULL_KAKAO_POINT);
+        Validator.notUnder(path.size(), MIN_POINT_NUM, MapErrorCode.INSUFFICIENT_PATH_POINTS);
 
-        StringBuilder stringBuilder = new StringBuilder("LINESTRING(");
+        StringBuilder stringBuilder = new StringBuilder(LINESTRING_PREFIX);
 
         path.forEach(point -> stringBuilder.append(point.toRawString())
-            .append(", "));
-        stringBuilder.replace(stringBuilder.length() - 3, stringBuilder.length() - 1, ")");
+            .append(LINESTRING_DELIM));
+        stringBuilder.replace(stringBuilder.length() - 3, stringBuilder.length() - 1,
+            GEOMETRY_SUFFIX);
 
         try {
             return (LineString) wktReader.read(stringBuilder.toString());
         } catch (ParseException e) {
-            throw new RuntimeException("LineString 변환을 실패했습니다");
+            throw new RuntimeException(LINESTRING_MAPPING_FAILED);
         }
     }
 
