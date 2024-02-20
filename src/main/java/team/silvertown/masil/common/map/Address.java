@@ -1,5 +1,6 @@
 package team.silvertown.masil.common.map;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -30,7 +31,7 @@ public class Address {
         this.depth1 = depth1;
         this.depth2 = depth2;
 
-        if (!depth4.isBlank()) {
+        if (StringUtils.isNotBlank(depth4)) {
             depth3 += " " + depth4;
         }
 
