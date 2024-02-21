@@ -42,7 +42,8 @@ class AddressTest {
         Address address = new Address(addressDepth1, addressDepth2, addressDepth3, addressDepth4);
 
         // then
-        assertThat(address.getDepth3()).contains(addressDepth4.strip());
+        assertThat(address).extracting("depth1", "depth2", "depth3", "depth4")
+            .containsExactly(addressDepth1, addressDepth2, addressDepth3, addressDepth4);
     }
 
     @ParameterizedTest
@@ -84,6 +85,20 @@ class AddressTest {
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
             .withMessage(MapErrorCode.BLANK_DEPTH3.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    void 지역_Depth_4이_Null_값이면_주소_생성을_실패한다(String nullDepth4) {
+        // given
+
+        // when
+        ThrowingCallable create = () -> new Address(addressDepth1, addressDepth2, addressDepth3,
+            nullDepth4);
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+            .withMessage(MapErrorCode.NULL_DEPTH4.getMessage());
     }
 
 }
