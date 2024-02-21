@@ -19,8 +19,8 @@ public final class KakaoPointMapper {
     private static final String LINESTRING_PREFIX = "LINESTRING(";
     private static final String LINESTRING_DELIM = ", ";
     private static final String GEOMETRY_SUFFIX = ")";
-    private static final String POINT_MAPPING_FAILED = "Point 변환을 실패했습니다";
-    private static final String LINESTRING_MAPPING_FAILED = "LineString 변환을 실패했습니다";
+    private static final String POINT_MAPPING_FAILED = "Point 변환을 실패했습니다 - ";
+    private static final String LINESTRING_MAPPING_FAILED = "LineString 변환을 실패했습니다 - ";
 
     public static Point mapToPoint(KakaoPoint point) {
         Validator.notNull(point, MapErrorCode.NULL_KAKAO_POINT);
@@ -28,7 +28,7 @@ public final class KakaoPointMapper {
         try {
             return (Point) wktReader.read(POINT_PREFIX + point.toRawString() + GEOMETRY_SUFFIX);
         } catch (ParseException e) {
-            throw new RuntimeException(POINT_MAPPING_FAILED);
+            throw new RuntimeException(POINT_MAPPING_FAILED + e.getMessage());
         }
     }
 
@@ -46,7 +46,7 @@ public final class KakaoPointMapper {
         try {
             return (LineString) wktReader.read(stringJoiner.toString());
         } catch (ParseException e) {
-            throw new RuntimeException(LINESTRING_MAPPING_FAILED);
+            throw new RuntimeException(LINESTRING_MAPPING_FAILED + e.getMessage());
         }
     }
 
