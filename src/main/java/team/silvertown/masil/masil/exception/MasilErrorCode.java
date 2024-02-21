@@ -7,8 +7,8 @@ public enum MasilErrorCode implements ErrorCode {
     TITLE_TOO_LONG(20111001, "제목 길이가 제한을 초과했습니다"),
     THUMBNAIL_URL_TOO_LONG(20111002, "썸네일 URL 주소 길이가 제한을 초과했습니다"),
 
-    NULL_DISTANCE(20112000, "산책 거리가 NULL이 될 수 없습니다"),
-    NULL_TOTAL_TIME(20112001, "산책 시간이 NULL이 될 수 없습니다"),
+    INVALID_DISTANCE(20112000, "산책 거리는 양수여야 합니다"),
+    INVALID_TOTAL_TIME(20112001, "산책 시간은 양수여야 합니다"),
 
     NULL_MASIL(20130000, "핀의 마실 기록을 확인할 수 없습니다"),
 
