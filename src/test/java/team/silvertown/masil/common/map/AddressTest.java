@@ -61,7 +61,7 @@ class AddressTest {
 
     @ParameterizedTest
     @NullSource
-    void 지역_Depth_2가_NULL_값이면_주소_생성을_실패한다(String nullDepth2) {
+    void 지역_Depth_2가_Null_값이면_주소_생성을_실패한다(String nullDepth2) {
         // given
 
         // when

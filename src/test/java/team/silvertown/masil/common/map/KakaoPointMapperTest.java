@@ -33,7 +33,7 @@ class KakaoPointMapperTest {
 
     @ParameterizedTest
     @NullSource
-    void 카카오_포인트가_NULL이면_Point_변환을_실패한다(KakaoPoint point) {
+    void 카카오_포인트가_Null이면_Point_변환을_실패한다(KakaoPoint point) {
         // given
 
         // when
@@ -58,7 +58,7 @@ class KakaoPointMapperTest {
 
     @ParameterizedTest
     @NullSource
-    void 경로가_NULL이면_Line_String_변환을_실패한다(List<KakaoPoint> path) {
+    void 경로가_Null이면_Line_String_변환을_실패한다(List<KakaoPoint> path) {
         // given
 
         // when
