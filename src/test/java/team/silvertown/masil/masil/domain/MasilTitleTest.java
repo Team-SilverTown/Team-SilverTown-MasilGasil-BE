@@ -26,8 +26,8 @@ class MasilTitleTest {
     @Test
     void 마실_제목_생성을_성공한다() {
         // given
-        String title = faker.book()
-            .title();
+        String title = faker.lorem()
+            .maxLengthSentence(29);
 
         // when
         ThrowingCallable create = () -> new MasilTitle(title);

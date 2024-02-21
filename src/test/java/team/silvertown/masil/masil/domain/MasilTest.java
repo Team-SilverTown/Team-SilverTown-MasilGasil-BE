@@ -49,8 +49,8 @@ class MasilTest {
         addressDepth3 = faker.address()
             .streetName();
         path = createLineString(10);
-        title = faker.book()
-            .title();
+        title = faker.lorem()
+            .maxLengthSentence(29);
         totalTime = faker.number()
             .numberBetween(10, 70);
     }

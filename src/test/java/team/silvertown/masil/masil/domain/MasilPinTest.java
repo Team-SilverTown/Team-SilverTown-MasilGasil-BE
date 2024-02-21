@@ -106,8 +106,8 @@ class MasilPinTest {
         String addressDepth3 = faker.address()
             .streetName();
         LineString path = createLineString(10);
-        String title = faker.book()
-            .title();
+        String title = faker.lorem()
+            .maxLengthSentence(29);
         int totalTime = faker.number()
             .numberBetween(10, 70);
 
