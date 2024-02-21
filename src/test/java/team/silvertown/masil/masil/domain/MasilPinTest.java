@@ -49,7 +49,6 @@ class MasilPinTest {
     void 마실_핀_생성을_할_수_있다() {
         // given
         MasilPinBuilder builder = MasilPin.builder()
-            .userId(userId)
             .masil(masil)
             .point(point);
 

@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import team.silvertown.masil.common.exception.BadRequestException;
@@ -34,7 +36,8 @@ class AddressTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", " ", "땡땡리"})
+    @EmptySource
+    @ValueSource(strings = {" ", "땡땡리"})
     void 주소_생성을_성공한다(String addressDepth4) {
         // given
 
@@ -47,8 +50,8 @@ class AddressTest {
     }
 
     @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", " "})
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
     void 지역_Depth_1이_빈_값이면_주소_생성을_실패한다(String blankDepth1) {
         // given
 
@@ -74,8 +77,8 @@ class AddressTest {
     }
 
     @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", " "})
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
     void 지역_Depth_3이_빈_값이면_주소_생성을_실패한다(String blankDepth3) {
         // given
 
