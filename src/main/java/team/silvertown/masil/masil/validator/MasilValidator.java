@@ -4,7 +4,7 @@ import io.micrometer.common.util.StringUtils;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import team.silvertown.masil.common.exception.BadRequestException;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
@@ -28,11 +28,19 @@ public class MasilValidator extends Validator {
         }
     }
 
+    public static void validateMasilOwner(Masil masil, User user) {
+        User owner = masil.getUser();
+
+        notNull(owner, MasilErrorCode.NULL_USER);
+        throwIf(!Objects.equals(owner, user),
+            () -> new ForbiddenException(MasilErrorCode.USER_NOT_AUTHORIZED_FOR_MASIL));
+    }
+
     public static void validatePinOwner(Masil masil, Long userId) {
         User masilOwner = masil.getUser();
 
         throwIf(!Objects.equals(masilOwner.getId(), userId),
-            () -> new BadRequestException(MasilErrorCode.OWNER_NOT_MATCHING));
+            () -> new ForbiddenException(MasilErrorCode.PIN_OWNER_NOT_MATCHING));
     }
 
 }
