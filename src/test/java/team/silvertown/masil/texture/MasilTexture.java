@@ -25,12 +25,16 @@ public final class MasilTexture extends BaseDomainTexture {
             .streetName();
     }
 
+    public static String createUrl() {
+        return faker.internet()
+            .webdomain();
+    }
+
     public static Masil createValidMasil() {
         long postId = getRandomId();
         String content = faker.gameOfThrones()
             .quote();
-        String thumbnailUrl = faker.internet()
-            .webdomain();
+        String thumbnailUrl = createUrl();
 
         return createMasil(postId, content, thumbnailUrl);
     }
@@ -41,10 +45,8 @@ public final class MasilTexture extends BaseDomainTexture {
         String addressDepth2 = createAddressDepth2();
         String addressDepth3 = createAddressDepth3();
         LineString path = MapTexture.createLineString(10);
-        String title = faker.book()
-            .title();
-        int totalTime = faker.number()
-            .numberBetween(10, 70);
+        String title = getRandomSentenceWithMax(29);
+        int totalTime = getRandomInt(600, 4200);
 
         return createMasil(user, postId, addressDepth1, addressDepth2, addressDepth3, "", path,
             title, content, thumbnailUrl, (int) path.getLength(), totalTime, OffsetDateTime.now());

@@ -17,10 +17,8 @@ public final class UserTexture extends BaseDomainTexture {
             .name();
         LocalDate birthDate = faker.date()
             .birthdayLocalDate(20, 40);
-        int height = faker.number()
-            .numberBetween(170, 190);
-        int weight = faker.number()
-            .numberBetween(60, 90);
+        int height = getRandomInt(170, 190);
+        int weight = getRandomInt(70, 90);
 
         return createUser(nickname, Sex.MALE, Date.valueOf(birthDate), height, weight,
             ExerciseIntensity.MIDDLE, 0, 0, true, true, Provider.KAKAO,
