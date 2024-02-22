@@ -3,11 +3,14 @@ package team.silvertown.masil.masil.controller;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.masil.dto.CreateRequest;
 import team.silvertown.masil.masil.dto.CreateResponse;
+import team.silvertown.masil.masil.dto.MasilResponse;
 import team.silvertown.masil.masil.service.MasilService;
 
 @RestController
@@ -27,6 +30,16 @@ public class MasilController {
 
         return ResponseEntity.created(uri)
             .body(createResponse);
+    }
+
+    @GetMapping("/api/v1/masils/{id}")
+    public ResponseEntity<MasilResponse> getById(
+        @PathVariable
+        Long id
+    ) {
+        MasilResponse response = masilService.getById(1L, id);
+
+        return ResponseEntity.ok(response);
     }
 
 }
