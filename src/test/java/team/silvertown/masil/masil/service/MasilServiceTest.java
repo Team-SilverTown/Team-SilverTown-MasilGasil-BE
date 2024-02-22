@@ -22,12 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
 import team.silvertown.masil.masil.dto.CreatePinRequest;
 import team.silvertown.masil.masil.dto.CreateRequest;
 import team.silvertown.masil.masil.dto.CreateResponse;
+import team.silvertown.masil.masil.dto.MasilResponse;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
 import team.silvertown.masil.masil.repository.MasilPinRepository;
 import team.silvertown.masil.masil.repository.MasilRepository;
@@ -70,7 +72,7 @@ class MasilServiceTest {
 
     @BeforeEach
     void setUp() {
-        userRepository.save(createUser());
+        user = userRepository.save(createUser());
         addressDepth1 = faker.address()
             .state();
         addressDepth2 = faker.address()
@@ -90,7 +92,6 @@ class MasilServiceTest {
     @ValueSource(ints = {10, 0})
     void 마실_생성을_성공한다(int expectedPinCount) {
         // given
-        user = userRepository.save(createUser());
         List<CreatePinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
         CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
             "", path, title, null, distance, totalTime,
@@ -125,6 +126,70 @@ class MasilServiceTest {
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(create)
             .withMessage(MasilErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 마실_단일_조회를_성공한다() {
+        // given
+        List<CreatePinRequest> pinRequests = createPinRequests(10, 10000);
+        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
+            "", path, title, null, distance, totalTime,
+            OffsetDateTime.now(), pinRequests, null, null);
+        CreateResponse expected = masilService.create(user.getId(), request);
+
+        // when
+        MasilResponse actual = masilService.getById(user.getId(), expected.id());
+
+        // then
+        assertThat(actual).extracting("id", "title", "distance", "totalTime")
+            .containsExactly(expected.id(), title, distance, totalTime);
+        assertThat(actual.pins()).hasSize(pinRequests.size());
+    }
+
+    @Test
+    void 사용자가_존재하지_않으면_마실_단일_조회를_실패한다() {
+        // given
+        long invalidId = faker.random()
+            .nextLong(Long.MAX_VALUE);
+
+        // when
+        ThrowingCallable getById = () -> masilService.getById(invalidId, invalidId);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getById)
+            .withMessage(MasilErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 마실이_존재하지_않으면_마실_단일_조회를_실패한다() {
+        // given
+        long invalidId = faker.random()
+            .nextLong(Long.MAX_VALUE);
+
+        // when
+        ThrowingCallable getById = () -> masilService.getById(user.getId(), invalidId);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getById)
+            .withMessage(MasilErrorCode.MASIL_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 로그인한_사용자와_마실_소유자가_다르면_마실_단일_조회를_실패한다() {
+        // given
+        User differntUser = userRepository.save(createUser());
+        List<CreatePinRequest> pinRequests = createPinRequests(10, 10000);
+        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
+            "", path, title, null, distance, totalTime,
+            OffsetDateTime.now(), pinRequests, null, null);
+        CreateResponse expected = masilService.create(user.getId(), request);
+
+        // when
+        ThrowingCallable getById = () -> masilService.getById(differntUser.getId(), expected.id());
+
+        // then
+        assertThatExceptionOfType(ForbiddenException.class).isThrownBy(getById)
+            .withMessage(MasilErrorCode.USER_NOT_AUTHORIZED_FOR_MASIL.getMessage());
     }
 
     User createUser() {

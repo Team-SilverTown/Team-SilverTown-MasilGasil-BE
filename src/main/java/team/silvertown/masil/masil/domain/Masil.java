@@ -99,4 +99,8 @@ public class Masil extends BaseEntity {
         this.startedAt = startedAt;
     }
 
+    public String getTitle() {
+        return this.title.getTitle();
+    }
+
 }
