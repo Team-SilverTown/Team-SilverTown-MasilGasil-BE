@@ -69,7 +69,10 @@ public class MasilService {
     }
 
     private MasilPin createPin(CreatePinRequest request, Masil masil) {
+        User owner = masil.getUser();
+
         return MasilPin.builder()
+            .userId(owner.getId())
             .point(KakaoPointMapper.mapToPoint(request.point()))
             .content(request.content())
             .thumbnailUrl(request.thumbnailUrl())
