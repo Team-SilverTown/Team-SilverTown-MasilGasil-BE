@@ -21,15 +21,16 @@ public class CustomUserArgumentResolver implements HandlerMethodArgumentResolver
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(
+        MethodParameter parameter, ModelAndViewContainer mavContainer,
+        NativeWebRequest webRequest, WebDataBinderFactory binderFactory
+    ) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();
 
-        if (authentication != null && authentication instanceof UsernamePasswordAuthenticationToken) {
-            UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
-            if(token.getPrincipal() != null && token.getPrincipal() instanceof Long) {
-                Long userId = (Long) token.getPrincipal();
+        if (authentication != null
+            && authentication instanceof UsernamePasswordAuthenticationToken token) {
+            if (token.getPrincipal() != null && token.getPrincipal() instanceof Long userId) {
                 return userId;
             }
         }

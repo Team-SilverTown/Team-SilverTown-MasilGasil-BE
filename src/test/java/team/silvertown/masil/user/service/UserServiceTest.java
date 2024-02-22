@@ -35,17 +35,22 @@ class UserServiceTest {
 
     private static final Faker faker = new Faker();
     private static final String VALID_PROVIDER = "kakao";
-    private static final String INVALID_PROVIDER = faker.animal().name();
+    private static final String INVALID_PROVIDER = faker.animal()
+        .name();
     private static final String AUTHORITY_PREFIX = "ROLE_";
 
     @Autowired
     UserService userService;
+
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     UserAuthorityRepository authorityRepository;
+
     @Autowired
     JwtTokenProvider tokenProvider;
+
     @Mock
     OAuth2User oAuth2User;
 

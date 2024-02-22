@@ -1,8 +1,8 @@
 package team.silvertown.masil.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashSet;
 import java.util.Set;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,12 +75,10 @@ public class WebSecurityConfig {
             authorities.forEach((authority) -> {
                 GrantedAuthority mappedAuthority;
 
-                if (authority instanceof OidcUserAuthority) {
-                    OidcUserAuthority userAuthority = (OidcUserAuthority) authority;
+                if (authority instanceof OidcUserAuthority userAuthority) {
                     mappedAuthority = new OidcUserAuthority(
                         "OIDC_USER", userAuthority.getIdToken(), userAuthority.getUserInfo());
-                } else if (authority instanceof OAuth2UserAuthority) {
-                    OAuth2UserAuthority userAuthority = (OAuth2UserAuthority) authority;
+                } else if (authority instanceof OAuth2UserAuthority userAuthority) {
                     mappedAuthority = new OAuth2UserAuthority(
                         "OAUTH2_USER", userAuthority.getAttributes());
                 } else {

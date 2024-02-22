@@ -5,6 +5,6 @@ import java.util.List;
 public record LoginResponseDto(
     String token,
     List<String> authority
-){
+) {
 
 }
