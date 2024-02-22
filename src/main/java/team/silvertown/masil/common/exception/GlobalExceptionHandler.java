@@ -79,13 +79,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleJsonParseException(HttpMessageNotReadableException e) {
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+        HttpMessageNotReadableException e
+    ) {
         Throwable rootCause = e.getRootCause();
 
         if (rootCause instanceof BadRequestException) {
             return handleBadRequestException((BadRequestException) rootCause);
         }
-        
+
         return handleUnknownException((Exception) rootCause);
     }
 
