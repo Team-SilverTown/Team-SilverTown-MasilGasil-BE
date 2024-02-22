@@ -26,11 +26,13 @@ public class Validator {
         throwIf(string.isBlank(), supplyBadRequest(errorCode));
     }
 
-    public static void notOver(int size, int max, ErrorCode errorCode) {
+    public static void notOver(Integer size, int max, ErrorCode errorCode) {
+        notNull(size, errorCode);
         throwIf(size > max, supplyBadRequest(errorCode));
     }
 
-    public static void notUnder(int size, int min, ErrorCode errorCode) {
+    public static void notUnder(Integer size, int min, ErrorCode errorCode) {
+        notNull(size, errorCode);
         throwIf(size < min, supplyBadRequest(errorCode));
     }
 

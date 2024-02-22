@@ -1,7 +1,7 @@
 package team.silvertown.masil.common.map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.common.exception.BadRequestException;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
@@ -22,13 +24,13 @@ class KakaoPointMapperTest {
     @Test
     void Point_변환을_성공한다() {
         // given
-        KakaoPoint point = new KakaoPoint(dongAnLat, dongAnLng);
+        KakaoPoint expected = new KakaoPoint(dongAnLat, dongAnLng);
 
         // when
-        ThrowingCallable map = () -> KakaoPointMapper.mapToPoint(point);
+        Point actual = KakaoPointMapper.mapToPoint(expected);
 
         // then
-        assertThatNoException().isThrownBy(map);
+        assertThat(actual.toString()).contains(expected.toRawString());
     }
 
     @ParameterizedTest
@@ -50,10 +52,15 @@ class KakaoPointMapperTest {
         List<KakaoPoint> path = createPath(10);
 
         // when
-        ThrowingCallable map = () -> KakaoPointMapper.mapToLineString(path);
+        LineString lineString = KakaoPointMapper.mapToLineString(path);
 
         // then
-        assertThatNoException().isThrownBy(map);
+        String asText = lineString.toString();
+        List<String> points = path.stream()
+            .map(KakaoPoint::toRawString)
+            .toList();
+
+        assertThat(asText).contains(points);
     }
 
     @ParameterizedTest

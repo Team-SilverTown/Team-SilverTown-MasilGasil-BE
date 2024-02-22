@@ -48,6 +48,7 @@ public class MasilPin extends BaseEntity {
     private MasilPin(Masil masil, Long userId, Point point, String content, String thumbnailUrl) {
         MasilValidator.notNull(masil, MasilErrorCode.NULL_MASIL);
         MasilValidator.validateUrl(thumbnailUrl);
+        MasilValidator.validatePinOwner(masil, userId);
 
         this.masil = masil;
         this.userId = userId;

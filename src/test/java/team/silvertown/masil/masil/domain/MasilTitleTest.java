@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
@@ -37,8 +37,8 @@ class MasilTitleTest {
     }
 
     @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", " "})
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
     void 마실_제목이_비었으면_오늘_날짜를_붙여_제목을_생성한다(String title) {
         // given
         LocalDate today = OffsetDateTime.now()

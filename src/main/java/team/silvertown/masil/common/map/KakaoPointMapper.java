@@ -1,6 +1,7 @@
 package team.silvertown.masil.common.map;
 
 import java.util.List;
+import java.util.StringJoiner;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
@@ -18,8 +19,8 @@ public final class KakaoPointMapper {
     private static final String LINESTRING_PREFIX = "LINESTRING(";
     private static final String LINESTRING_DELIM = ", ";
     private static final String GEOMETRY_SUFFIX = ")";
-    private static final String POINT_MAPPING_FAILED = "Point 변환을 실패했습니다";
-    private static final String LINESTRING_MAPPING_FAILED = "LineString 변환을 실패했습니다";
+    private static final String POINT_MAPPING_FAILED = "Point 변환을 실패했습니다 - ";
+    private static final String LINESTRING_MAPPING_FAILED = "LineString 변환을 실패했습니다 - ";
 
     public static Point mapToPoint(KakaoPoint point) {
         Validator.notNull(point, MapErrorCode.NULL_KAKAO_POINT);
@@ -27,7 +28,7 @@ public final class KakaoPointMapper {
         try {
             return (Point) wktReader.read(POINT_PREFIX + point.toRawString() + GEOMETRY_SUFFIX);
         } catch (ParseException e) {
-            throw new RuntimeException(POINT_MAPPING_FAILED);
+            throw new RuntimeException(POINT_MAPPING_FAILED + e.getMessage());
         }
     }
 
@@ -35,17 +36,17 @@ public final class KakaoPointMapper {
         Validator.notNull(path, MapErrorCode.NULL_KAKAO_POINT);
         Validator.notUnder(path.size(), MIN_POINT_NUM, MapErrorCode.INSUFFICIENT_PATH_POINTS);
 
-        StringBuilder stringBuilder = new StringBuilder(LINESTRING_PREFIX);
-
-        path.forEach(point -> stringBuilder.append(point.toRawString())
-            .append(LINESTRING_DELIM));
-        stringBuilder.replace(stringBuilder.length() - 3, stringBuilder.length() - 1,
+        StringJoiner stringJoiner = new StringJoiner(LINESTRING_DELIM, LINESTRING_PREFIX,
             GEOMETRY_SUFFIX);
 
+        path.stream()
+            .map(KakaoPoint::toRawString)
+            .forEach(stringJoiner::add);
+
         try {
-            return (LineString) wktReader.read(stringBuilder.toString());
+            return (LineString) wktReader.read(stringJoiner.toString());
         } catch (ParseException e) {
-            throw new RuntimeException(LINESTRING_MAPPING_FAILED);
+            throw new RuntimeException(LINESTRING_MAPPING_FAILED + e.getMessage());
         }
     }
 

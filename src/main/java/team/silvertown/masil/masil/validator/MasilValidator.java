@@ -1,10 +1,14 @@
 package team.silvertown.masil.masil.validator;
 
 import io.micrometer.common.util.StringUtils;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.validator.Validator;
+import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
+import team.silvertown.masil.user.domain.User;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MasilValidator extends Validator {
@@ -22,6 +26,13 @@ public class MasilValidator extends Validator {
         if (StringUtils.isNotBlank(url)) {
             notOver(url.length(), MAX_URL_LENGTH, MasilErrorCode.THUMBNAIL_URL_TOO_LONG);
         }
+    }
+
+    public static void validatePinOwner(Masil masil, Long userId) {
+        User masilOwner = masil.getUser();
+
+        throwIf(!Objects.equals(masilOwner.getId(), userId),
+            () -> new BadRequestException(MasilErrorCode.OWNER_NOT_MATCHING));
     }
 
 }

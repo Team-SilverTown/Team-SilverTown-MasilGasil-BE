@@ -49,7 +49,6 @@ class MasilPinTest {
     void 마실_핀_생성을_할_수_있다() {
         // given
         MasilPinBuilder builder = MasilPin.builder()
-            .userId(userId)
             .masil(masil)
             .point(point);
 
@@ -97,6 +96,22 @@ class MasilPinTest {
             .withMessage(MasilErrorCode.THUMBNAIL_URL_TOO_LONG.getMessage());
     }
 
+    @Test
+    void 마실_기록자와_핀의_사용자가_다르면_마실_핀_생성을_실패한다() {
+        // given
+        MasilPinBuilder builder = MasilPin.builder()
+            .masil(masil)
+            .userId(userId)
+            .point(point);
+
+        // when
+        ThrowingCallable create = builder::build;
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+            .withMessage(MasilErrorCode.OWNER_NOT_MATCHING.getMessage());
+    }
+
     Masil createMasil() {
         User user = createUser();
         String addressDepth1 = faker.address()
@@ -105,6 +120,7 @@ class MasilPinTest {
             .city();
         String addressDepth3 = faker.address()
             .streetName();
+        String addressDepth4 = "";
         LineString path = createLineString(10);
         String title = faker.lorem()
             .maxLengthSentence(29);
@@ -116,6 +132,7 @@ class MasilPinTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
+            .depth4(addressDepth4)
             .path(path)
             .title(title)
             .distance((int) path.getLength())

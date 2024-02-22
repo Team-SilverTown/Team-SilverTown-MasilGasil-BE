@@ -15,6 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.LineString;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.map.KakaoPoint;
@@ -35,6 +38,7 @@ class MasilTest {
     String addressDepth1;
     String addressDepth2;
     String addressDepth3;
+    String addressDepth4;
     LineString path;
     String title;
     int totalTime;
@@ -48,6 +52,7 @@ class MasilTest {
             .city();
         addressDepth3 = faker.address()
             .streetName();
+        addressDepth4 = "";
         path = createLineString(10);
         title = faker.lorem()
             .maxLengthSentence(29);
@@ -63,6 +68,7 @@ class MasilTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
+            .depth4(addressDepth4)
             .path(path)
             .title(title)
             .distance((int) path.getLength())
@@ -123,17 +129,21 @@ class MasilTest {
             .withMessage(MasilErrorCode.THUMBNAIL_URL_TOO_LONG.getMessage());
     }
 
-    @Test
-    void 마실_거리가_입력되지_않으면_마실_생성을_실패한다() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(ints = -1)
+    void 마실_거리가_잘못됐으면_마실_생성을_실패한다(Integer invalidDistance) {
         // given
         MasilBuilder builder = Masil.builder()
             .user(user)
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
+            .depth4(addressDepth4)
             .path(path)
             .title(title)
             .totalTime(totalTime)
+            .distance(invalidDistance)
             .startedAt(OffsetDateTime.now());
 
         // when
@@ -141,19 +151,23 @@ class MasilTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(MasilErrorCode.NULL_DISTANCE.getMessage());
+            .withMessage(MasilErrorCode.INVALID_DISTANCE.getMessage());
     }
 
-    @Test
-    void 마실_총_시간이_입력되지_않으면_마실_생성을_실패한다() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(ints = -1)
+    void 마실_총_시간_형식이_잘못됐으면_마실_생성을_실패한다(Integer invalidTotalTime) {
         // given
         MasilBuilder builder = Masil.builder()
             .user(user)
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
+            .depth4(addressDepth4)
             .path(path)
             .title(title)
+            .totalTime(invalidTotalTime)
             .distance((int) path.getLength())
             .startedAt(OffsetDateTime.now());
 
@@ -162,7 +176,7 @@ class MasilTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(MasilErrorCode.NULL_TOTAL_TIME.getMessage());
+            .withMessage(MasilErrorCode.INVALID_TOTAL_TIME.getMessage());
     }
 
     User createUser() {
