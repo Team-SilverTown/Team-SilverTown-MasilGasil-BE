@@ -109,7 +109,7 @@ class MasilPinTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(MasilErrorCode.OWNER_NOT_MATCHING.getMessage());
+            .withMessage(MasilErrorCode.PIN_OWNER_NOT_MATCHING.getMessage());
     }
 
     Masil createMasil() {
