@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
   pull-requests: write
 
 jobs:
@@ -22,9 +23,6 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Gradle 권한 부여
-        run: chmod +x gradlew
-
       - name: 테스트 application.yaml 덮어쓰기
         uses: microsoft/variable-substitution@v1
         with:
@@ -33,6 +31,9 @@ jobs:
           jwt.issuer: ${{ secrets.TOKEN_ISSUER }}
           jwt.base64-secret: ${{ secrets.TOKEN_SECRET }}
           jwt.token-validity-in-seconds: ${{ secrets.TOKEN_EXPIRATION }}
+
+      - name: Gradle 권한 부여
+        run: chmod +x gradlew
 
       - name: 프로젝트 빌드
         run: ./gradlew clean build
