@@ -1,9 +1,15 @@
 logging:
   level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
     root: info
-  org:
-    hibernate:
-      SQL: debug
-      type:
-        descriptor:
-          sql: trace
+spring:
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
