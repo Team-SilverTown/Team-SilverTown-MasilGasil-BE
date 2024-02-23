@@ -1,10 +1,18 @@
 logging:
   level:
+    tor$SharedEntityManagerInvocationHandler: debug
     org:
+      springframework:
+        orm:
+          jpa:
+            JpaTransactionManager: debug
       hibernate:
-        type:
-          descriptor:
-            sql: trace
+        event:
+          internal:
+            AbstractFlushingEventListener: debug
+        internal:
+          util:
+            EntityPrinter: debug
     root: info
 spring:
   jpa:
