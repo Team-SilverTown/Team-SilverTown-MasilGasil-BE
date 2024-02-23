@@ -9,3 +9,7 @@ spring:
     open-in-view: false
   flyway:
     enabled: false
+jwt:
+  issuer: ${TOKEN_ISSUER}
+  base64-secret: ${TOKEN_SECRET}
+  token-validity-in-seconds: ${TOKEN_EXPIRATION}
