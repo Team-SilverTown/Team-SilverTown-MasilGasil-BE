@@ -2,15 +2,15 @@ package team.silvertown.masil.texture;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserTexture extends BaseDomainTexture {
-
-    private UserTexture() {
-    }
 
     public static User createValidUser() {
         String nickname = faker.funnyName()

@@ -3,15 +3,15 @@ package team.silvertown.masil.texture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.map.KakaoPointMapper;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapTexture {
-
-    private MapTexture() {
-    }
 
     private static double dongAnLat = 37.4004;
     private static double dongAnLng = 126.9555;

@@ -1,14 +1,14 @@
 package team.silvertown.masil.texture;
 
 import java.time.OffsetDateTime;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.user.domain.User;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MasilTexture extends BaseDomainTexture {
-
-    private MasilTexture() {
-    }
 
     public static String createAddressDepth1() {
         return faker.address()

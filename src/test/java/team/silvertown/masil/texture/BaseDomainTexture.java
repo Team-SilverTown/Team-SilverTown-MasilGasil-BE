@@ -1,12 +1,12 @@
 package team.silvertown.masil.texture;
 
 import java.util.Locale;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.datafaker.Faker;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BaseDomainTexture {
-
-    protected BaseDomainTexture() {
-    }
 
     protected static final Faker faker = new Faker(Locale.KOREA);
 
