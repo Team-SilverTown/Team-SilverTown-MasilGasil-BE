@@ -37,6 +37,12 @@ jobs:
       - name: 프로젝트 빌드
         run: ./gradlew clean build
 
+      - name: Checkstyle 결과 표시
+        uses: lcollins/checkstyle-github-action@v2.0.0
+        with:
+          path: '**/build/reports/checkstyle/**.xml'
+          title: 📝 Checkstyle report
+
       - name: Jacoco 테스트 결과 출력
         id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
