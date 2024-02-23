@@ -19,6 +19,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.common.exception.BadRequestException;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.map.KakaoPointMapper;
 import team.silvertown.masil.masil.domain.MasilPin.MasilPinBuilder;
@@ -108,7 +109,7 @@ class MasilPinTest {
         ThrowingCallable create = builder::build;
 
         // then
-        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+        assertThatExceptionOfType(ForbiddenException.class).isThrownBy(create)
             .withMessage(MasilErrorCode.PIN_OWNER_NOT_MATCHING.getMessage());
     }
 
