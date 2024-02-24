@@ -43,7 +43,7 @@ dependencies {
     implementation 'org.hibernate.orm:hibernate-spatial'
 
     // oauth2
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.0'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2'
 
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
