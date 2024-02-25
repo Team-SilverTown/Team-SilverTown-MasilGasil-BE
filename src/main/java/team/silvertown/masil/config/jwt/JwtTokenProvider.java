@@ -21,6 +21,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
 
+    private static final String INVALID_SIGNATURE = "Invalid JWT signature.";
+    private static final String EXPIRED_TOKEN = "Expired JWT token.";
+    private static final String UNSUPPORTED_TOKEN = "Unsupported JWT token.";
+    private static final String UNEXPECTED_TOKEN = "JWT token compact of handler are invalid.";
     private static final String USER_ID_CLAIM = "user_id";
     private static final int MILLS = 1000;
     private final long tokenValidityInMilliseconds;
@@ -77,13 +81,13 @@ public class JwtTokenProvider {
 
     private void loggingException(RuntimeException e) {
         if (e instanceof SecurityException || e instanceof MalformedJwtException) {
-            log.debug(TokenMessage.INVALID_SIGNATURE, e);
+            log.debug(INVALID_SIGNATURE, e);
         } else if (e instanceof ExpiredJwtException) {
-            log.debug(TokenMessage.EXPIRED_TOKEN, e);
+            log.debug(EXPIRED_TOKEN, e);
         } else if (e instanceof UnsupportedJwtException) {
-            log.debug(TokenMessage.UNSUPPORTED_TOKEN, e);
+            log.debug(UNSUPPORTED_TOKEN, e);
         } else {
-            log.debug(TokenMessage.UNEXPECTED_TOKEN, e);
+            log.debug(UNEXPECTED_TOKEN, e);
         }
     }
 
