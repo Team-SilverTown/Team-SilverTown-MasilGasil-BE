@@ -34,14 +34,6 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(auth -> {
-                auth.requestMatchers("/oauth2/**")
-                    .permitAll();
-                auth.anyRequest()
-                    .authenticated();
-            });
-
         // jwt 토큰 필터 삽입
         http
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
