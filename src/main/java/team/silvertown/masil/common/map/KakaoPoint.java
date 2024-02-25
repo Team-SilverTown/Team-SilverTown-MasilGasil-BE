@@ -1,6 +1,6 @@
 package team.silvertown.masil.common.map;
 
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Coordinate;
 
 public record KakaoPoint(double lat, double lng) {
 
@@ -8,8 +8,8 @@ public record KakaoPoint(double lat, double lng) {
         return this.lat + " " + this.lng;
     }
 
-    public static KakaoPoint from(Point point) {
-        return new KakaoPoint(point.getX(), point.getY());
+    public static KakaoPoint from(Coordinate coordinate) {
+        return new KakaoPoint(coordinate.getX(), coordinate.getY());
     }
 
 }

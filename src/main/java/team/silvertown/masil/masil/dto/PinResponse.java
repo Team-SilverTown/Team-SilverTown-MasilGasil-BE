@@ -13,11 +13,9 @@ public record PinResponse(
 ) {
 
     public static PinResponse from(MasilPin pin) {
-        KakaoPoint point = KakaoPoint.from(pin.getPoint());
-
         return PinResponse.builder()
             .id(pin.getId())
-            .point(point)
+            .point(pin.getSimplePoint())
             .content(pin.getContent())
             .thumbnailUrl(pin.getThumbnailUrl())
             .build();
