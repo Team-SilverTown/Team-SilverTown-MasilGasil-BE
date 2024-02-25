@@ -56,7 +56,7 @@ class UserServiceTest {
 
 
     @Test
-    public void 정상적으로_처음_회원가입하는_유저는_유저_정보를_저장한_후_유저객체를_return한다() throws Exception {
+    public void 정상적으로_처음_회원가입하는_유저는_유저_정보를_저장한_후_유저객체를_반환한다() throws Exception {
         //given
         authorityRepository.deleteAll();
         userRepository.deleteAll();
