@@ -26,7 +26,7 @@ class JwtTokenProviderTest {
         //then
         assertThat(jwtTokenProvider.validateToken(token)).isTrue();
         assertThat(jwtTokenProvider.getAuthentication(token)
-            .getPrincipal() instanceof Long).isTrue();
+            .getPrincipal()).isInstanceOf(Long.class);
         Long decodedUserId = (Long) jwtTokenProvider.getAuthentication(token)
             .getPrincipal();
         assertThat(userId).isEqualTo(decodedUserId);
