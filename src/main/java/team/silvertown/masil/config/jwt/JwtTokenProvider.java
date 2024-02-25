@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
 
-    public static final String USER_ID_CLAIM = "user_id";
-    public static final int MILLS = 1000;
+    private static final String USER_ID_CLAIM = "user_id";
+    private static final int MILLS = 1000;
     private final long tokenValidityInMilliseconds;
     private final String issuer;
     private final MacAlgorithm algorithm;
