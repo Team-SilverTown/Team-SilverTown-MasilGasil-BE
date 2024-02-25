@@ -16,7 +16,6 @@ import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.dto.LoginResponseDto;
 import team.silvertown.masil.user.service.UserService;
 
-// 인증이 완료됐을 때 호출되는 핸들러
 @Slf4j
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends
@@ -38,7 +37,6 @@ public class OAuth2AuthenticationSuccessHandler extends
             .close();
     }
 
-    // 인증이 완료되고 호출되는 메서드
     @Override
     public void onAuthenticationSuccess(
         HttpServletRequest request, HttpServletResponse response,
