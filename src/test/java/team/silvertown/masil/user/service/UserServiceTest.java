@@ -153,7 +153,6 @@ class UserServiceTest {
 
         //when
         User joinedUser = userService.join(oAuth2User, VALID_PROVIDER);
-        userRepository.flush();
         User findUser = userRepository.findById(joinedUser.getId())
             .get();
         String token = tokenProvider.createToken(findUser.getId());
