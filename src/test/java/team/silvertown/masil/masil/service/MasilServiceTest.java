@@ -43,6 +43,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 class MasilServiceTest {
 
     static final Faker faker = new Faker(Locale.KOREA);
+
     static double dongAnLat = 37.4004;
     static double dongAnLng = 126.9555;
     static double appender = 0.002;
