@@ -44,7 +44,7 @@ public class UserAuthority {
         this.authority = authority;
     }
 
-    public GrantedAuthority getAuthority() {
+    public GrantedAuthority getName() {
         return new SimpleGrantedAuthority(ROLE_PREFIX + authority.name());
     }
 
