@@ -37,6 +37,7 @@ public class MasilController {
         @PathVariable
         Long id
     ) {
+        // TODO: Replace the temp user id to the one actual after login applied
         MasilResponse response = masilService.getById(1L, id);
 
         return ResponseEntity.ok(response);
