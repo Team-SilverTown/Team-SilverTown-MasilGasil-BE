@@ -11,7 +11,7 @@ import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponseDto;
-import team.silvertown.masil.user.exception.OAuthValidator;
+import team.silvertown.masil.security.exception.OAuthValidator;
 import team.silvertown.masil.user.exception.UserValidator;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;

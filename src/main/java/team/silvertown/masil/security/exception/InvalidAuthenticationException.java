@@ -1,4 +1,4 @@
-package team.silvertown.masil.user.exception;
+package team.silvertown.masil.security.exception;
 
 import team.silvertown.masil.common.exception.BaseException;
 import team.silvertown.masil.common.exception.ErrorCode;

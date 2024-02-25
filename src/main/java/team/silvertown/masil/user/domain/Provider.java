@@ -2,7 +2,7 @@ package team.silvertown.masil.user.domain;
 
 import java.util.Arrays;
 import lombok.Getter;
-import team.silvertown.masil.user.exception.InvalidAuthenticationException;
+import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.exception.UserErrorCode;
 
 @Getter

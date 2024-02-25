@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
-import team.silvertown.masil.user.exception.InvalidAuthenticationException;
+import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.exception.UserErrorCode;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)

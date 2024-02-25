@@ -23,7 +23,7 @@ import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.dto.LoginResponseDto;
-import team.silvertown.masil.user.exception.InvalidAuthenticationException;
+import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
