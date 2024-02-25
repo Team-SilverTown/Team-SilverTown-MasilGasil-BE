@@ -101,11 +101,9 @@ class MasilServiceTest {
         CreateResponse expected = masilService.create(user.getId(), request);
 
         // then
-        Optional<Masil> optionalMasil = masilRepository.findById(expected.id());
-
-        assertThat(optionalMasil).isPresent();
-
-        Masil actual = optionalMasil.get();
+        Masil actual = masilRepository
+            .findById(expected.id())
+            .orElseThrow();
         List<MasilPin> actualPins = masilPinRepository.findAll();
 
         assertThat(actual.getId()).isEqualTo(expected.id());
