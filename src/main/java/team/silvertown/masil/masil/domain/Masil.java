@@ -45,6 +45,7 @@ public class Masil extends BaseEntity {
     private Long postId;
 
     @Embedded
+    @Getter(AccessLevel.NONE)
     private Address address;
 
     @Column(name = "path", nullable = false)
