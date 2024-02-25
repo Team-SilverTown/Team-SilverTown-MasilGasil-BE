@@ -48,7 +48,7 @@ public class OAuth2AuthenticationSuccessHandler extends
         if (oauth2Authentication instanceof OAuth2AuthenticationToken oauth2Token) {
             OAuth2User oAuth2User = oauth2Token.getPrincipal();
             String provider = oauth2Token.getAuthorizedClientRegistrationId();
-            User user = processUserOAuth2UserJoin(oAuth2User, provider);
+            User user = userService.join(oAuth2User, provider);
             String jwtToken = tokenProvider.createToken(user.getId());
 
             LoginResponseDto loginResponseDto = userService.login(jwtToken, user);
@@ -56,10 +56,6 @@ public class OAuth2AuthenticationSuccessHandler extends
 
             setResponseBody(response, loginResponse);
         }
-    }
-
-    private User processUserOAuth2UserJoin(OAuth2User oAuth2User, String provider) {
-        return userService.join(oAuth2User, provider);
     }
 
 }
