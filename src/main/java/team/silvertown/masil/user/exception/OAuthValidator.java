@@ -17,7 +17,7 @@ public class OAuthValidator extends Validator {
         throwIf(provider == null,
             () -> new InvalidAuthenticationException(UserErrorCode.INVALID_PROVIDER));
 
-        return Provider.returnProvider(provider);
+        return Provider.get(provider);
     }
 
 }

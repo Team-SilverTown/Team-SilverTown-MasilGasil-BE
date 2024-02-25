@@ -1,5 +1,6 @@
 package team.silvertown.masil.user.domain;
 
+import java.util.Arrays;
 import lombok.Getter;
 import team.silvertown.masil.user.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -14,14 +15,11 @@ public enum Provider {
         this.value = value;
     }
 
-    public static Provider returnProvider(String value) {
-        Provider[] values = Provider.values();
-        for (Provider provider : values) {
-            if (provider.getValue()
-                .equals(value)) {
-                return provider;
-            }
-        }
-        throw new InvalidAuthenticationException(UserErrorCode.INVALID_PROVIDER);
+    public static Provider get(String value) {
+        return Arrays.stream(Provider.values())
+            .filter(provider -> provider.getValue()
+                .equals(value))
+            .findFirst()
+            .orElseThrow(() -> new InvalidAuthenticationException(UserErrorCode.INVALID_PROVIDER));
     }
 }

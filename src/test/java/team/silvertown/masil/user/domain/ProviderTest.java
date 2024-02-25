@@ -18,7 +18,7 @@ class ProviderTest {
         String normalProvider = "kakao";
 
         //when
-        Provider provider = Provider.returnProvider(normalProvider);
+        Provider provider = Provider.get(normalProvider);
 
         //then
         assertThat(provider.name()).isEqualTo("KAKAO");
@@ -32,7 +32,7 @@ class ProviderTest {
         String invalidProvider = "bug";
 
         //then
-        Assertions.assertThatThrownBy(() -> Provider.returnProvider(invalidProvider))
+        Assertions.assertThatThrownBy(() -> Provider.get(invalidProvider))
             .isInstanceOf(InvalidAuthenticationException.class)
             .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
 

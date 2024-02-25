@@ -81,7 +81,7 @@ class UserServiceTest {
         when(oAuth2User.getName()).thenReturn(socialId);
 
         User user = User.builder()
-            .provider(Provider.returnProvider(VALID_PROVIDER))
+            .provider(Provider.get(VALID_PROVIDER))
             .socialId(socialId)
             .build();
 
@@ -170,7 +170,7 @@ class UserServiceTest {
         String socialId = String.valueOf(faker.barcode());
 
         User user = User.builder()
-            .provider(Provider.returnProvider(VALID_PROVIDER))
+            .provider(Provider.get(VALID_PROVIDER))
             .socialId(socialId)
             .build();
 
