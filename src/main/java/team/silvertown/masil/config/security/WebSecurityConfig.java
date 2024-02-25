@@ -55,7 +55,7 @@ public class WebSecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
-            .headers(AbstractHttpConfigurer::disable)
+            .requestCache(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .rememberMe(AbstractHttpConfigurer::disable)
             .logout(AbstractHttpConfigurer::disable)
