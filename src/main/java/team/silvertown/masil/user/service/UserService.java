@@ -24,33 +24,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAuthorityRepository userAuthorityRepository;
 
-    @Transactional
-    public User join(OAuth2User oAuth2User, String provider) {
-        OAuthValidator.validateSocialUser(oAuth2User);
-        Provider authenticatedProvider = OAuthValidator.validateProvider(provider);
-
-        String providerId = oAuth2User.getName();
-
-        return userRepository.findByProviderAndSocialId(authenticatedProvider, providerId)
-            .map(user -> {
-                log.info("already login user {}", user.getId());
-                return user;
-            })
-            .orElseGet(() -> {
-                User newUser = User.builder()
-                    .socialId(providerId)
-                    .provider(authenticatedProvider)
-                    .build();
-                User savedUser = userRepository.save(newUser);
-                UserAuthority newAuthority = UserAuthority.builder()
-                    .authority(Authority.RESTRICTED)
-                    .user(savedUser)
-                    .build();
-                userAuthorityRepository.save(newAuthority);
-                return savedUser;
-            });
-    }
-
     public LoginResponseDto login(String jwtToken, User user) {
         List<UserAuthority> userAuthorities = userAuthorityRepository.findByUser(user);
         UserValidator.validateAuthority(userAuthorities);
@@ -61,6 +34,39 @@ public class UserService {
             .toList();
 
         return new LoginResponseDto(jwtToken, authorities);
+    }
+
+    @Transactional
+    public User join(OAuth2User oAuth2User, String provider) {
+        OAuthValidator.validateSocialUser(oAuth2User);
+        Provider authenticatedProvider = OAuthValidator.validateProvider(provider);
+
+        String providerId = oAuth2User.getName();
+
+        return userRepository.findByProviderAndSocialId(authenticatedProvider, providerId)
+            .orElseGet(() -> createAndSave(authenticatedProvider, providerId));
+    }
+
+    private User createAndSave(Provider authenticatedProvider, String providerId) {
+        User newUser = create(authenticatedProvider, providerId);
+        User savedUser = userRepository.save(newUser);
+        assignDefaultAuthority(savedUser);
+        return savedUser;
+    }
+
+    private User create(Provider authenticatedProvider, String providerId) {
+        return User.builder()
+            .socialId(providerId)
+            .provider(authenticatedProvider)
+            .build();
+    }
+
+    private void assignDefaultAuthority(User user) {
+        UserAuthority newAuthority = UserAuthority.builder()
+            .authority(Authority.RESTRICTED)
+            .user(user)
+            .build();
+        userAuthorityRepository.save(newAuthority);
     }
 
 }
