@@ -34,12 +34,9 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // jwt 토큰 필터 삽입
+        // jwt 토큰 필터 삽입, 필터 예외 처리
         http
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // 필터 예외 처리
-        http
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(
                 handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint));
 
