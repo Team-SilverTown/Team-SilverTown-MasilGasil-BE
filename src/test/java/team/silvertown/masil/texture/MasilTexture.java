@@ -1,10 +1,14 @@
 package team.silvertown.masil.texture;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.masil.domain.Masil;
+import team.silvertown.masil.masil.domain.MasilPin;
 import team.silvertown.masil.user.domain.User;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,10 +40,23 @@ public final class MasilTexture extends BaseDomainTexture {
             .quote();
         String thumbnailUrl = createUrl();
 
-        return createMasil(postId, content, thumbnailUrl);
+        return createMasilWithOptional(postId, content, thumbnailUrl);
     }
 
-    public static Masil createMasil(Long postId, String content, String thumbnailUrl) {
+    public static Masil createDependentMasil(User user, int pathSize) {
+        String addressDepth1 = createAddressDepth1();
+        String addressDepth2 = createAddressDepth2();
+        String addressDepth3 = createAddressDepth3();
+        LineString path = MapTexture.createLineString(pathSize);
+        String title = getRandomSentenceWithMax(29);
+        int totalTime = getRandomInt(600, 4200);
+
+        return createMasil(user, null, addressDepth1, addressDepth2, addressDepth3, "", path,
+            title,
+            null, null, (int) path.getLength(), totalTime, OffsetDateTime.now());
+    }
+
+    public static Masil createMasilWithOptional(Long postId, String content, String thumbnailUrl) {
         User user = UserTexture.createValidUser();
         String addressDepth1 = createAddressDepth1();
         String addressDepth2 = createAddressDepth2();
@@ -82,6 +99,40 @@ public final class MasilTexture extends BaseDomainTexture {
             .totalTime(totalTime)
             .startedAt(startedAt)
             .build();
+    }
+
+    public static MasilPin createMasilPin(Masil masil, Long userId) {
+        Point point = MapTexture.createPoint();
+
+        return createMasilPin(masil, point, null, null, userId);
+    }
+
+    public static MasilPin createMasilPin(
+        Masil masil,
+        Point point,
+        String content,
+        String thumbnailUrl,
+        Long userId
+    ) {
+        return MasilPin.builder()
+            .userId(userId)
+            .point(point)
+            .content(content)
+            .thumbnailUrl(thumbnailUrl)
+            .masil(masil)
+            .build();
+    }
+
+    public static List<MasilPin> createDependentMasilPins(Masil masil, Long userId, int size) {
+        List<MasilPin> masilPins = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            MasilPin masilPin = createMasilPin(masil, userId);
+
+            masilPins.add(masilPin);
+        }
+
+        return masilPins;
     }
 
 }

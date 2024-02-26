@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.common.BaseEntity;
+import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
 import team.silvertown.masil.masil.validator.MasilValidator;
 
@@ -55,6 +56,10 @@ public class MasilPin extends BaseEntity {
         this.point = point;
         this.content = content;
         this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public KakaoPoint getSimplePoint() {
+        return KakaoPoint.from(this.point.getCoordinate());
     }
 
 }
