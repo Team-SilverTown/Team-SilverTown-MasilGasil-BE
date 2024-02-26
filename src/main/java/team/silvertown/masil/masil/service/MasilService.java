@@ -52,10 +52,7 @@ public class MasilService {
 
         MasilValidator.validateMasilOwner(masil, user);
 
-        List<PinResponse> pins = masil.getMasilPins()
-            .stream()
-            .map(PinResponse::from)
-            .toList();
+        List<PinResponse> pins = PinResponse.listFrom(masil);
 
         return MasilResponse.from(masil, pins);
     }

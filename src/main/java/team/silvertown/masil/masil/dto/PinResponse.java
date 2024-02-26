@@ -1,7 +1,9 @@
 package team.silvertown.masil.masil.dto;
 
+import java.util.List;
 import lombok.Builder;
 import team.silvertown.masil.common.map.KakaoPoint;
+import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
 
 @Builder
@@ -19,6 +21,13 @@ public record PinResponse(
             .content(pin.getContent())
             .thumbnailUrl(pin.getThumbnailUrl())
             .build();
+    }
+
+    public static List<PinResponse> listFrom(Masil masil) {
+        return masil.getMasilPins()
+            .stream()
+            .map(PinResponse::from)
+            .toList();
     }
 
 }
