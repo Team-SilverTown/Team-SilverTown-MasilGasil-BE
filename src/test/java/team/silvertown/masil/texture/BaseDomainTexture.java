@@ -21,7 +21,7 @@ public class BaseDomainTexture {
 
     public static String getRandomFixedSentence(int length) {
         return faker.lorem()
-            .sentence(length);
+            .characters(length);
     }
 
     public static int getRandomInt(int min, int max) {
