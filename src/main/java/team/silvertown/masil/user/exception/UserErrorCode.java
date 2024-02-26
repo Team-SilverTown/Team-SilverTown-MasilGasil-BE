@@ -22,5 +22,5 @@ public enum UserErrorCode implements ErrorCode {
     public String getMessage() {
         return this.message;
     }
-    
+
 }
