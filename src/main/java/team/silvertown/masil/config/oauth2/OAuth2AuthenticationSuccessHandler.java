@@ -25,26 +25,11 @@ public class OAuth2AuthenticationSuccessHandler extends
     private final JwtTokenProvider tokenProvider;
     private final ObjectMapper objectMapper;
 
-    private static void setResponseBody(HttpServletResponse response, String loginResponse)
-        throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter()
-            .write(loginResponse);
-        response.getWriter()
-            .flush();
-        response.getWriter()
-            .close();
-    }
-
     @Override
     public void onAuthenticationSuccess(
         HttpServletRequest request, HttpServletResponse response,
         Authentication oauth2Authentication
     ) throws ServletException, IOException {
-        Object principal = oauth2Authentication.getPrincipal();
-        log.info("OAuth2 authentication success: {}", principal);
-
         if (oauth2Authentication instanceof OAuth2AuthenticationToken oauth2Token) {
             OAuth2User oAuth2User = oauth2Token.getPrincipal();
             String provider = oauth2Token.getAuthorizedClientRegistrationId();
@@ -56,6 +41,18 @@ public class OAuth2AuthenticationSuccessHandler extends
 
             setResponseBody(response, loginResponse);
         }
+    }
+
+    private static void setResponseBody(HttpServletResponse response, String loginResponse)
+        throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter()
+            .write(loginResponse);
+        response.getWriter()
+            .flush();
+        response.getWriter()
+            .close();
     }
 
 }
