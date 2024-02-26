@@ -8,14 +8,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.sql.Date;
+
+import java.util.Date;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.BaseEntity;
-import team.silvertown.masil.user.dto.UpdateInfoRequest;
+import team.silvertown.masil.common.validator.DateValidator;
+import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.exception.UserErrorCode;
+import team.silvertown.masil.user.exception.UserValidator;
 
 @Entity
 @Table(name = "users")
@@ -68,8 +72,20 @@ public class User extends BaseEntity {
     @Column(name = "social_id", length = 50)
     private String socialId;
 
-    public void update(UpdateInfoRequest request) {
+    public void update(OnboardRequest request) {
+        UserValidator.validateNickname(request.nickname(), UserErrorCode.INVALID_NICKNAME);
+        UserValidator.validateSex(request.sex(), UserErrorCode.INVALID_SEX);
+        UserValidator.validateBirthDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
+        UserValidator.validateHeight(request.height(), UserErrorCode.INVALID_HEIGHT);
+        UserValidator.validateWeight(request.weight(), UserErrorCode.INVALID_WEIGHT);
+        UserValidator.validateExerciseIntensity(request.exerciseIntensity(), UserErrorCode.INVALID_EXERCISE_INTENSITY);
 
+        this.nickname = request.nickname();
+        this.sex = Sex.valueOf(request.sex());
+        this.birthDate = DateValidator.parseDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
+        this.height = request.height();
+        this.weight = request.weight();
+        this.exerciseIntensity = ExerciseIntensity.valueOf(request.exerciseIntensity());
     }
 
 }
