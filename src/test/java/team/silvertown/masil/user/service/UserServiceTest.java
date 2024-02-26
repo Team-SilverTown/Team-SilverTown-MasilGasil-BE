@@ -22,6 +22,7 @@ import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
+import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponseDto;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -155,12 +156,11 @@ class UserServiceTest {
         User joinedUser = userService.join(oAuth2User, VALID_PROVIDER);
         User findUser = userRepository.findById(joinedUser.getId())
             .get();
-        String token = tokenProvider.createToken(findUser.getId());
-        LoginResponseDto responseDto = userService.login(token, findUser);
+        List<UserAuthority> userAuthorities = authorityRepository.findByUser(findUser);
 
         //then
-        assertThat(AUTHORITY_PREFIX + responseDto.authority()).contains(
-            Authority.RESTRICTED.name());
+        assertThat(userAuthorities).hasSize(1);
+        assertThat(userAuthorities.get(0).getAuthority().name()).isEqualTo(Authority.RESTRICTED.name());
     }
 
     @Test
