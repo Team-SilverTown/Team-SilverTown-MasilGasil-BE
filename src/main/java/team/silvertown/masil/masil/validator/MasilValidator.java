@@ -32,7 +32,7 @@ public class MasilValidator extends Validator {
         User owner = masil.getUser();
 
         notNull(owner, MasilErrorCode.NULL_USER);
-        throwIf(!Objects.equals(owner, user),
+        throwIf(!owner.equals(user),
             () -> new ForbiddenException(MasilErrorCode.USER_NOT_AUTHORIZED_FOR_MASIL));
     }
 
