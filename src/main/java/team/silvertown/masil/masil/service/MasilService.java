@@ -83,7 +83,7 @@ public class MasilService {
     }
 
     private void savePins(List<CreatePinRequest> pins, Masil masil) {
-        if (Objects.nonNull(pins) && !pins.isEmpty()) {
+        if (Objects.nonNull(pins)) {
             pins.forEach(pin -> savePin(pin, masil));
         }
     }

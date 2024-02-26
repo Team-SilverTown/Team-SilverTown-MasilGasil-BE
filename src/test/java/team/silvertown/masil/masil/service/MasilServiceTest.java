@@ -45,6 +45,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 class MasilServiceTest {
 
     static final Faker faker = new Faker(Locale.KOREA);
+
     static double dongAnLat = 37.4004;
     static double dongAnLng = 126.9555;
     static double appender = 0.002;
@@ -101,11 +102,9 @@ class MasilServiceTest {
         CreateResponse expected = masilService.create(user.getId(), request);
 
         // then
-        Optional<Masil> optionalMasil = masilRepository.findById(expected.id());
-
-        assertThat(optionalMasil).isPresent();
-
-        Masil actual = optionalMasil.get();
+        Masil actual = masilRepository
+            .findById(expected.id())
+            .orElseThrow();
         List<MasilPin> actualPins = masilPinRepository.findAll();
 
         assertThat(actual.getId()).isEqualTo(expected.id());

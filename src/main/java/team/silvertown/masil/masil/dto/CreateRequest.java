@@ -30,6 +30,7 @@ public record CreateRequest(
         MasilValidator.notBlank(depth1, MapErrorCode.BLANK_DEPTH1);
         MasilValidator.notNull(depth2, MapErrorCode.NULL_DEPTH2);
         MasilValidator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);
+        MasilValidator.notNull(depth4, MapErrorCode.NULL_DEPTH4);
         MasilValidator.validateTitle(title);
         MasilValidator.validateUrl(thumbnailUrl);
         MasilValidator.notNull(distance, MasilErrorCode.INVALID_DISTANCE);
