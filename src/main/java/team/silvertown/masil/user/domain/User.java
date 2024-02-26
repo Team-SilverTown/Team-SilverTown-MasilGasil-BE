@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.BaseEntity;
+import team.silvertown.masil.user.dto.UpdateInfoRequest;
 
 @Entity
 @Table(name = "users")
@@ -66,5 +67,9 @@ public class User extends BaseEntity {
 
     @Column(name = "social_id", length = 50)
     private String socialId;
+
+    public void update(UpdateInfoRequest request) {
+
+    }
 
 }
