@@ -11,11 +11,19 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.MacAlgorithm;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import javax.crypto.SecretKey;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import team.silvertown.masil.user.domain.Authority;
+import team.silvertown.masil.user.domain.UserAuthority;
+import team.silvertown.masil.user.exception.UserValidator;
+import team.silvertown.masil.user.repository.UserAuthorityRepository;
 
 @Slf4j
 @Component
@@ -32,6 +40,9 @@ public class JwtTokenProvider {
     private final MacAlgorithm algorithm;
     private final SecretKey secretKey;
     private final JwtParser jwtParser;
+
+    @Autowired
+    private UserAuthorityRepository userAuthorityRepository;
 
     public JwtTokenProvider(JwtProperties jwtProperties) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
@@ -64,7 +75,14 @@ public class JwtTokenProvider {
             .getPayload()
             .get(USER_ID_CLAIM, Long.class);
 
-        return new UsernamePasswordAuthenticationToken(userId, token, Collections.emptyList());
+        List<UserAuthority> userAuthorities = userAuthorityRepository.findAllByUserId(userId);
+        UserValidator.validateAuthority(userAuthorities);
+
+        List<GrantedAuthority> authorities = userAuthorities.stream()
+            .map(UserAuthority::getName)
+            .toList();
+
+        return new UsernamePasswordAuthenticationToken(userId, token, authorities);
     }
 
     public boolean validateToken(String token) {
