@@ -2,10 +2,12 @@ package team.silvertown.masil.masil.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
 import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
@@ -32,7 +34,7 @@ public class MasilService {
     @Transactional
     public CreateResponse create(Long userId, CreateRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new DataNotFoundException(MasilErrorCode.USER_NOT_FOUND));
+            .orElseThrow(throwNotFound(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = createMasil(request, user);
         Masil savedMasil = masilRepository.save(masil);
 
@@ -44,18 +46,22 @@ public class MasilService {
     @Transactional(readOnly = true)
     public MasilResponse getById(Long userId, Long id) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new DataNotFoundException(MasilErrorCode.USER_NOT_FOUND));
+            .orElseThrow(throwNotFound(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = masilRepository.findById(id)
-            .orElseThrow(() -> new DataNotFoundException(MasilErrorCode.MASIL_NOT_FOUND));
+            .orElseThrow(throwNotFound(MasilErrorCode.MASIL_NOT_FOUND));
 
         MasilValidator.validateMasilOwner(masil, user);
 
-        List<MasilPin> masilPins = masilPinRepository.findAllByMasil(masil);
-        List<PinResponse> pins = masilPins.stream()
+        List<PinResponse> pins = masil.getMasilPins()
+            .stream()
             .map(PinResponse::from)
             .toList();
 
         return MasilResponse.from(masil, pins);
+    }
+
+    private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
+        return () -> new DataNotFoundException(errorCode);
     }
 
     private Masil createMasil(CreateRequest request, User user) {
