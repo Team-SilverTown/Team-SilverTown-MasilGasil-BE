@@ -3,6 +3,7 @@ package team.silvertown.masil.masil.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import jakarta.persistence.EntityManager;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,9 @@ class MasilServiceTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    EntityManager entityManager;
+
     User user;
     String addressDepth1;
     String addressDepth2;
@@ -68,7 +72,7 @@ class MasilServiceTest {
         addressDepth2 = MasilTexture.createAddressDepth2();
         addressDepth3 = MasilTexture.createAddressDepth3();
         path = MapTexture.createPath(10000);
-        title = MasilTexture.getRandomFixedSentence(29);
+        title = MasilTexture.getRandomSentenceWithMax(29);
         distance = MasilTexture.getRandomPositive();
         totalTime = MasilTexture.getRandomPositive();
     }
@@ -113,19 +117,24 @@ class MasilServiceTest {
     @Test
     void 마실_단일_조회를_성공한다() {
         // given
-        List<CreatePinRequest> pinRequests = createPinRequests(10, 10000);
-        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
-            "", path, title, null, distance, totalTime,
-            OffsetDateTime.now(), pinRequests, null, null);
-        CreateResponse expected = masilService.create(user.getId(), request);
+        Masil masil = MasilTexture.createDependentMasil(user, 10000);
+        Masil expected = masilRepository.save(masil);
+        int pinSize = 10;
+        List<MasilPin> masilPins = MasilTexture.createDependentMasilPins(expected, user.getId(),
+            pinSize);
+
+        masilPinRepository.saveAll(masilPins);
+        entityManager.clear();
 
         // when
-        MasilResponse actual = masilService.getById(user.getId(), expected.id());
+        MasilResponse actual = masilService.getById(user.getId(), expected.getId());
 
         // then
-        assertThat(actual).extracting("id", "title", "distance", "totalTime")
-            .containsExactly(expected.id(), title, distance, totalTime);
-        assertThat(actual.pins()).hasSize(pinRequests.size());
+        assertThat(actual).extracting("id", "depth1", "depth2", "depth3", "depth4", "title",
+                "distance", "totalTime")
+            .containsExactly(masil.getId(), masil.getDepth1(), masil.getDepth2(), masil.getDepth3(),
+                masil.getDepth4(), masil.getTitle(), masil.getDistance(), masil.getTotalTime());
+        assertThat(actual.pins()).hasSize(pinSize);
     }
 
     @Test
@@ -158,14 +167,18 @@ class MasilServiceTest {
     void 로그인한_사용자와_마실_소유자가_다르면_마실_단일_조회를_실패한다() {
         // given
         User differntUser = userRepository.save(UserTexture.createValidUser());
-        List<CreatePinRequest> pinRequests = createPinRequests(10, 10000);
-        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
-            "", path, title, null, distance, totalTime,
-            OffsetDateTime.now(), pinRequests, null, null);
-        CreateResponse expected = masilService.create(user.getId(), request);
+        Masil masil = MasilTexture.createDependentMasil(user, 10000);
+        Masil expected = masilRepository.save(masil);
+        int pinSize = 10;
+        List<MasilPin> masilPins = MasilTexture.createDependentMasilPins(expected, user.getId(),
+            pinSize);
+
+        masilPinRepository.saveAll(masilPins);
+        entityManager.clear();
 
         // when
-        ThrowingCallable getById = () -> masilService.getById(differntUser.getId(), expected.id());
+        ThrowingCallable getById = () -> masilService.getById(differntUser.getId(),
+            expected.getId());
 
         // then
         assertThatExceptionOfType(ForbiddenException.class).isThrownBy(getById)
