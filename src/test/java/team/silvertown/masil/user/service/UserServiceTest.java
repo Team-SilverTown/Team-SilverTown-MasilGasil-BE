@@ -16,19 +16,22 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import team.silvertown.masil.JwtTestConfig;
+import team.silvertown.masil.OAuth2TestConfig;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.LoginResponseDto;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
 
+@Import(value = {JwtTestConfig.class, OAuth2TestConfig.class})
 @AutoConfigureMockMvc
 @DisplayNameGeneration(ReplaceUnderscores.class)
 @SpringBootTest
