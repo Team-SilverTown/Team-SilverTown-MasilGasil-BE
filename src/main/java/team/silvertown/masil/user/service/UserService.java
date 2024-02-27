@@ -1,23 +1,22 @@
 package team.silvertown.masil.user.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import team.silvertown.masil.common.exception.DuplicateResourceException;
-import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.repository.UserRepository;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.DuplicateResourceException;
+import team.silvertown.masil.security.exception.OAuthValidator;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponseDto;
-import team.silvertown.masil.security.exception.OAuthValidator;
+import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.exception.UserValidator;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
+import team.silvertown.masil.user.repository.UserRepository;
 
 @Slf4j
 @Service
@@ -45,6 +44,12 @@ public class UserService {
             .orElseGet(() -> createAndSave(authenticatedProvider, providerId));
     }
 
+    public void checkNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
+        }
+    }
+
     private User createAndSave(Provider authenticatedProvider, String providerId) {
         User newUser = create(authenticatedProvider, providerId);
         User savedUser = userRepository.save(newUser);
@@ -65,12 +70,6 @@ public class UserService {
             .user(user)
             .build();
         userAuthorityRepository.save(newAuthority);
-    }
-
-    public void doubleCheck(String nickname) {
-        if (userRepository.existsByNickname(nickname)) {
-            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
-        }
     }
 
 }
