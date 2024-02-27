@@ -40,11 +40,9 @@ public class JwtTokenProvider {
     private final MacAlgorithm algorithm;
     private final SecretKey secretKey;
     private final JwtParser jwtParser;
+    private final UserAuthorityRepository userAuthorityRepository;
 
-    @Autowired
-    private UserAuthorityRepository userAuthorityRepository;
-
-    public JwtTokenProvider(JwtProperties jwtProperties) {
+    public JwtTokenProvider(JwtProperties jwtProperties, UserAuthorityRepository userAuthorityRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
 
         this.tokenValidityInMilliseconds = jwtProperties.tokenValidityInSeconds() * MILLS;
@@ -55,6 +53,7 @@ public class JwtTokenProvider {
             .verifyWith(secretKey)
             .requireIssuer(issuer)
             .build();
+        this.userAuthorityRepository = userAuthorityRepository;
     }
 
     public String createToken(long userId) {
