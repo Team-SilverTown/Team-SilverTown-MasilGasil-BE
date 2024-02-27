@@ -1,6 +1,5 @@
-package team.silvertown.masil;
+package team.silvertown.masil.testConfig;
 
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -9,7 +8,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
-@TestConfiguration
+@Configuration
 public class OAuth2TestConfig {
 
     @Bean

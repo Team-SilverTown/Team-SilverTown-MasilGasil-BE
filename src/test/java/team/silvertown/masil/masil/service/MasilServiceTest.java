@@ -9,7 +9,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import net.datafaker.Faker;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
-import team.silvertown.masil.JwtTestConfig;
-import team.silvertown.masil.OAuth2TestConfig;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.masil.domain.Masil;
@@ -42,7 +38,6 @@ import team.silvertown.masil.user.repository.UserRepository;
 
 @SpringBootTest
 @Transactional
-@Import(value = {JwtTestConfig.class, OAuth2TestConfig.class})
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class MasilServiceTest {
 

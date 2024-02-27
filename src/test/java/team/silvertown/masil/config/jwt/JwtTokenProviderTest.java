@@ -12,12 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
-import team.silvertown.masil.JwtTestConfig;
-import team.silvertown.masil.OAuth2TestConfig;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.User;
@@ -25,7 +22,6 @@ import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.service.UserService;
 
 @SpringBootTest
-@Import(value = {JwtTestConfig.class, OAuth2TestConfig.class})
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class JwtTokenProviderTest {
 
