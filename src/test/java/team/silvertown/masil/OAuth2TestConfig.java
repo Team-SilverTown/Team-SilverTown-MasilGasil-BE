@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
-@Configuration
+@TestConfiguration
 public class OAuth2TestConfig {
 
     @Bean

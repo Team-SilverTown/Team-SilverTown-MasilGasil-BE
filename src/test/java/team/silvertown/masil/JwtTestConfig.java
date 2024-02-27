@@ -1,10 +1,11 @@
 package team.silvertown.masil;
 
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import team.silvertown.masil.config.jwt.JwtProperties;
 
-@Configuration
+@TestConfiguration
 public class JwtTestConfig {
 
     private static final String JWT_ISSUER = "test issuer";
