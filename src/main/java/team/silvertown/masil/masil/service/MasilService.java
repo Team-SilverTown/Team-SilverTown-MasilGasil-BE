@@ -16,6 +16,8 @@ import team.silvertown.masil.masil.dto.CreateRequest;
 import team.silvertown.masil.masil.dto.CreateResponse;
 import team.silvertown.masil.masil.dto.MasilResponse;
 import team.silvertown.masil.masil.dto.PinResponse;
+import team.silvertown.masil.masil.dto.RecentMasilResponse;
+import team.silvertown.masil.masil.dto.SimpleMasilResponse;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
 import team.silvertown.masil.masil.repository.MasilPinRepository;
 import team.silvertown.masil.masil.repository.MasilRepository;
@@ -55,6 +57,17 @@ public class MasilService {
         List<PinResponse> pins = PinResponse.listFrom(masil);
 
         return MasilResponse.from(masil, pins);
+    }
+
+    public RecentMasilResponse getRecent(Long userId, Integer size) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(throwNotFound(MasilErrorCode.USER_NOT_FOUND));
+        List<SimpleMasilResponse> masils = masilRepository.findRecent(user, size)
+            .stream()
+            .map(SimpleMasilResponse::from)
+            .toList();
+
+        return new RecentMasilResponse(masils, masils.isEmpty());
     }
 
     private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {

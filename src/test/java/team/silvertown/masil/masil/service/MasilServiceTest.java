@@ -7,8 +7,6 @@ import jakarta.persistence.EntityManager;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import net.datafaker.Faker;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -29,6 +27,8 @@ import team.silvertown.masil.masil.dto.CreatePinRequest;
 import team.silvertown.masil.masil.dto.CreateRequest;
 import team.silvertown.masil.masil.dto.CreateResponse;
 import team.silvertown.masil.masil.dto.MasilResponse;
+import team.silvertown.masil.masil.dto.RecentMasilResponse;
+import team.silvertown.masil.masil.dto.SimpleMasilResponse;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
 import team.silvertown.masil.masil.repository.MasilPinRepository;
 import team.silvertown.masil.masil.repository.MasilRepository;
@@ -185,6 +185,73 @@ class MasilServiceTest {
         // then
         assertThatExceptionOfType(ForbiddenException.class).isThrownBy(getById)
             .withMessage(MasilErrorCode.USER_NOT_AUTHORIZED_FOR_MASIL.getMessage());
+    }
+
+    @Test
+    void 마실이_없으면_최근_마실_조회_시_빈_값을_명시한다() {
+        // given
+
+        // when
+        RecentMasilResponse response = masilService.getRecent(user.getId(), null);
+
+        // then
+        assertThat(response.masils()).isNotNull();
+        assertThat(response.isEmpty()).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {5, 10, 15})
+    void 최근_마실_조회를_성공한다(int masilSize) {
+        // given
+        List<Masil> masils = creataeMasils(user.getId(), masilSize);
+
+        masils.sort((a, b) -> Math.toIntExact(b.getId() - a.getId()));
+
+        int expectedSize = Math.min(masilSize, 10);
+        Masil firstExpected = masils.get(0);
+        Masil lastExpected = masils.get(expectedSize - 1);
+
+        // when
+        RecentMasilResponse response = masilService.getRecent(user.getId(), null);
+
+        // then
+        List<SimpleMasilResponse> actual = response.masils();
+        SimpleMasilResponse firstActual = actual.get(0);
+        SimpleMasilResponse lastActual = actual.get(expectedSize - 1);
+
+        assertThat(actual).hasSize(expectedSize);
+        assertThat(firstActual.id()).isEqualTo(firstExpected.getId());
+        assertThat(lastActual.id()).isEqualTo(lastExpected.getId());
+    }
+
+    @Test
+    void 로그인한_사용자가_존재하지_않으면_최근_마실_조회를_실패한다() {
+        // given
+        long invalidId = MasilTexture.getRandomId();
+
+        // when
+        ThrowingCallable getRecent = () -> masilService.getRecent(invalidId, null);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getRecent)
+            .withMessage(MasilErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    List<Masil> creataeMasils(long userId, int size) {
+        List<Masil> masils = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            Masil masil = MasilTexture.createDependentMasil(user, 100);
+            Masil saved = masilRepository.save(masil);
+            List<MasilPin> masilPins = MasilTexture.createDependentMasilPins(saved, userId, 5);
+
+            masilPinRepository.saveAll(masilPins);
+            masils.add(saved);
+        }
+
+        entityManager.clear();
+
+        return masils;
     }
 
     List<CreatePinRequest> createPinRequests(int size, int maxPathPoints) {
