@@ -23,11 +23,12 @@ public class MasilController {
 
     @PostMapping("/api/v1/masils")
     public ResponseEntity<CreateResponse> create(
+        @AuthenticationPrincipal
+        Long userId,
         @RequestBody
         CreateRequest request
     ) {
-        // TODO: Replace the temp user id to the one actual after login applied
-        CreateResponse createResponse = masilService.create(2L, request);
+        CreateResponse createResponse = masilService.create(userId, request);
         URI uri = URI.create("/api/v1/masils/" + createResponse.id());
 
         return ResponseEntity.created(uri)
@@ -47,11 +48,12 @@ public class MasilController {
 
     @GetMapping("/api/v1/masils/{id}")
     public ResponseEntity<MasilResponse> getById(
+        @AuthenticationPrincipal
+        Long userId,
         @PathVariable
         Long id
     ) {
-        // TODO: Replace the temp user id to the one actual after login applied
-        MasilResponse response = masilService.getById(2L, id);
+        MasilResponse response = masilService.getById(userId, id);
 
         return ResponseEntity.ok(response);
     }
