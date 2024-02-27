@@ -30,6 +30,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 .idea/**/codeStyleConfig.xml
+minio/
 
 # AWS User-specific
 .idea/**/aws.xml
