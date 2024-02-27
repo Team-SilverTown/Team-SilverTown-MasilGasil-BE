@@ -1,5 +1,6 @@
 package team.silvertown.masil.user.domain;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.Assertions;
@@ -32,7 +33,7 @@ class ProviderTest {
         String invalidProvider = "bug";
 
         //then
-        Assertions.assertThatThrownBy(() -> Provider.get(invalidProvider))
+        assertThatThrownBy(() -> Provider.get(invalidProvider))
             .isInstanceOf(InvalidAuthenticationException.class)
             .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
 
