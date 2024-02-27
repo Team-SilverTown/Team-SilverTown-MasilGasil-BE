@@ -35,6 +35,7 @@ public class JwtTokenProvider {
     private static final String UNEXPECTED_TOKEN = "JWT token compact of handler are invalid.";
     private static final String USER_ID_CLAIM = "user_id";
     private static final int MILLS = 1000;
+
     private final long tokenValidityInMilliseconds;
     private final String issuer;
     private final MacAlgorithm algorithm;
@@ -42,7 +43,10 @@ public class JwtTokenProvider {
     private final JwtParser jwtParser;
     private final UserAuthorityRepository userAuthorityRepository;
 
-    public JwtTokenProvider(JwtProperties jwtProperties, UserAuthorityRepository userAuthorityRepository) {
+    public JwtTokenProvider(
+        JwtProperties jwtProperties,
+        UserAuthorityRepository userAuthorityRepository
+    ) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
 
         this.tokenValidityInMilliseconds = jwtProperties.tokenValidityInSeconds() * MILLS;

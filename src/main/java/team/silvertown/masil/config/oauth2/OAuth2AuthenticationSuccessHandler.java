@@ -18,8 +18,8 @@ import team.silvertown.masil.user.service.UserService;
 
 @Slf4j
 @RequiredArgsConstructor
-public class OAuth2AuthenticationSuccessHandler extends
-    SavedRequestAwareAuthenticationSuccessHandler {
+public class OAuth2AuthenticationSuccessHandler
+    extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final UserService userService;
     private final JwtTokenProvider tokenProvider;
@@ -27,7 +27,8 @@ public class OAuth2AuthenticationSuccessHandler extends
 
     @Override
     public void onAuthenticationSuccess(
-        HttpServletRequest request, HttpServletResponse response,
+        HttpServletRequest request,
+        HttpServletResponse response,
         Authentication oauth2Authentication
     ) throws ServletException, IOException {
         if (oauth2Authentication instanceof OAuth2AuthenticationToken oauth2Token) {
