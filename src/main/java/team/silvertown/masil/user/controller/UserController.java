@@ -10,12 +10,11 @@ import team.silvertown.masil.user.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/users")
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("api/v1/users/check-nickname")
     public ResponseEntity<Void> nicknameDoubleCheck(@RequestParam String nickname){
         userService.doubleCheck(nickname);
         return ResponseEntity.ok().build();
