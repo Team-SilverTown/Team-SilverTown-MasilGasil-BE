@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -22,20 +21,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
-import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
-import team.silvertown.masil.user.repository.UserRepository;
 
 @AutoConfigureMockMvc
 @DisplayNameGeneration(ReplaceUnderscores.class)
@@ -62,6 +56,7 @@ class UserServiceTest {
     @Mock
     OAuth2User oAuth2User;
 
+
     @Test
     public void 중복닉네임_조회시_존재하지_않는_닉네임을_조회할_경우_정상적으로_통과한다() throws Exception {
         //given
@@ -69,26 +64,25 @@ class UserServiceTest {
             .fullName();
 
         //when, then
-        assertDoesNotThrow(() -> userService.doubleCheck(nickname));
+        assertDoesNotThrow(() -> userService.checkNickname(nickname));
     }
 
     @Test
     public void 중복닉네임_조회시_이미_존재하는_닉네임을_조회할_경우_예외가_발생한다() throws Exception {
-        //given
+        //given, when
         String nickname = faker.name()
             .fullName();
         User user = User.builder()
             .nickname(nickname)
             .build();
-
-        //when
         userRepository.save(user);
 
         //then
-        assertThatThrownBy(() -> userService.doubleCheck(nickname))
+        assertThatThrownBy(() -> userService.checkNickname(nickname))
             .isInstanceOf(DuplicateResourceException.class)
             .hasMessage(UserErrorCode.DUPLICATED_NICKNAME.getMessage());
     }
+
 
     @Test
     public void 정상적으로_처음_회원가입하는_유저는_유저_정보를_저장한_후_유저객체를_반환한다() throws Exception {
