@@ -14,7 +14,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("api/v1/users/check-nickname")
-    public ResponseEntity<Void> nicknameDoubleCheck(@RequestParam String nickname){
+    public ResponseEntity<Void> nicknameCheck(@RequestParam String nickname){
         userService.checkNickname(nickname);
         return ResponseEntity.ok().build();
     }
