@@ -9,8 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +24,7 @@ import org.hibernate.annotations.TimeZoneStorageType;
 import org.locationtech.jts.geom.LineString;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.map.Address;
+import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
 import team.silvertown.masil.masil.validator.MasilValidator;
 import team.silvertown.masil.user.domain.User;
@@ -42,6 +47,7 @@ public class Masil extends BaseEntity {
     private Long postId;
 
     @Embedded
+    @Getter(AccessLevel.NONE)
     private Address address;
 
     @Column(name = "path", nullable = false)
@@ -65,6 +71,9 @@ public class Masil extends BaseEntity {
     @Column(name = "started_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
     private OffsetDateTime startedAt;
+
+    @OneToMany(mappedBy = "masil")
+    private List<MasilPin> masilPins = new ArrayList<>();
 
     @Builder
     private Masil(
@@ -97,6 +106,32 @@ public class Masil extends BaseEntity {
         this.distance = distance;
         this.totalTime = totalTime;
         this.startedAt = startedAt;
+    }
+
+    public String getTitle() {
+        return this.title.getTitle();
+    }
+
+    public List<KakaoPoint> getKakaoPath() {
+        return Arrays.stream(this.path.getCoordinates())
+            .map(KakaoPoint::from)
+            .toList();
+    }
+
+    public String getDepth1() {
+        return this.address.getDepth1();
+    }
+
+    public String getDepth2() {
+        return this.address.getDepth2();
+    }
+
+    public String getDepth3() {
+        return this.address.getDepth3();
+    }
+
+    public String getDepth4() {
+        return this.address.getDepth4();
     }
 
 }

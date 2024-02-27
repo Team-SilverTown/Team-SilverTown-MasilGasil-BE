@@ -6,8 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Locale;
-import net.datafaker.Faker;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -17,17 +15,15 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
+import team.silvertown.masil.texture.MasilTexture;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class MasilTitleTest {
 
-    static final Faker faker = new Faker(Locale.KOREA);
-
     @Test
     void 마실_제목_생성을_성공한다() {
         // given
-        String title = faker.lorem()
-            .maxLengthSentence(29);
+        String title = MasilTexture.getRandomSentenceWithMax(29);
 
         // when
         ThrowingCallable create = () -> new MasilTitle(title);
@@ -57,8 +53,8 @@ class MasilTitleTest {
     @Test
     void 마실_제목이_30자를_넘으면_제목_생성을_실패한다() {
         // given
-        String title = faker.lorem()
-            .sentence(35);
+        int length = MasilTexture.getRandomInt(31, 1000);
+        String title = MasilTexture.getRandomFixedSentence(length);
 
         // when
         ThrowingCallable create = () -> new MasilTitle(title);
