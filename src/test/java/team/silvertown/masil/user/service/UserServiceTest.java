@@ -3,6 +3,7 @@ package team.silvertown.masil.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -71,7 +72,7 @@ class UserServiceTest {
 
         @Test
         public void 중복닉네임_조회시_이미_존재하는_닉네임을_조회할_경우_예외가_발생한다() throws Exception {
-            //given, when
+            //given
             String nickname = faker.name()
                 .fullName();
             User user = User.builder()
@@ -79,7 +80,7 @@ class UserServiceTest {
                 .build();
             userRepository.save(user);
 
-            //then
+            //when, then
             assertThatThrownBy(() -> userService.checkNickname(nickname))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage(UserErrorCode.DUPLICATED_NICKNAME.getMessage());
@@ -97,7 +98,7 @@ class UserServiceTest {
             userRepository.deleteAll();
 
             String socialId = String.valueOf(faker.barcode());
-            when(oAuth2User.getName()).thenReturn(socialId);
+            given(oAuth2User.getName()).willReturn(socialId);
 
             //when
             User joinedUser = userService.join(oAuth2User, VALID_PROVIDER);
@@ -113,7 +114,7 @@ class UserServiceTest {
             userRepository.deleteAll();
 
             String socialId = String.valueOf(faker.barcode());
-            when(oAuth2User.getName()).thenReturn(socialId);
+            given(oAuth2User.getName()).willReturn(socialId);
 
             User user = User.builder()
                 .provider(Provider.get(VALID_PROVIDER))
@@ -134,11 +135,11 @@ class UserServiceTest {
 
         @Test
         public void 비정상적인_provider로_회원가입하는_유저는_회원가입에_실패한다() throws Exception {
-            //given, when
+            //given
             String socialId = String.valueOf(faker.barcode());
-            when(oAuth2User.getName()).thenReturn(socialId);
+            given(oAuth2User.getName()).willReturn(socialId);
 
-            //then
+            //when, then
             assertThatThrownBy(() -> userService.join(oAuth2User, INVALID_PROVIDER))
                 .isInstanceOf(InvalidAuthenticationException.class)
                 .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
