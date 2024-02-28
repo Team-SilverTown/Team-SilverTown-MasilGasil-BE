@@ -51,9 +51,21 @@ public final class MasilTexture extends BaseDomainTexture {
         String title = getRandomSentenceWithMax(29);
         int totalTime = getRandomInt(600, 4200);
 
-        return createMasil(user, null, addressDepth1, addressDepth2, addressDepth3, "", path,
-            title,
+        return createMasil(user, null, addressDepth1, addressDepth2, addressDepth3, "", path, title,
             null, null, (int) path.getLength(), totalTime, OffsetDateTime.now());
+    }
+
+    public static Masil createMasilWithStartedAt(User user, OffsetDateTime startedAt) {
+        String addressDepth1 = createAddressDepth1();
+        String addressDepth2 = createAddressDepth2();
+        String addressDepth3 = createAddressDepth3();
+        LineString path = MapTexture.createLineString(1000);
+        String title = getRandomSentenceWithMax(29);
+        int totalTime = getRandomInt(600, 4200);
+
+        return createMasil(user, null, addressDepth1, addressDepth2, addressDepth3, "", path, title,
+            null, null,
+            (int) path.getLength(), totalTime, startedAt);
     }
 
     public static Masil createMasilWithOptional(Long postId, String content, String thumbnailUrl) {
