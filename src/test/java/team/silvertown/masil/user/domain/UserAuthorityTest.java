@@ -33,7 +33,7 @@ class UserAuthorityTest {
             .build();
 
         // when
-        GrantedAuthority grantedAuthority = authority.getAuthority();
+        GrantedAuthority grantedAuthority = authority.getName();
 
         // then
         String roleAuthority = grantedAuthority.getAuthority();

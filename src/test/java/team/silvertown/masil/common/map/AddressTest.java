@@ -3,8 +3,6 @@ package team.silvertown.masil.common.map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.util.Locale;
-import net.datafaker.Faker;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -15,11 +13,10 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import team.silvertown.masil.common.exception.BadRequestException;
+import team.silvertown.masil.texture.MasilTexture;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class AddressTest {
-
-    static final Faker faker = new Faker(Locale.KOREA);
 
     String addressDepth1;
     String addressDepth2;
@@ -27,12 +24,9 @@ class AddressTest {
 
     @BeforeEach
     void setUp() {
-        addressDepth1 = faker.address()
-            .state();
-        addressDepth2 = faker.address()
-            .city();
-        addressDepth3 = faker.address()
-            .streetName();
+        addressDepth1 = MasilTexture.createAddressDepth1();
+        addressDepth2 = MasilTexture.createAddressDepth2();
+        addressDepth3 = MasilTexture.createAddressDepth3();
     }
 
     @ParameterizedTest

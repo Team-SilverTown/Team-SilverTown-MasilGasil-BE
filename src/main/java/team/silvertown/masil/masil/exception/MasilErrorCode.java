@@ -10,8 +10,11 @@ public enum MasilErrorCode implements ErrorCode {
     INVALID_DISTANCE(20112000, "산책 거리는 양수여야 합니다"),
     INVALID_TOTAL_TIME(20112001, "산책 시간은 양수여야 합니다"),
 
+    USER_NOT_AUTHORIZED_FOR_MASIL(20120300, "해당 사용자는 해당 마실 조회 권한이 없습니다"),
+    MASIL_NOT_FOUND(201204000, "해당 아이디의 마실을 찾을 수 없습니다"),
+
     NULL_MASIL(20130000, "핀의 마실 기록을 확인할 수 없습니다"),
-    OWNER_NOT_MATCHING(20130001, "마실 기록의 사용자와 핀의 사용자가 다릅니다"),
+    PIN_OWNER_NOT_MATCHING(20130301, "마실 기록의 사용자와 핀의 사용자가 다릅니다"),
 
     NULL_USER(20190000, "마실 기록 사용자를 확인할 수 없습니다"),
     USER_NOT_FOUND(20190400, "마실 기록 사용자가 존재하지 않습니다");
