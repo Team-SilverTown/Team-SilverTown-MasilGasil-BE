@@ -38,17 +38,17 @@ spring:
       location: ${java.io.tmpdir}
       max-file-size: 100MB
       max-request-size: 100MB
-cloud:
-  aws:
-    credentials:
-      accessKey: minio
-      secretKey: miniopass
-    region:
-      static: ap-northeast-2
-    s3:
-      bucket: ${AWS_IMAGE_BUCKET_NAME}
-    stack:
-      auto: false
+  cloud:
+    aws:
+      credentials:
+        accessKey: ${AWS_ACCESS_KEY}
+        secretKey: ${AWS_SECRET_KEY}
+      region:
+        static: ap-northeast-2
+      endpoint: ${AWS_ENDPOINT}
+      s3:
+        bucket: ${AWS_S3_IMAGE_BUCKET}
+        endpoint: ${AWS_S3_IMAGE_ENDPOINT}
 endpoint:
   image:
     bucket: http://localhost:9000

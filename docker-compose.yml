@@ -15,18 +15,22 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       TZ: Asia/Seoul
-  minio:
-    image: quay.io/minio/minio:RELEASE.2024-02-26T09-33-48Z
-    volumes:
-      - ./minio:/data
+  localstack:
+    container_name: localstack
+    build: ./localstack-scripts
+    network_mode: bridge
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "4566:4566"
     environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: miniopass
-      MINIO_ADDRESS: :9000
-      MINIO_CONSOLE_ADDRESS: :9001
-    command: server /data
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_SOCK=unix:///var/run/docker.sock
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - "./localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
 volumes:
   data_volume:
