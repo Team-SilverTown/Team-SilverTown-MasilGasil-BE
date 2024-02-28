@@ -1,34 +1,39 @@
 package team.silvertown.masil.image.service;
 
+import io.awspring.cloud.s3.S3Resource;
+import io.awspring.cloud.s3.S3Template;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import team.silvertown.masil.image.bucket.ImageBucket;
-import team.silvertown.masil.image.exception.UncheckedURISyntaxException;
 
 @Service
 @RequiredArgsConstructor
 public class ImageService {
 
-    private final ImageBucket imageBucket;
+    private final S3Template s3;
+
+    @Value("${spring.cloud.aws.s3.bucket}")
+    private String bucket;
 
     public URI upload(MultipartFile file) {
         String key = generateKey(file.getOriginalFilename());
-        URL url = imageBucket.upload(key, file);
 
         try {
-            return url.toURI();
-        } catch (URISyntaxException e) {
-            throw new UncheckedURISyntaxException(e.getMessage(), e);
+            S3Resource resource = s3.upload(bucket, key, file.getInputStream());
+
+            return resource.getURI();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e.getMessage(), e);
         }
     }
 
-    private String generateKey(String filename) {
+    private @NonNull String generateKey(String filename) {
         return filename;
     }
-
 
 }
