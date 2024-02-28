@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import team.silvertown.masil.masil.dto.CreateRequest;
-import team.silvertown.masil.masil.dto.CreateResponse;
-import team.silvertown.masil.masil.dto.MasilResponse;
-import team.silvertown.masil.masil.dto.RecentMasilResponse;
+import team.silvertown.masil.masil.dto.request.CreateRequest;
+import team.silvertown.masil.masil.dto.request.PeriodRequest;
+import team.silvertown.masil.masil.dto.response.CreateResponse;
+import team.silvertown.masil.masil.dto.response.MasilResponse;
+import team.silvertown.masil.masil.dto.response.PeriodResponse;
+import team.silvertown.masil.masil.dto.response.RecentMasilResponse;
 import team.silvertown.masil.masil.service.MasilService;
 
 @RestController
@@ -42,6 +44,17 @@ public class MasilController {
         Integer size
     ) {
         RecentMasilResponse response = masilService.getRecent(userId, size);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/v1/masils/period")
+    public ResponseEntity<PeriodResponse> getInGivenPeriod(
+        @AuthenticationPrincipal
+        Long userId,
+        PeriodRequest request
+    ) {
+        PeriodResponse response = masilService.getInGivenPeriod(userId, request);
 
         return ResponseEntity.ok(response);
     }
