@@ -59,6 +59,7 @@ public class MasilService {
         return MasilResponse.from(masil, pins);
     }
 
+    @Transactional(readOnly = true)
     public RecentMasilResponse getRecent(Long userId, Integer size) {
         User user = userRepository.findById(userId)
             .orElseThrow(throwNotFound(MasilErrorCode.USER_NOT_FOUND));
