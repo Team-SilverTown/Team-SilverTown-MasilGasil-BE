@@ -69,6 +69,9 @@ dependencies {
 
     // RestTemplate(retry)
     implementation 'org.springframework.retry:spring-retry:1.2.5.RELEASE'
+
+    // aws
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 def querydslSrcDir = 'src/main/generated'
