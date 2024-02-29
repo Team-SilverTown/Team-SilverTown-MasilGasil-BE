@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.text.MessageFormat;
-import lombok.NonNull;
+import java.util.Base64;
+import java.util.Base64.Encoder;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,8 @@ import team.silvertown.masil.image.config.S3Properties;
 @Service
 @RequiredArgsConstructor
 public class ImageService {
+
+    private static final Encoder encoder = Base64.getEncoder();
 
     private final S3Properties s3Properties;
     private final S3Template s3Template;
@@ -30,8 +34,11 @@ public class ImageService {
         }
     }
 
-    private @NonNull String generateKey(String filename) {
-        return filename;
+    private String generateKey(String filename) {
+        String uuid = UUID.randomUUID().toString();
+        byte[] key = (uuid + filename).getBytes();
+
+        return encoder.encodeToString(key);
     }
 
     private URI getUri(String key) {
