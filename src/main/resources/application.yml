@@ -50,9 +50,6 @@ spring:
         bucket: ${AWS_S3_IMAGE_BUCKET}
         endpoint: ${AWS_S3_IMAGE_ENDPOINT}
         path-style-access-enabled: true
-endpoint:
-  image:
-    bucket: http://localhost:9000
 jwt:
   issuer: ${TOKEN_ISSUER}
   base64-secret: ${TOKEN_SECRET}
