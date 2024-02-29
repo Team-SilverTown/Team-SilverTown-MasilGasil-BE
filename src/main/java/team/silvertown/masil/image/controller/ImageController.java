@@ -18,10 +18,10 @@ public class ImageController {
 
     @PostMapping("/api/v1/images")
     public ResponseEntity<ImageResponse> upload(@RequestPart MultipartFile file) {
-        URI savedImageUri = imageService.upload(file);
-        ImageResponse imageResponse = new ImageResponse(savedImageUri.toString());
+        URI imageUri = imageService.upload(file);
+        ImageResponse imageResponse = new ImageResponse(imageUri.toString());
 
-        return ResponseEntity.created(savedImageUri)
+        return ResponseEntity.created(imageUri)
             .body(imageResponse);
     }
 
