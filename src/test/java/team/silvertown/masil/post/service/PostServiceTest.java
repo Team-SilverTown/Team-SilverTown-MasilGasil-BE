@@ -3,6 +3,7 @@ package team.silvertown.masil.post.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -23,6 +24,7 @@ import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePinRequest;
 import team.silvertown.masil.post.dto.request.CreateRequest;
 import team.silvertown.masil.post.dto.response.CreateResponse;
+import team.silvertown.masil.post.dto.response.PostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
@@ -49,6 +51,9 @@ class PostServiceTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    EntityManager entityManager;
 
     User user;
     String addressDepth1;
@@ -104,6 +109,43 @@ class PostServiceTest {
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(create)
             .withMessage(PostErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 산책로_포스트_단일_조회를_성공한다() {
+        // given
+        Post post = PostTexture.createDependentPost(user, 10000);
+        Post expected = postRepository.save(post);
+        int pinSize = 10;
+        User author = post.getUser();
+        List<PostPin> postPins = PostTexture.createDependentPostPins(post, author.getId(),
+            pinSize);
+
+        postPinRepository.saveAll(postPins);
+        entityManager.clear();
+
+        // when
+        PostResponse actual = postService.getById(expected.getId());
+
+        // then
+        assertThat(actual).extracting("id", "depth1", "depth2", "depth3", "depth4", "title",
+                "distance", "totalTime")
+            .containsExactly(post.getId(), post.getDepth1(), post.getDepth2(), post.getDepth3(),
+                post.getDepth4(), post.getTitle(), post.getDistance(), post.getTotalTime());
+        assertThat(actual.pins()).hasSize(pinSize);
+    }
+
+    @Test
+    void 사용자가_존재하지_않으면_마실_단일_조회를_실패한다() {
+        // given
+        long invalidId = MasilTexture.getRandomId();
+
+        // when
+        ThrowingCallable getById = () -> postService.getById(invalidId);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getById)
+            .withMessage(PostErrorCode.POST_NOT_FOUND.getMessage());
     }
 
     List<CreatePinRequest> createPinRequests(int size, int maxPathPoints) {

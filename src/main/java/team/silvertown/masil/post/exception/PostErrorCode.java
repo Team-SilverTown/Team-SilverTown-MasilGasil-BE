@@ -14,6 +14,8 @@ public enum PostErrorCode implements ErrorCode {
     NON_POSITIVE_DISTANCE(20212000, "산책로 포스트의 산책 거리는 양수여야 합니다"),
     NON_POSITIVE_TOTAL_TIME(20212001, "산책로 포스트의 산책 시간은 양수여야 합니다"),
 
+    POST_NOT_FOUND(202204000, "해당 아이디의 산책로 포스트를 찾을 수 없습니다"),
+
     NULL_MASIL(20230000, "핀의 산책로 포스트를 확인할 수 없습니다"),
     PIN_OWNER_NOT_MATCHING(20230300, "산책로 포스트의 사용자와 핀의 사용자가 다릅니다"),
 
