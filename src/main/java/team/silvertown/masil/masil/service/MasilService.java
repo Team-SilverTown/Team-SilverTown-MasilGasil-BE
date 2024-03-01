@@ -36,11 +36,10 @@ public class MasilService {
         User user = userRepository.findById(userId)
             .orElseThrow(throwNotFound(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = createMasil(request, user);
-        Masil savedMasil = masilRepository.save(masil);
 
-        savePins(request.pins(), savedMasil);
+        savePins(request.pins(), masil);
 
-        return new CreateResponse(savedMasil.getId());
+        return new CreateResponse(masil.getId());
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +61,7 @@ public class MasilService {
     }
 
     private Masil createMasil(CreateRequest request, User user) {
-        return Masil.builder()
+        Masil masil = Masil.builder()
             .depth1(request.depth1())
             .depth2(request.depth2())
             .depth3(request.depth3())
@@ -77,6 +76,8 @@ public class MasilService {
             .totalTime(request.totalTime())
             .user(user)
             .build();
+
+        return masilRepository.save(masil);
     }
 
     private void savePins(List<CreatePinRequest> pins, Masil masil) {
