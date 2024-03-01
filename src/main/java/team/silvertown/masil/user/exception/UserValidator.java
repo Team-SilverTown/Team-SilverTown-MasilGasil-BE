@@ -13,7 +13,7 @@ import team.silvertown.masil.user.domain.UserAuthority;
 
 public class UserValidator extends Validator {
 
-    private static final String VALID_NICKNAME_PATTERN = "^[가-힣a-zA-Z0-9]+$";
+    private static final String VALID_NICKNAME_PATTERN = "^[가-힣a-zA-Z0-9_]+$";
 
     public static void validateAuthority(List<UserAuthority> authorities) {
         throwIf(authorities.isEmpty(),
@@ -43,14 +43,12 @@ public class UserValidator extends Validator {
 
     public static void validateHeight(Integer height, UserErrorCode userErrorCode) {
         notNull(height, userErrorCode);
-        notUnder(height, 0, userErrorCode);
-        notUnder(height, 0, userErrorCode);
+        notUnder(height, 1, userErrorCode);
     }
 
     public static void validateWeight(Integer weight, UserErrorCode userErrorCode) {
         notNull(weight, userErrorCode);
-        notUnder(weight, 0, userErrorCode);
-        notUnder(weight, 0, userErrorCode);
+        notUnder(weight, 1, userErrorCode);
     }
 
     public static void validateExerciseIntensity(
