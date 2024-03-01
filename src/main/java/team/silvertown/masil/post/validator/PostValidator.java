@@ -17,9 +17,8 @@ public final class PostValidator extends Validator {
     private static final int MAX_URL_LENGTH = 1024;
 
     public static void validateTitle(String title) {
-        int length = Objects.requireNonNullElse(title, "")
-            .length();
-        range(length, 0, MAX_TITLE_LENGTH, PostErrorCode.TITLE_TOO_LONG);
+        notBlank(title, PostErrorCode.BLANK_TITLE);
+        notOver(title.length(), MAX_TITLE_LENGTH, PostErrorCode.TITLE_TOO_LONG);
     }
 
     public static void validateUrl(String url) {
