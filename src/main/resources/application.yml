@@ -41,5 +41,3 @@ springdoc:
   swagger-ui:
     path: /docs
     filter: true
-  api-docs:
-    enabled: false
