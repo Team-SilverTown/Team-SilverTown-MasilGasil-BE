@@ -31,30 +31,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAgreementRepository agreementRepository;
     private final UserAuthorityRepository userAuthorityRepository;
-    @Transactional
-    public void onboard(long userId, OnboardRequest request) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
-
-        user.update(request);
-        UserAgreement userAgreement = getUserAgreement(request, user);
-
-        agreementRepository.save(userAgreement);
-    }
-
-    private static UserAgreement getUserAgreement(OnboardRequest request, User user) {
-        LocalDateTime marketingConsentedAt = request.isAllowingMarketing() ? LocalDateTime.now() : null;
-
-        UserAgreement userAgreement = UserAgreement.builder()
-            .user(user)
-            .isAllowingMarketing(request.isAllowingMarketing())
-            .isLocationInfoConsented(request.isLocationInfoConsented())
-            .isPersonalInfoConsented(request.isPersonalInfoConsented())
-            .isUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed())
-            .marketingConsentedAt(marketingConsentedAt)
-            .build();
-        return userAgreement;
-    }
 
     public LoginResponseDto login(String jwtToken, User user) {
         List<UserAuthority> userAuthorities = userAuthorityRepository.findByUser(user);
@@ -74,10 +50,56 @@ public class UserService {
             .orElseGet(() -> createAndSave(authenticatedProvider, providerId));
     }
 
+    @Transactional
+    public void onboard(long userId, OnboardRequest request) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        user.update(request);
+        UserAgreement userAgreement = getUserAgreement(request, user);
+        agreementRepository.save(userAgreement);
+
+        List<UserAuthority> authorities = userAuthorityRepository.findByUser(user)
+            .stream()
+            .toList();
+        updatingAuthority(authorities, user);
+    }
+
+    private void updatingAuthority(List<UserAuthority> authorities, User user) {
+        if (authorities.size() == 1 && authorities.get(0)
+            .getAuthority() == Authority.RESTRICTED) {
+            UserAuthority normalAuthority = generateUserAuthority(user, Authority.NORMAL);
+            userAuthorityRepository.save(normalAuthority);
+        }
+    }
+
+    private static UserAgreement getUserAgreement(OnboardRequest request, User user) {
+        LocalDateTime marketingConsentedAt = request.isAllowingMarketing() ? LocalDateTime.now()
+            : null;
+        UserValidator.validateIsPersonalInfoConsented(request.isPersonalInfoConsented(),
+            UserErrorCode.INVALID_PERSONAL_INFO_CONSENTED);
+        UserValidator.validateIsLocationInfoConsented(request.isLocationInfoConsented(),
+            UserErrorCode.INVALID_LOCATION_INFO_CONSENTED);
+        UserValidator.validateIsUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed(),
+            UserErrorCode.INVALID_UNDER_AGE_CONSENTED);
+
+        UserAgreement userAgreement = UserAgreement.builder()
+            .user(user)
+            .isAllowingMarketing(request.isAllowingMarketing())
+            .isLocationInfoConsented(request.isLocationInfoConsented())
+            .isPersonalInfoConsented(request.isPersonalInfoConsented())
+            .isUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed())
+            .marketingConsentedAt(marketingConsentedAt)
+            .build();
+
+        return userAgreement;
+    }
+
     private User createAndSave(Provider authenticatedProvider, String providerId) {
         User newUser = create(authenticatedProvider, providerId);
         User savedUser = userRepository.save(newUser);
         assignDefaultAuthority(savedUser);
+
         return savedUser;
     }
 
@@ -89,11 +111,15 @@ public class UserService {
     }
 
     private void assignDefaultAuthority(User user) {
-        UserAuthority newAuthority = UserAuthority.builder()
-            .authority(Authority.RESTRICTED)
+        UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
+        userAuthorityRepository.save(newAuthority);
+    }
+
+    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
             .user(user)
             .build();
-        userAuthorityRepository.save(newAuthority);
     }
 
 }
