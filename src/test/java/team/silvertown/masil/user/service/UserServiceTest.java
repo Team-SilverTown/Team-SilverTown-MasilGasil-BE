@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.validator.DateValidator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
@@ -41,6 +44,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 @AutoConfigureMockMvc
 @DisplayNameGeneration(ReplaceUnderscores.class)
 @SpringBootTest
+@Transactional
 class UserServiceTest {
 
     private static final Faker faker = new Faker();
@@ -199,7 +203,8 @@ class UserServiceTest {
     class 유저_추가정보를_입력하는_서비스로직_테스트 {
 
         private User unTypedUser;
-        private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         @BeforeEach
         void setup() {
@@ -209,22 +214,11 @@ class UserServiceTest {
         }
 
         @Test
-        @Transactional
         public void 정상적으로_추가정보를_작성한_경우_회원정보가_제대로_업데이트_되고_모든_서비스를_이용할_수_있다() throws Exception {
             //given
-            OnboardRequest request = new OnboardRequest(
-                "nickname",
-                Sex.MALE.name(),
-                "1999-08-25",
-                175,
-                70,
-                ExerciseIntensity.MIDDLE.name(),
-                true,
-                true,
-                true,
-                true
-            );
-            List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(unTypedUser);
+            OnboardRequest request = getNormalRequest();
+            List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
+                unTypedUser);
             assertThat(beforeUpdatedAuthority).hasSize(1);
             assertThat(beforeUpdatedAuthority.get(0)
                 .getAuthority()).isEqualTo(Authority.RESTRICTED);
@@ -237,19 +231,36 @@ class UserServiceTest {
                 .get();
             assertAll(
                 () -> assertThat(updatedUser.getNickname()).isEqualTo(request.nickname()),
-                () -> assertThat(format.format(updatedUser.getBirthDate())).isEqualTo(request.birthDate()),
+                () -> assertThat(simpleDateFormat.format(updatedUser.getBirthDate())).isEqualTo(
+                    request.birthDate()),
                 () -> assertThat(updatedUser.getHeight()).isEqualTo(request.height()),
                 () -> assertThat(updatedUser.getWeight()).isEqualTo(request.weight()),
                 () -> assertThat(updatedUser.getSex()
                     .name()).isEqualTo(request.sex()),
                 () -> assertThat(updatedUser.getExerciseIntensity()
                     .name()).isEqualTo(request.exerciseIntensity())
-                );
+            );
             List<UserAuthority> updatedAuthority = userAuthorityRepository.findByUser(unTypedUser);
             assertThat(updatedAuthority).hasSize(2);
             assertThat(updatedAuthority.get(1)
                 .getAuthority()).isEqualTo(Authority.NORMAL);
 
+        }
+
+        private static OnboardRequest getNormalRequest() {
+            return new OnboardRequest(
+                "nickname",
+                Sex.MALE.name(),
+                format.format(faker.date()
+                    .birthdayLocalDate(20, 40)),
+                getRandomInt(170, 190),
+                getRandomInt(70, 90),
+                ExerciseIntensity.MIDDLE.name(),
+                true,
+                true,
+                true,
+                true
+            );
         }
 
     }
