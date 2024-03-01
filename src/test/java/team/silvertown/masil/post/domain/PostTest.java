@@ -46,8 +46,10 @@ class PostTest {
         totalTime = MasilTexture.getRandomPositive();
     }
 
-    @Test
-    void 산책로_포스트_생성을_할_수_있다() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(booleans = {true, false})
+    void 산책로_포스트_생성을_할_수_있다(Boolean isPublic) {
         // given
         PostBuilder builder = Post.builder()
             .user(user)
@@ -58,7 +60,8 @@ class PostTest {
             .path(path)
             .title(title)
             .distance((int) path.getLength())
-            .totalTime(totalTime);
+            .totalTime(totalTime)
+            .isPublic(isPublic);
 
         // when
         ThrowingCallable create = builder::build;
