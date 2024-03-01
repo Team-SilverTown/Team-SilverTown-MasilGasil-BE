@@ -77,6 +77,7 @@ public class UserValidator extends Validator {
         UserErrorCode userErrorCode
     ) {
         notNull(isPersonalInfoConsented, userErrorCode);
+        throwIf(!isPersonalInfoConsented, () -> new BadRequestException(userErrorCode));
     }
 
     public static void validateIsLocationInfoConsented(
@@ -84,6 +85,7 @@ public class UserValidator extends Validator {
         UserErrorCode userErrorCode
     ) {
         notNull(isLocationInfoConsented, userErrorCode);
+        throwIf(!isLocationInfoConsented, () -> new BadRequestException(userErrorCode));
     }
 
     public static void validateIsUnderAgeConsentConfirmed(
@@ -91,6 +93,7 @@ public class UserValidator extends Validator {
         UserErrorCode userErrorCode
     ) {
         notNull(isUnderAgeConsentConfirmed, userErrorCode);
+        throwIf(!isUnderAgeConsentConfirmed, () -> new BadRequestException(userErrorCode));
     }
 
 }
