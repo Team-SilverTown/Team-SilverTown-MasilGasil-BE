@@ -4,11 +4,14 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.post.dto.request.CreateRequest;
 import team.silvertown.masil.post.dto.response.CreateResponse;
+import team.silvertown.masil.post.dto.response.PostResponse;
 import team.silvertown.masil.post.service.PostService;
 
 @RestController
@@ -29,6 +32,16 @@ public class PostController {
 
         return ResponseEntity.created(uri)
             .body(response);
+    }
+
+    @GetMapping("/api/v1/posts/{id}")
+    public ResponseEntity<PostResponse> getById(
+        @PathVariable
+        Long id
+    ) {
+        PostResponse response = postService.getById(id);
+
+        return ResponseEntity.ok(response);
     }
 
 }
