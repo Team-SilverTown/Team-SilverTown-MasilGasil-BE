@@ -2,9 +2,13 @@ package team.silvertown.masil.user.service;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.dto.OnboardRequest;
@@ -55,6 +59,7 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
+        checkNickname(request.nickname());
         user.update(request);
         UserAgreement userAgreement = getUserAgreement(request, user);
         agreementRepository.save(userAgreement);
@@ -65,6 +70,12 @@ public class UserService {
         updatingAuthority(authorities, user);
     }
 
+    public void checkNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
+        }
+    }
+
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
         if (authorities.size() == 1 && authorities.get(0)
             .getAuthority() == Authority.RESTRICTED) {
@@ -73,7 +84,7 @@ public class UserService {
         }
     }
 
-    private static UserAgreement getUserAgreement(OnboardRequest request, User user) {
+    private UserAgreement getUserAgreement(OnboardRequest request, User user) {
         LocalDateTime marketingConsentedAt = request.isAllowingMarketing() ? LocalDateTime.now()
             : null;
         UserValidator.validateIsPersonalInfoConsented(request.isPersonalInfoConsented(),

@@ -7,6 +7,8 @@ import team.silvertown.masil.user.domain.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    boolean existsByNickname(String nickname);
+
     Optional<User> findByProviderAndSocialId(Provider provider, String socialId);
 
 }

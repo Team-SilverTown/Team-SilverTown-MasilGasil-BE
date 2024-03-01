@@ -15,6 +15,7 @@ public enum UserErrorCode implements ErrorCode {
     INVALID_WEIGHT(10012001, "올바르지 않은 형식의 몸무 정보입니다."),
     INVALID_BIRTH_DATE(10014000, "올바라즤 않은 형식의 생일 정보입니다"),
     USER_NOT_FOUND(10020401, "해당 유저를 찾을 수 없습니다."),
+    DUPLICATED_NICKNAME(10020900, "이미 존재하는 닉네임입니다."),
     AUTHORITY_NOT_FOUND(10090400, "해당 유저의 권한을 찾을 수 없습니다."),
     INVALID_OAUTH2_TOKEN(10030000, "소셜로그인 과정에서 문제가 발생했습니다."),
     INVALID_PROVIDER(10030001, "유효하지 않은 서비스 제공자입니다."),
