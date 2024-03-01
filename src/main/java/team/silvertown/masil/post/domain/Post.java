@@ -9,7 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,6 +22,7 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.map.Address;
+import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.validator.PostValidator;
 import team.silvertown.masil.user.domain.User;
@@ -37,6 +42,7 @@ public class Post extends BaseEntity {
     private User user;
 
     @Embedded
+    @Getter(AccessLevel.NONE)
     private Address address;
 
     @Column(name = "path", nullable = false)
@@ -65,6 +71,9 @@ public class Post extends BaseEntity {
 
     @Column(name = "like_count", nullable = false)
     private int likeCount;
+
+    @OneToMany(mappedBy = "post")
+    private List<PostPin> postPins = new ArrayList<>();
 
     @Builder
     private Post(
@@ -98,6 +107,28 @@ public class Post extends BaseEntity {
         this.isPublic = Objects.isNull(isPublic) || isPublic;
         this.viewCount = 0;
         this.likeCount = 0;
+    }
+
+    public String getDepth1() {
+        return this.address.getDepth1();
+    }
+
+    public String getDepth2() {
+        return this.address.getDepth2();
+    }
+
+    public String getDepth3() {
+        return this.address.getDepth3();
+    }
+
+    public String getDepth4() {
+        return this.address.getDepth4();
+    }
+
+    public List<KakaoPoint> getKakaoPath() {
+        return Arrays.stream(this.path.getCoordinates())
+            .map(KakaoPoint::from)
+            .toList();
     }
 
 }
