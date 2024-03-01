@@ -7,6 +7,7 @@ import team.silvertown.masil.common.exception.ErrorCode;
 public enum PostErrorCode implements ErrorCode {
     THUMBNAIL_URL_TOO_LONG(20211000, "산책로 포스트썸네일 URL 주소 길이가 제한을 초과했습니다"),
     TITLE_TOO_LONG(20211001, "산책로 포스트 제목 길이가 제한을 초과했습니다"),
+    BLANK_TITLE(20211002, "산책로 포스트 제목이 입력되지 않았습니다"),
 
     INVALID_DISTANCE(20212000, "산책로 포스트의 산책 거리는 양수여야 합니다"),
     INVALID_TOTAL_TIME(20212001, "산책로 포스트의 산책 시간은 양수여야 합니다"),
