@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.LineString;
@@ -17,6 +18,7 @@ import team.silvertown.masil.post.domain.Post.PostBuilder;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.texture.MapTexture;
 import team.silvertown.masil.texture.MasilTexture;
+import team.silvertown.masil.texture.PostTexture;
 import team.silvertown.masil.texture.UserTexture;
 import team.silvertown.masil.user.domain.User;
 
@@ -44,8 +46,10 @@ class PostTest {
         totalTime = MasilTexture.getRandomPositive();
     }
 
-    @Test
-    void 산책로_포스트_생성을_할_수_있다() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(booleans = {true, false})
+    void 산책로_포스트_생성을_할_수_있다(Boolean isPublic) {
         // given
         PostBuilder builder = Post.builder()
             .user(user)
@@ -56,7 +60,8 @@ class PostTest {
             .path(path)
             .title(title)
             .distance((int) path.getLength())
-            .totalTime(totalTime);
+            .totalTime(totalTime)
+            .isPublic(isPublic);
 
         // when
         ThrowingCallable create = builder::build;
@@ -83,6 +88,51 @@ class PostTest {
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
             .withMessage(PostErrorCode.NULL_USER.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void 제목이_없으면_산책로_포스트_생성을_실패한다(String invalidTitle) {
+        // given
+        PostBuilder builder = Post.builder()
+            .user(user)
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .path(path)
+            .title(invalidTitle)
+            .distance((int) path.getLength())
+            .totalTime(totalTime);
+
+        // when
+        ThrowingCallable create = builder::build;
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+            .withMessage(PostErrorCode.BLANK_TITLE.getMessage());
+    }
+
+    @Test
+    void 제목이_30자를_넘으면_산책로_포스트_생성을_실패한다() {
+        // given
+        String longTitle = PostTexture.getRandomFixedSentence(31);
+        PostBuilder builder = Post.builder()
+            .user(user)
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .path(path)
+            .title(longTitle)
+            .distance((int) path.getLength())
+            .totalTime(totalTime);
+
+        // when
+        ThrowingCallable create = builder::build;
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+            .withMessage(PostErrorCode.TITLE_TOO_LONG.getMessage());
     }
 
     @Test

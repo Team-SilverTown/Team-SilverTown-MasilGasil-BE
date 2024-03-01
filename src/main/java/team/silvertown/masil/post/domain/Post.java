@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -78,7 +79,7 @@ public class Post extends BaseEntity {
         String thumbnailUrl,
         Integer distance,
         Integer totalTime,
-        boolean isPublic
+        Boolean isPublic
     ) {
         PostValidator.notNull(user, PostErrorCode.NULL_USER);
         PostValidator.validateUrl(thumbnailUrl);
@@ -94,7 +95,7 @@ public class Post extends BaseEntity {
         this.thumbnailUrl = thumbnailUrl;
         this.distance = distance;
         this.totalTime = totalTime;
-        this.isPublic = isPublic;
+        this.isPublic = Objects.isNull(isPublic) || isPublic;
         this.viewCount = 0;
         this.likeCount = 0;
     }
