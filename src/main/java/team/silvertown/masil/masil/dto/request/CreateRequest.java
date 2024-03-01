@@ -35,7 +35,7 @@ public record CreateRequest(
         MasilValidator.validateUrl(thumbnailUrl);
         MasilValidator.notNull(distance, MasilErrorCode.INVALID_DISTANCE);
         MasilValidator.notNull(totalTime, MasilErrorCode.INVALID_TOTAL_TIME);
-        MasilValidator.notNull(path, MapErrorCode.NULL_KAKAO_POINT);
+        MasilValidator.notNull(path, MapErrorCode.NULL_PATH);
         MasilValidator.notUnder(path.size(), MIN_POINT_NUM, MapErrorCode.INSUFFICIENT_PATH_POINTS);
     }
 
