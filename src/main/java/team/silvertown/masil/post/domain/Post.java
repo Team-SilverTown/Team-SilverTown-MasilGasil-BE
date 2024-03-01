@@ -83,8 +83,8 @@ public class Post extends BaseEntity {
         PostValidator.notNull(user, PostErrorCode.NULL_USER);
         PostValidator.validateUrl(thumbnailUrl);
         PostValidator.validateTitle(title);
-        PostValidator.notUnder(distance, 0, PostErrorCode.INVALID_DISTANCE);
-        PostValidator.notUnder(totalTime, 0, PostErrorCode.INVALID_TOTAL_TIME);
+        PostValidator.notUnder(distance, 0, PostErrorCode.NON_POSITIVE_DISTANCE);
+        PostValidator.notUnder(totalTime, 0, PostErrorCode.NON_POSITIVE_TOTAL_TIME);
 
         this.user = user;
         this.address = new Address(depth1, depth2, depth3, depth4);

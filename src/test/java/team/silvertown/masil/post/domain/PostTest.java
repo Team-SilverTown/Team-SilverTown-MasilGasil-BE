@@ -129,7 +129,7 @@ class PostTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(PostErrorCode.INVALID_DISTANCE.getMessage());
+            .withMessage(PostErrorCode.NON_POSITIVE_DISTANCE.getMessage());
     }
 
     @ParameterizedTest
@@ -153,7 +153,7 @@ class PostTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(PostErrorCode.INVALID_TOTAL_TIME.getMessage());
+            .withMessage(PostErrorCode.NON_POSITIVE_TOTAL_TIME.getMessage());
     }
 
 }
