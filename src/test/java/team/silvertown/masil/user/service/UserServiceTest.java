@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import net.datafaker.Faker;
@@ -201,7 +202,6 @@ class UserServiceTest {
     class 유저_추가정보를_입력하는_서비스로직_테스트 {
 
         private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         private User unTypedUser;
 
         private static OnboardRequest getNormalRequest() {
@@ -245,7 +245,7 @@ class UserServiceTest {
                 .get();
             assertAll(
                 () -> assertThat(updatedUser.getNickname()).isEqualTo(request.nickname()),
-                () -> assertThat(simpleDateFormat.format(updatedUser.getBirthDate())).isEqualTo(
+                () -> assertThat(updatedUser.getBirthDate().toString()).isEqualTo(
                     request.birthDate()),
                 () -> assertThat(updatedUser.getHeight()).isEqualTo(request.height()),
                 () -> assertThat(updatedUser.getWeight()).isEqualTo(request.weight()),
