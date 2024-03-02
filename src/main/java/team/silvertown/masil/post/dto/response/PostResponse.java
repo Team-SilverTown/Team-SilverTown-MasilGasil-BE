@@ -19,6 +19,8 @@ public record PostResponse(
     int distance,
     int totalTime,
     boolean isPublic,
+    int viewCount,
+    int likeCount,
     List<PinResponse> pins,
     long authorId,
     String authorName,
@@ -40,6 +42,8 @@ public record PostResponse(
             .distance(post.getDistance())
             .totalTime(post.getTotalTime())
             .isPublic(post.isPublic())
+            .viewCount(post.getViewCount())
+            .likeCount(post.getLikeCount())
             .pins(pins)
             .authorId(author.getId())
             .authorName(author.getNickname())
