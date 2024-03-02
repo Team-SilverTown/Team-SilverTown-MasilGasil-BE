@@ -2,7 +2,6 @@ package team.silvertown.masil.security.exception;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import team.silvertown.masil.common.validator.Validator;
-import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.exception.UserErrorCode;
 

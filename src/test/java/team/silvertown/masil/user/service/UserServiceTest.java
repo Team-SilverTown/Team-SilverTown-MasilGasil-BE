@@ -25,9 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
-import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
-import team.silvertown.masil.common.validator.DateValidator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
@@ -202,9 +200,25 @@ class UserServiceTest {
     @Nested
     class 유저_추가정보를_입력하는_서비스로직_테스트 {
 
-        private User unTypedUser;
         private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        private User unTypedUser;
+
+        private static OnboardRequest getNormalRequest() {
+            return new OnboardRequest(
+                "nickname",
+                Sex.MALE.name(),
+                format.format(faker.date()
+                    .birthdayLocalDate(20, 40)),
+                getRandomInt(170, 190),
+                getRandomInt(70, 90),
+                ExerciseIntensity.MIDDLE.name(),
+                true,
+                true,
+                true,
+                true
+            );
+        }
 
         @BeforeEach
         void setup() {
@@ -245,22 +259,6 @@ class UserServiceTest {
             assertThat(updatedAuthority.get(1)
                 .getAuthority()).isEqualTo(Authority.NORMAL);
 
-        }
-
-        private static OnboardRequest getNormalRequest() {
-            return new OnboardRequest(
-                "nickname",
-                Sex.MALE.name(),
-                format.format(faker.date()
-                    .birthdayLocalDate(20, 40)),
-                getRandomInt(170, 190),
-                getRandomInt(70, 90),
-                ExerciseIntensity.MIDDLE.name(),
-                true,
-                true,
-                true,
-                true
-            );
         }
 
     }

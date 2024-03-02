@@ -11,7 +11,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,10 +57,14 @@ public class UserAgreement extends BaseEntity {
         Boolean isUnderAgeConsentConfirmed,
         LocalDateTime marketingConsentedAt
     ) {
-        UserValidator.validateIsAllowingMarketing(isAllowingMarketing, UserErrorCode.INVALID_ALLOWING_MARKETING);
-        UserValidator.validateIsPersonalInfoConsented(isPersonalInfoConsented, UserErrorCode.INVALID_PERSONAL_INFO_CONSENTED);
-        UserValidator.validateIsLocationInfoConsented(isLocationInfoConsented, UserErrorCode.INVALID_LOCATION_INFO_CONSENTED);
-        UserValidator.validateIsUnderAgeConsentConfirmed(isUnderAgeConsentConfirmed, UserErrorCode.INVALID_UNDER_AGE_CONSENTED);
+        UserValidator.validateIsAllowingMarketing(isAllowingMarketing,
+            UserErrorCode.INVALID_ALLOWING_MARKETING);
+        UserValidator.validateIsPersonalInfoConsented(isPersonalInfoConsented,
+            UserErrorCode.INVALID_PERSONAL_INFO_CONSENTED);
+        UserValidator.validateIsLocationInfoConsented(isLocationInfoConsented,
+            UserErrorCode.INVALID_LOCATION_INFO_CONSENTED);
+        UserValidator.validateIsUnderAgeConsentConfirmed(isUnderAgeConsentConfirmed,
+            UserErrorCode.INVALID_UNDER_AGE_CONSENTED);
 
         this.id = id;
         this.user = user;

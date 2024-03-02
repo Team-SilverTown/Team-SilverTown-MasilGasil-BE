@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.user.dto.OnboardRequest;
-import team.silvertown.masil.user.dto.UpdateInfoResponse;
 import team.silvertown.masil.user.service.UserService;
 
 @RestController

@@ -45,7 +45,6 @@ class OnboardRequestTest {
     @Nested
     class 유저_추가정보를_입력하는_서비스로직_테스트 {
 
-        private User unTypedUser;
         private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         private static final String VALID_NICKNAME = "VALID_NAME";
@@ -57,7 +56,33 @@ class OnboardRequestTest {
         private static final String VALID_EXERCISE_INTENSITY = ExerciseIntensity.MIDDLE.name();
         private static final boolean CONSENT = true;
         private static final boolean DISSENT = false;
+        private User unTypedUser;
 
+        private static OnboardRequest invalidRequest(
+            String nickname,
+            String sex,
+            String birthDate,
+            Integer height,
+            Integer weight,
+            String exerciseIntensity,
+            Boolean isAllowingMarketing,
+            Boolean isPersonalInfoConsented,
+            Boolean isLocationalInfoConsented,
+            Boolean isUnderAgeConsentConfirmed
+        ) {
+            return new OnboardRequest(
+                nickname,
+                sex,
+                birthDate,
+                height,
+                weight,
+                exerciseIntensity,
+                isAllowingMarketing,
+                isPersonalInfoConsented,
+                isLocationalInfoConsented,
+                isUnderAgeConsentConfirmed
+            );
+        }
 
         @BeforeEach
         void setup() {
@@ -257,33 +282,6 @@ class OnboardRequestTest {
             )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(UserErrorCode.INVALID_UNDER_AGE_CONSENTED.getMessage());
-        }
-
-
-        private static OnboardRequest invalidRequest(
-            String nickname,
-            String sex,
-            String birthDate,
-            Integer height,
-            Integer weight,
-            String exerciseIntensity,
-            Boolean isAllowingMarketing,
-            Boolean isPersonalInfoConsented,
-            Boolean isLocationalInfoConsented,
-            Boolean isUnderAgeConsentConfirmed
-        ) {
-            return new OnboardRequest(
-                nickname,
-                sex,
-                birthDate,
-                height,
-                weight,
-                exerciseIntensity,
-                isAllowingMarketing,
-                isPersonalInfoConsented,
-                isLocationalInfoConsented,
-                isUnderAgeConsentConfirmed
-            );
         }
 
     }

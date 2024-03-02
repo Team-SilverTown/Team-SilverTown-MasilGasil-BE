@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.util.Date;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -78,11 +77,13 @@ public class User extends BaseEntity {
         UserValidator.validateBirthDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
         UserValidator.validateHeight(request.height(), UserErrorCode.INVALID_HEIGHT);
         UserValidator.validateWeight(request.weight(), UserErrorCode.INVALID_WEIGHT);
-        UserValidator.validateExerciseIntensity(request.exerciseIntensity(), UserErrorCode.INVALID_EXERCISE_INTENSITY);
+        UserValidator.validateExerciseIntensity(request.exerciseIntensity(),
+            UserErrorCode.INVALID_EXERCISE_INTENSITY);
 
         this.nickname = request.nickname();
         this.sex = Sex.valueOf(request.sex());
-        this.birthDate = DateValidator.parseDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
+        this.birthDate = DateValidator.parseDate(request.birthDate(),
+            UserErrorCode.INVALID_BIRTH_DATE);
         this.height = request.height();
         this.weight = request.weight();
         this.exerciseIntensity = ExerciseIntensity.valueOf(request.exerciseIntensity());

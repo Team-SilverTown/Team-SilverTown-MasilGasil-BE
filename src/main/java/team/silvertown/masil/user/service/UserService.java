@@ -1,31 +1,27 @@
 package team.silvertown.masil.user.service;
 
 import java.time.LocalDateTime;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import team.silvertown.masil.common.exception.DataNotFoundException;
-import team.silvertown.masil.common.exception.DuplicateResourceException;
-import team.silvertown.masil.user.domain.User;
-import team.silvertown.masil.user.domain.UserAgreement;
-import team.silvertown.masil.user.dto.OnboardRequest;
-import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.repository.UserAgreementRepository;
-import team.silvertown.masil.user.repository.UserRepository;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.exception.DuplicateResourceException;
+import team.silvertown.masil.security.exception.OAuthValidator;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
+import team.silvertown.masil.user.domain.User;
+import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponseDto;
-import team.silvertown.masil.security.exception.OAuthValidator;
+import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.exception.UserValidator;
+import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
+import team.silvertown.masil.user.repository.UserRepository;
 
 @Slf4j
 @Service
@@ -35,6 +31,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAgreementRepository agreementRepository;
     private final UserAuthorityRepository userAuthorityRepository;
+
+    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
+            .build();
+    }
 
     public LoginResponseDto login(String jwtToken, User user) {
         List<UserAuthority> userAuthorities = userAuthorityRepository.findByUser(user);
@@ -124,13 +127,6 @@ public class UserService {
     private void assignDefaultAuthority(User user) {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
-    }
-
-    private static UserAuthority generateUserAuthority(User user, Authority authority) {
-        return UserAuthority.builder()
-            .authority(authority)
-            .user(user)
-            .build();
     }
 
 }
