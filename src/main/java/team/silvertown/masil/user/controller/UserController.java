@@ -11,12 +11,11 @@ import team.silvertown.masil.user.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/users")
 public class UserController {
 
     private final UserService userService;
 
-    @PutMapping("/extra-info")
+    @PutMapping("api/v1/users/extra-info")
     public ResponseEntity<Void> onboard(
         @RequestBody
         OnboardRequest request
