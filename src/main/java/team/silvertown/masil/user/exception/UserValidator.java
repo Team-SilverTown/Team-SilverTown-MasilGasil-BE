@@ -28,11 +28,7 @@ public class UserValidator extends Validator {
 
     public static void validateSex(String sex, UserErrorCode userErrorCode) {
         notBlank(sex, userErrorCode);
-        Arrays.stream(Sex.values())
-            .filter(value -> value.name()
-                .equals(sex))
-            .findFirst()
-            .orElseThrow(() -> new BadRequestException(UserErrorCode.INVALID_SEX));
+        Sex.get(sex);
     }
 
     public static void validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
