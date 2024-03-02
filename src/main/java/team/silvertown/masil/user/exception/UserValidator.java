@@ -22,8 +22,7 @@ public class UserValidator extends Validator {
 
     public static void validateNickname(String nickname, UserErrorCode userErrorCode) {
         notBlank(nickname, userErrorCode);
-        throwIf(nickname.length() <= 2 || nickname.length() > 12,
-            () -> new BadRequestException(userErrorCode));
+        range(nickname.length(), 2, 12, userErrorCode);
         notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
     }
 
