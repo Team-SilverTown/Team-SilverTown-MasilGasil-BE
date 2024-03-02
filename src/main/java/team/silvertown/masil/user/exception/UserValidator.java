@@ -51,11 +51,7 @@ public class UserValidator extends Validator {
         UserErrorCode userErrorCode
     ) {
         notNull(exerciseIntensity, userErrorCode);
-        Arrays.stream(ExerciseIntensity.values())
-            .filter(value -> value.name()
-                .equals(exerciseIntensity))
-            .findFirst()
-            .orElseThrow(() -> new BadRequestException(UserErrorCode.INVALID_EXERCISE_INTENSITY));
+        ExerciseIntensity.get(exerciseIntensity);
     }
 
     public static void validateIsAllowingMarketing(
