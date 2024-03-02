@@ -118,7 +118,7 @@ class PostServiceTest {
         Post expected = postRepository.save(post);
         int pinSize = 10;
         User author = post.getUser();
-        List<PostPin> postPins = PostTexture.createDependentPostPins(post, author.getId(),
+        List<PostPin> postPins = PostTexture.createDependentPostPins(expected, author.getId(),
             pinSize);
 
         postPinRepository.saveAll(postPins);
@@ -128,10 +128,20 @@ class PostServiceTest {
         PostResponse actual = postService.getById(expected.getId());
 
         // then
-        assertThat(actual).extracting("id", "depth1", "depth2", "depth3", "depth4", "title",
-                "distance", "totalTime")
-            .containsExactly(post.getId(), post.getDepth1(), post.getDepth2(), post.getDepth3(),
-                post.getDepth4(), post.getTitle(), post.getDistance(), post.getTotalTime());
+        assertThat(actual)
+            .hasFieldOrPropertyWithValue("id", expected.getId())
+            .hasFieldOrPropertyWithValue("depth1", expected.getDepth1())
+            .hasFieldOrPropertyWithValue("depth2", expected.getDepth2())
+            .hasFieldOrPropertyWithValue("depth3", expected.getDepth3())
+            .hasFieldOrPropertyWithValue("depth4", expected.getDepth4())
+            .hasFieldOrPropertyWithValue("title", expected.getTitle())
+            .hasFieldOrPropertyWithValue("distance", expected.getDistance())
+            .hasFieldOrPropertyWithValue("totalTime", expected.getTotalTime())
+            .hasFieldOrPropertyWithValue("isPublic", expected.isPublic())
+            .hasFieldOrPropertyWithValue("viewCount", expected.getViewCount())
+            .hasFieldOrPropertyWithValue("likeCount", expected.getLikeCount())
+            .hasFieldOrPropertyWithValue("authorId", user.getId())
+            .hasFieldOrPropertyWithValue("authorName", user.getNickname());
         assertThat(actual.pins()).hasSize(pinSize);
     }
 
