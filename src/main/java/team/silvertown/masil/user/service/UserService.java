@@ -23,7 +23,6 @@ import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -80,8 +79,11 @@ public class UserService {
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
-        if (authorities.size() == 1 && authorities.get(0)
-            .getAuthority() == Authority.RESTRICTED) {
+        boolean hasNormalAuthority = authorities.stream()
+            .map(UserAuthority::getAuthority)
+            .anyMatch(a -> a.equals(Authority.NORMAL));
+
+        if (!hasNormalAuthority) {
             UserAuthority normalAuthority = generateUserAuthority(user, Authority.NORMAL);
             userAuthorityRepository.save(normalAuthority);
         }
@@ -90,12 +92,6 @@ public class UserService {
     private UserAgreement getUserAgreement(OnboardRequest request, User user) {
         LocalDateTime marketingConsentedAt = request.isAllowingMarketing() ? LocalDateTime.now()
             : null;
-        UserValidator.validateIsPersonalInfoConsented(request.isPersonalInfoConsented(),
-            UserErrorCode.INVALID_PERSONAL_INFO_CONSENTED);
-        UserValidator.validateIsLocationInfoConsented(request.isLocationInfoConsented(),
-            UserErrorCode.INVALID_LOCATION_INFO_CONSENTED);
-        UserValidator.validateIsUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed(),
-            UserErrorCode.INVALID_UNDER_AGE_CONSENTED);
 
         UserAgreement userAgreement = UserAgreement.builder()
             .user(user)
