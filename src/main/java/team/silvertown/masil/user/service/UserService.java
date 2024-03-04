@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
+import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.security.exception.OAuthValidator;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
@@ -64,9 +65,8 @@ public class UserService {
         checkNickname(request.nickname());
         user.update(request);
         UserAgreement userAgreement = getUserAgreement(request, user);
-        if (agreementRepository.existsByUser(user)) {
-            throw new DuplicateResourceException(UserErrorCode.ALREADY_ONBOARDED);
-        }
+        Validator.throwIf(agreementRepository.existsByUser(user),
+            () -> new DuplicateResourceException(UserErrorCode.ALREADY_ONBOARDED));
         agreementRepository.save(userAgreement);
 
         List<UserAuthority> authorities = userAuthorityRepository.findByUser(user)
