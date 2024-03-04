@@ -20,7 +20,7 @@ public final class UserTexture extends BaseDomainTexture {
         int height = getRandomInt(170, 190);
         int weight = getRandomInt(70, 90);
 
-        return createUser(nickname, Sex.MALE, Date.valueOf(birthDate), height, weight,
+        return createUser(nickname, Sex.MALE, birthDate, height, weight,
             ExerciseIntensity.MIDDLE, 0, 0, true, true, Provider.KAKAO,
             String.valueOf(getRandomId()));
     }
@@ -28,7 +28,7 @@ public final class UserTexture extends BaseDomainTexture {
     public static User createUser(
         String nickname,
         Sex sex,
-        Date birthDate,
+        LocalDate birthDate,
         Integer height,
         Integer weight,
         ExerciseIntensity exerciseIntensity,
