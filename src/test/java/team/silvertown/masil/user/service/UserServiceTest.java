@@ -8,7 +8,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
-
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import net.datafaker.Faker;
@@ -83,7 +82,6 @@ class UserServiceTest {
             //when, then
             assertDoesNotThrow(() -> userService.checkNickname(nickname));
         }
-
 
         @Test
         public void 중복닉네임_조회시_이미_존재하는_닉네임을_조회할_경우_예외가_발생한다() throws Exception {
