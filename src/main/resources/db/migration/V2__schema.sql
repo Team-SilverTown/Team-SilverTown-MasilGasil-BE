@@ -5,7 +5,8 @@ CREATE TABLE user_agreements
     is_allowing_marketing          TINYINT      NOT NULL,
     is_personal_info_consented     TINYINT      NOT NULL,
     is_location_info_consented     TINYINT      NOT NULL,
-    is_under_age_consent_confirmed TIMESTAMP(6),
+    is_under_age_consent_confirmed TINYINT,
+    marketing_consented_at         TIMESTAMP(6),
     created_at                     TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at                     TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
 

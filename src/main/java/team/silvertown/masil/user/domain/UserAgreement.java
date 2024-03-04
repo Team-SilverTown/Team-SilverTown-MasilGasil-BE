@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,20 +32,20 @@ public class UserAgreement extends BaseEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Column(name = "is_allowing_marketing")
+    @Column(name = "is_allowing_marketing", columnDefinition = "TINYINT")
     private Boolean isAllowingMarketing;
 
-    @Column(name = "is_personal_info_consented")
+    @Column(name = "is_personal_info_consented", columnDefinition = "TINYINT")
     private Boolean isPersonalInfoConsented;
 
-    @Column(name = "is_location_info_consented")
+    @Column(name = "is_location_info_consented", columnDefinition = "TINYINT")
     private Boolean isLocationInfoConsented;
 
-    @Column(name = "is_under_age_consent_confirmed")
+    @Column(name = "is_under_age_consent_confirmed", columnDefinition = "TINYINT")
     private Boolean isUnderAgeConsentConfirmed;
 
     @Column(name = "marketing_consented_at")
-    private LocalDateTime marketingConsentedAt;
+    private OffsetDateTime marketingConsentedAt;
 
     @Builder
     private UserAgreement(
@@ -55,7 +55,7 @@ public class UserAgreement extends BaseEntity {
         Boolean isPersonalInfoConsented,
         Boolean isLocationInfoConsented,
         Boolean isUnderAgeConsentConfirmed,
-        LocalDateTime marketingConsentedAt
+        OffsetDateTime marketingConsentedAt
     ) {
         UserValidator.validateIsAllowingMarketing(isAllowingMarketing,
             UserErrorCode.INVALID_ALLOWING_MARKETING);
