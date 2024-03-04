@@ -2,7 +2,6 @@ package team.silvertown.masil.user.exception;
 
 import static team.silvertown.masil.common.validator.DateValidator.parseDate;
 
-import java.util.Arrays;
 import java.util.List;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;

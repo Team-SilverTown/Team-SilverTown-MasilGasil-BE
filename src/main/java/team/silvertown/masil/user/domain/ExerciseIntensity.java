@@ -11,9 +11,10 @@ public enum ExerciseIntensity {
     HIGH,
     SUPER_HIGH;
 
-    public static ExerciseIntensity get(String value){
+    public static ExerciseIntensity get(String value) {
         return Arrays.stream(ExerciseIntensity.values())
-            .filter(exerciseIntensity -> exerciseIntensity.name().equals(value))
+            .filter(exerciseIntensity -> exerciseIntensity.name()
+                .equals(value))
             .findFirst()
             .orElseThrow(() -> new BadRequestException(UserErrorCode.INVALID_EXERCISE_INTENSITY));
     }

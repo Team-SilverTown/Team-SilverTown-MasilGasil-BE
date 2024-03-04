@@ -1,6 +1,5 @@
 package team.silvertown.masil.texture;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
