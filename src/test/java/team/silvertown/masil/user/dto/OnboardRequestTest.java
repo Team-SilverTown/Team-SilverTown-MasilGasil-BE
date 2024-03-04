@@ -13,8 +13,7 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +92,7 @@ class OnboardRequestTest {
 
         @ParameterizedTest
         @Transactional
-        @NullAndEmptySource
+        @EmptySource
         @ValueSource(strings = {" ", "a", "_sjf!", "ssssssssssssssssss"})
         public void 유효하지_않은_닉네임이_들어올_시_예외를_발생시킨다(String invalidNickname) throws Exception {
             //given, when, then
@@ -115,7 +114,7 @@ class OnboardRequestTest {
 
         @ParameterizedTest
         @Transactional
-        @NullAndEmptySource
+        @EmptySource
         @ValueSource(strings = {" ", "not woman man", "man", "woman", "mid"})
         public void 유효하지_않은_성별이_들어올_시_예외를_발생시킨다(String invalidSex) throws Exception {
             //given, when, then
@@ -137,7 +136,7 @@ class OnboardRequestTest {
 
         @ParameterizedTest
         @Transactional
-        @NullAndEmptySource
+        @EmptySource
         @ValueSource(strings = {" ", "1999.01.01", "199-901-01", "1999-21-11", "1999-01-011"})
         public void 유효하지_않은_생년월일이_들어올_시_예외를_발생시킨다(String invalidBirthDate) throws Exception {
             //given, when, then
@@ -159,7 +158,6 @@ class OnboardRequestTest {
 
         @ParameterizedTest
         @Transactional
-        @NullSource
         @ValueSource(ints = {0, -1, -123})
         public void 유효하지_않은_키_값이_들어올_시_예외를_발생시킨다(Integer invalidHeight) throws Exception {
             //given, when, then
@@ -181,7 +179,6 @@ class OnboardRequestTest {
 
         @ParameterizedTest
         @Transactional
-        @NullSource
         @ValueSource(ints = {0, -1, -123})
         public void 유효하지_않은_몸무게_값이_들어올_시_예외를_발생시킨다(Integer invalidWeight) throws Exception {
             //given, when, then
@@ -203,7 +200,7 @@ class OnboardRequestTest {
 
         @ParameterizedTest
         @Transactional
-        @NullAndEmptySource
+        @EmptySource
         @ValueSource(strings = {" ", "very good", "awesome", "hahahaha"})
         public void 유효하지_않은_운동강도_값이_들어올_시_예외를_발생시킨다(String invalidExerciseIntensity)
             throws Exception {
