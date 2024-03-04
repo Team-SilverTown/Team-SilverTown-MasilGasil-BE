@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.user.domain.User;
-import team.silvertown.masil.user.dto.LoginResponseDto;
+import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.service.UserService;
 
 @Slf4j
@@ -37,7 +37,7 @@ public class OAuth2AuthenticationSuccessHandler
             User user = userService.join(oAuth2User, provider);
             String jwtToken = tokenProvider.createToken(user.getId());
 
-            LoginResponseDto loginResponseDto = userService.login(jwtToken, user);
+            LoginResponse loginResponseDto = userService.login(jwtToken, user);
             String loginResponse = objectMapper.writeValueAsString(loginResponseDto);
 
             setResponseBody(response, loginResponse);
