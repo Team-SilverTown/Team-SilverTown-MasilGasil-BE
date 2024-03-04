@@ -6,13 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.security.exception.OAuthValidator;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.LoginResponseDto;
+import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.exception.UserValidator;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
@@ -26,11 +28,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAuthorityRepository userAuthorityRepository;
 
-    public LoginResponseDto login(String jwtToken, User user) {
+    public LoginResponse login(String jwtToken, User user) {
         List<UserAuthority> userAuthorities = userAuthorityRepository.findByUser(user);
         UserValidator.validateAuthority(userAuthorities);
 
-        return new LoginResponseDto(jwtToken);
+        return new LoginResponse(jwtToken);
     }
 
     @Transactional
@@ -70,6 +72,13 @@ public class UserService {
             .user(user)
             .build();
         userAuthorityRepository.save(newAuthority);
+    }
+
+    public MeInfoResponse getMe(Long memberId) {
+        User user = userRepository.findById(memberId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        return MeInfoResponse.from(user);
     }
 
 }
