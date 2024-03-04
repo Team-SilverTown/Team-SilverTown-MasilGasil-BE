@@ -1,6 +1,7 @@
 package team.silvertown.masil.user.service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -63,6 +64,9 @@ public class UserService {
         checkNickname(request.nickname());
         user.update(request);
         UserAgreement userAgreement = getUserAgreement(request, user);
+        if (agreementRepository.existsByUser(user)) {
+            throw new DuplicateResourceException(UserErrorCode.ALREADY_ONBOARDED);
+        }
         agreementRepository.save(userAgreement);
 
         List<UserAuthority> authorities = userAuthorityRepository.findByUser(user)
@@ -89,7 +93,7 @@ public class UserService {
     }
 
     private UserAgreement getUserAgreement(OnboardRequest request, User user) {
-        LocalDateTime marketingConsentedAt = request.isAllowingMarketing() ? LocalDateTime.now()
+        OffsetDateTime marketingConsentedAt = request.isAllowingMarketing() ? OffsetDateTime.now()
             : null;
 
         UserAgreement userAgreement = UserAgreement.builder()
