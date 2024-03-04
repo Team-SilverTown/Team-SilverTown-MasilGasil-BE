@@ -39,6 +39,7 @@ import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
+import team.silvertown.masil.user.service.UserService;
 
 @AutoConfigureMockMvc
 @DisplayNameGeneration(ReplaceUnderscores.class)

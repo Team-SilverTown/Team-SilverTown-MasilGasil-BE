@@ -35,34 +35,45 @@ import team.silvertown.masil.user.domain.User;
 @Getter
 public class Masil extends BaseEntity {
 
-    @OneToMany(mappedBy = "masil")
-    private final List<MasilPin> masilPins = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
     @Column(name = "post_id")
     private Long postId;
+
     @Embedded
     @Getter(AccessLevel.NONE)
     private Address address;
+
     @Column(name = "path", nullable = false)
     private LineString path;
+
     @Embedded
     private MasilTitle title;
+
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
+
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
+
     @Column(name = "distance", nullable = false)
     private Integer distance;
+
     @Column(name = "total_time", nullable = false)
     private Integer totalTime;
+
     @Column(name = "started_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
     private OffsetDateTime startedAt;
+
+    @OneToMany(mappedBy = "masil")
+    private final List<MasilPin> masilPins = new ArrayList<>();
 
     @Builder
     private Masil(

@@ -5,8 +5,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.ErrorCode;
+import team.silvertown.masil.user.exception.UserErrorCode;
 
-public class DateValidator extends Validator {
+public class DateValidator extends Validator{
 
     private static final String DATE_FORMAT = "\\d{4}-\\d{2}-\\d{2}";
     private static final String DATE_PATTERN = "yyyy-MM-dd";

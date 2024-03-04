@@ -41,4 +41,4 @@ public enum UserErrorCode implements ErrorCode {
         return this.message;
     }
 
-}
+    }
