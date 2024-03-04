@@ -17,13 +17,8 @@ public record OnboardRequest(
 ) {
 
     public OnboardRequest {
+        // Essential
         UserValidator.validateNickname(nickname, UserErrorCode.INVALID_NICKNAME);
-        UserValidator.validateSex(sex, UserErrorCode.INVALID_SEX);
-        UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
-        UserValidator.validateHeight(height, UserErrorCode.INVALID_HEIGHT);
-        UserValidator.validateWeight(weight, UserErrorCode.INVALID_WEIGHT);
-        UserValidator.validateExerciseIntensity(exerciseIntensity,
-            UserErrorCode.INVALID_EXERCISE_INTENSITY);
         UserValidator.validateIsAllowingMarketing(isAllowingMarketing,
             UserErrorCode.INVALID_ALLOWING_MARKETING);
         UserValidator.validateIsPersonalInfoConsented(isPersonalInfoConsented,
@@ -32,6 +27,24 @@ public record OnboardRequest(
             UserErrorCode.INVALID_LOCATION_INFO_CONSENTED);
         UserValidator.validateIsUnderAgeConsentConfirmed(isUnderAgeConsentConfirmed,
             UserErrorCode.INVALID_UNDER_AGE_CONSENTED);
+
+        // Not essential
+        if (sex != null) {
+            UserValidator.validateSex(sex, UserErrorCode.INVALID_SEX);
+        }
+        if (birthDate != null) {
+            UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
+        }
+        if (height != null) {
+            UserValidator.validateHeight(height, UserErrorCode.INVALID_HEIGHT);
+        }
+        if (weight != null) {
+            UserValidator.validateWeight(weight, UserErrorCode.INVALID_WEIGHT);
+        }
+        if (exerciseIntensity != null) {
+            UserValidator.validateExerciseIntensity(exerciseIntensity,
+                UserErrorCode.INVALID_EXERCISE_INTENSITY);
+        }
     }
 
 }

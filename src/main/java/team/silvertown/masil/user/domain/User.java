@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import java.util.Date;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -74,12 +73,22 @@ public class User extends BaseEntity {
 
     public void update(OnboardRequest request) {
         UserValidator.validateNickname(request.nickname(), UserErrorCode.INVALID_NICKNAME);
-        UserValidator.validateSex(request.sex(), UserErrorCode.INVALID_SEX);
-        UserValidator.validateBirthDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
-        UserValidator.validateHeight(request.height(), UserErrorCode.INVALID_HEIGHT);
-        UserValidator.validateWeight(request.weight(), UserErrorCode.INVALID_WEIGHT);
-        UserValidator.validateExerciseIntensity(request.exerciseIntensity(),
-            UserErrorCode.INVALID_EXERCISE_INTENSITY);
+        if (request.sex() != null) {
+            UserValidator.validateSex(request.sex(), UserErrorCode.INVALID_SEX);
+        }
+        if (request.birthDate() != null) {
+            UserValidator.validateBirthDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
+        }
+        if (request.height() != null) {
+            UserValidator.validateHeight(request.height(), UserErrorCode.INVALID_HEIGHT);
+        }
+        if (request.weight() != null) {
+            UserValidator.validateWeight(request.weight(), UserErrorCode.INVALID_WEIGHT);
+        }
+        if (request.exerciseIntensity() != null) {
+            UserValidator.validateExerciseIntensity(request.exerciseIntensity(),
+                UserErrorCode.INVALID_EXERCISE_INTENSITY);
+        }
 
         this.nickname = request.nickname();
         this.sex = Sex.valueOf(request.sex());
