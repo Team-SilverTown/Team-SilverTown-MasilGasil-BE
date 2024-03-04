@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.sql.Date;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +37,7 @@ public class User extends BaseEntity {
     private Sex sex;
 
     @Column(name = "birth_date")
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "height")
     private Integer height;
@@ -48,6 +49,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ExerciseIntensity exerciseIntensity;
 
+    @Column(name = "profileImg", columnDefinition = "VARCHAR(500)")
+    private String profileImg;
+
     @Column(name = "total_distance")
     private Integer totalDistance;
 
@@ -58,7 +62,7 @@ public class User extends BaseEntity {
     private Boolean isPublic;
 
     @Column(name = "is_allowing_notification")
-    private boolean isAllowingNotification;
+    private Boolean isAllowingNotification;
 
     @Column(name = "provider", columnDefinition = "VARCHAR(20)")
     @Enumerated(EnumType.STRING)
