@@ -7,6 +7,7 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -96,6 +97,19 @@ class AddressTest {
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
             .withMessage(MapErrorCode.NULL_DEPTH4.getMessage());
+    }
+
+    @Test
+    void 지역_Depth_3이_동이_아니면_주소_생성을_실패한다() {
+        // given
+        String seoul = "서울시";
+
+        // when
+        ThrowingCallable create = () -> new Address(addressDepth1, addressDepth2, seoul, "");
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+            .withMessage(MapErrorCode.INVALID_ADDRESS.getMessage());
     }
 
 }
