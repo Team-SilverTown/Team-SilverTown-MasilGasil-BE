@@ -2,7 +2,6 @@ package team.silvertown.masil.user.exception;
 
 import static team.silvertown.masil.common.validator.DateValidator.parseDate;
 
-import java.util.Arrays;
 import java.util.List;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
@@ -21,37 +20,45 @@ public class UserValidator extends Validator {
     }
 
     public static void validateNickname(String nickname, UserErrorCode userErrorCode) {
-        notBlank(nickname, userErrorCode);
-        range(nickname.length(), 2, 12, userErrorCode);
-        notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
+        if (nickname != null) {
+            notBlank(nickname, userErrorCode);
+            range(nickname.length(), 2, 12, userErrorCode);
+            notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
+        }
     }
 
     public static void validateSex(String sex, UserErrorCode userErrorCode) {
-        notBlank(sex, userErrorCode);
-        Sex.get(sex);
+        if (sex != null) {
+            notBlank(sex, userErrorCode);
+            Sex.get(sex);
+        }
     }
 
     public static void validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
-        notBlank(birthDate, userErrorCode);
-        parseDate(birthDate, userErrorCode);
+        if (birthDate != null) {
+            notBlank(birthDate, userErrorCode);
+            parseDate(birthDate, userErrorCode);
+        }
     }
 
     public static void validateHeight(Integer height, UserErrorCode userErrorCode) {
-        notNull(height, userErrorCode);
-        notUnder(height, 1, userErrorCode);
+        if (height != null) {
+            notUnder(height, 1, userErrorCode);
+        }
     }
 
     public static void validateWeight(Integer weight, UserErrorCode userErrorCode) {
-        notNull(weight, userErrorCode);
-        notUnder(weight, 1, userErrorCode);
+        if (weight != null) {
+            notUnder(weight, 1, userErrorCode);
+        }
     }
 
     public static void validateExerciseIntensity(
-        String exerciseIntensity,
-        UserErrorCode userErrorCode
+        String exerciseIntensity
     ) {
-        notNull(exerciseIntensity, userErrorCode);
-        ExerciseIntensity.get(exerciseIntensity);
+        if (exerciseIntensity != null) {
+            ExerciseIntensity.get(exerciseIntensity);
+        }
     }
 
     public static void validateIsAllowingMarketing(
