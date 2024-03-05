@@ -5,7 +5,6 @@ import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.validator.Validator;
 
 @Embeddable
@@ -29,8 +28,6 @@ public class Address {
         Validator.notBlank(depth1, MapErrorCode.BLANK_DEPTH1);
         Validator.notNull(depth2, MapErrorCode.NULL_DEPTH2);
         Validator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);
-        Validator.throwIf(!depth3.endsWith("동"),
-            () -> new BadRequestException(MapErrorCode.INVALID_ADDRESS));
         Validator.notNull(depth4, MapErrorCode.NULL_DEPTH4);
 
         this.depth1 = depth1;

@@ -7,7 +7,6 @@ public enum MapErrorCode implements ErrorCode {
     NULL_DEPTH2(20011001, "지역 2 Depth는 Null이 될 수 없습니다"),
     BLANK_DEPTH3(20011002, "지역 3 Depth가 입력되지 않았습니다"),
     NULL_DEPTH4(20011003, "지역 4 Depth는 Null이 될 수 없습니다"),
-    INVALID_ADDRESS(20011004, "동 정보가 없습니다"),
 
     NULL_KAKAO_POINT(20016000, "입력된 포인트가 NULL이 될 수 없습니다"),
     NULL_PATH(20016001, "입력된 경로가 NULL이 될 수 없습니다"),
