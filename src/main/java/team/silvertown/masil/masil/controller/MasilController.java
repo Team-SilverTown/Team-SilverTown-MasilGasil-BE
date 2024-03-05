@@ -79,6 +79,14 @@ public class MasilController {
     }
 
     @GetMapping("/api/v1/masils/period")
+    @Operation(summary = "기간 별 마실 조회")
+    @ApiResponse(
+        responseCode = "200",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = PeriodResponse.class)
+        )
+    )
     public ResponseEntity<PeriodResponse> getInGivenPeriod(
         @AuthenticationPrincipal
         Long userId,
