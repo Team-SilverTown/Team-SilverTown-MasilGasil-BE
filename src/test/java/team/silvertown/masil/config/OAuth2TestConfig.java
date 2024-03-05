@@ -1,4 +1,4 @@
-package team.silvertown.masil.testConfig;
+package team.silvertown.masil.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
