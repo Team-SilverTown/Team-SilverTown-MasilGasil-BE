@@ -14,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.TimeZoneStorage;
+import org.hibernate.annotations.TimeZoneStorageType;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.exception.UserValidator;
@@ -44,6 +46,7 @@ public class UserAgreement extends BaseEntity {
     @Column(name = "is_under_age_consent_confirmed", columnDefinition = "TINYINT")
     private Boolean isUnderAgeConsentConfirmed;
 
+    @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
     @Column(name = "marketing_consented_at")
     private OffsetDateTime marketingConsentedAt;
 
