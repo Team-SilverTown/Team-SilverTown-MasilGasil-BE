@@ -37,3 +37,7 @@ jwt:
   token-validity-in-seconds: ${TOKEN_EXPIRATION}
 server:
   port: ${SERVER_PORT}
+springdoc:
+  swagger-ui:
+    path: /docs
+    filter: true
