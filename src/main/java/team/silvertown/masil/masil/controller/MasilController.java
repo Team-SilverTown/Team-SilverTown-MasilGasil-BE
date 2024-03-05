@@ -58,6 +58,14 @@ public class MasilController {
     }
 
     @GetMapping("/api/v1/masils/recent")
+    @Operation(summary = "최근 마실 조회")
+    @ApiResponse(
+        responseCode = "200",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = RecentMasilResponse.class)
+        )
+    )
     public ResponseEntity<RecentMasilResponse> getRecent(
         @AuthenticationPrincipal
         Long userId,
