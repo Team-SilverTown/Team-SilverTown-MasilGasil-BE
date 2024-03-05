@@ -31,7 +31,7 @@ public class PostService {
     @Transactional
     public CreateResponse create(Long userId, CreateRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
+            .orElseThrow(getNotFoundException(PostErrorCode.USER_NOT_FOUND));
         Post post = createPost(request, user);
 
         savePins(request.pins(), post);
@@ -39,7 +39,7 @@ public class PostService {
         return new CreateResponse(post.getId());
     }
 
-    private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
+    private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
 
