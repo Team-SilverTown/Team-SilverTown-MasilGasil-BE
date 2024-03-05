@@ -73,7 +73,7 @@ public class Post extends BaseEntity {
     private int likeCount;
 
     @OneToMany(mappedBy = "post")
-    private List<PostPin> postPins = new ArrayList<>();
+    private final List<PostPin> postPins = new ArrayList<>();
 
     @Builder
     private Post(
