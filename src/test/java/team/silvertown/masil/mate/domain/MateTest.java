@@ -54,7 +54,7 @@ class MateTest {
         gatheringPlacePoint = MapTexture.createPoint();
         gatheringPlaceDetail = MateTexture.getRandomSentenceWithMax(50);
         gatherAt = MateTexture.getFutureDateTime();
-        capacity = MateTexture.getRandomInt(1, 9);
+        capacity = 5;
     }
 
     @Test
