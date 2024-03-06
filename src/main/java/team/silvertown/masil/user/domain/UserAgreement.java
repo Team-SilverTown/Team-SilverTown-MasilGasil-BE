@@ -18,7 +18,7 @@ import org.hibernate.annotations.TimeZoneStorage;
 import org.hibernate.annotations.TimeZoneStorageType;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.exception.UserValidator;
+import team.silvertown.masil.user.validator.UserValidator;
 
 @Entity
 @Table(name = "user_agreements")

@@ -1,14 +1,14 @@
-package team.silvertown.masil.user.exception;
-
-import static team.silvertown.masil.common.validator.DateValidator.parseDate;
+package team.silvertown.masil.user.validator;
 
 import java.util.List;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.validator.DateValidator;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.UserAuthority;
+import team.silvertown.masil.user.exception.UserErrorCode;
 
 public class UserValidator extends Validator {
 
@@ -37,7 +37,7 @@ public class UserValidator extends Validator {
     public static void validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
         if (birthDate != null) {
             notBlank(birthDate, userErrorCode);
-            parseDate(birthDate, userErrorCode);
+            DateValidator.parseDate(birthDate, userErrorCode);
         }
     }
 

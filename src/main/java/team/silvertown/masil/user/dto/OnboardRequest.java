@@ -1,7 +1,7 @@
 package team.silvertown.masil.user.dto;
 
 import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.exception.UserValidator;
+import team.silvertown.masil.user.validator.UserValidator;
 
 public record OnboardRequest(
     String nickname,

@@ -3,7 +3,6 @@ package team.silvertown.masil.user.exception;
 import team.silvertown.masil.common.exception.ErrorCode;
 
 public enum UserErrorCode implements ErrorCode {
-
     INVALID_ALLOWING_MARKETING(10010000, "올바르지 않은 형식의 마케팅 동의입니다."),
     INVALID_PERSONAL_INFO_CONSENTED(10010001, "올바르지 않은 형식의 개인 정보 이용 동의입니다."),
     INVALID_LOCATION_INFO_CONSENTED(10010002, "올바르지 않은 형식의 위치 정보 이용 동의 동의입니다."),

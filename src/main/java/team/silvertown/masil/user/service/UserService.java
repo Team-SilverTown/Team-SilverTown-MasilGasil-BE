@@ -1,6 +1,5 @@
 package team.silvertown.masil.user.service;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +18,10 @@ import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponseDto;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.exception.UserValidator;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
+import team.silvertown.masil.user.validator.UserValidator;
 
 @Service
 @RequiredArgsConstructor

@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.ErrorCode;
-import team.silvertown.masil.user.exception.UserErrorCode;
 
 public class DateValidator extends Validator{
 

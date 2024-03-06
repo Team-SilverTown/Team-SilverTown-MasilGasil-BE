@@ -18,7 +18,7 @@ import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.validator.DateValidator;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.exception.UserValidator;
+import team.silvertown.masil.user.validator.UserValidator;
 
 @Entity
 @Table(name = "users")
