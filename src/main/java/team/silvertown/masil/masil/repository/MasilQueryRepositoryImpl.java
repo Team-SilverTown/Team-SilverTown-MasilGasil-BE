@@ -84,6 +84,7 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
             Projections.constructor(
                 MasilDailyDetailDto.class,
                 masil.id,
+                masil.address,
                 masil.content,
                 masil.thumbnailUrl,
                 masil.distance,
