@@ -36,7 +36,7 @@ class MateTest {
     Point gatheringPlacePoint;
     String gatheringPlaceDetail;
     OffsetDateTime gatherAt;
-    int capacity;
+    Integer capacity;
 
     @BeforeEach
     void setUp() {
