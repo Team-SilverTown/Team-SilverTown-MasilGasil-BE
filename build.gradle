@@ -60,7 +60,11 @@ dependencies {
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // RestTemplate(retry)
+    implementation 'org.springframework.retry:spring-retry:1.2.5.RELEASE'
 }
+
 
 test {
     useJUnitPlatform()
