@@ -22,10 +22,10 @@ public abstract class LocalstackTest {
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add("app.bucket", () -> BUCKET_NAME);
         registry.add("spring.cloud.aws.region.static", localStack::getRegion);
         registry.add("spring.cloud.aws.credentials.access-key", localStack::getAccessKey);
         registry.add("spring.cloud.aws.credentials.secret-key", localStack::getSecretKey);
+        registry.add("spring.cloud.aws.s3.bucket", () -> BUCKET_NAME);
         registry.add("spring.cloud.aws.s3.endpoint", LocalstackTest::getS3Endpoint);
     }
 
