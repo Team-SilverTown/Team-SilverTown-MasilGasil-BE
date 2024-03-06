@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 public class HttpRequestsConfigurer
     implements Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> {
 
-    private static final String AUTH_RESOURCE = "/oauth2/**";
+    private static final String AUTH_RESOURCE = "/api/v1/users/login";
 
     @Override
     public void customize(
