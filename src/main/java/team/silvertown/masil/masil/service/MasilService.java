@@ -91,8 +91,9 @@ public class MasilService {
             endDateTime);
         int totalCount = getTotalCount(dailyMasils);
         int totalDistance = getTotalDistance(dailyMasils);
+        int totalCalories = getTotalCalories(dailyMasils);
 
-        return new PeriodResponse(totalDistance, totalCount, dailyMasils);
+        return new PeriodResponse(totalDistance, totalCount, totalCalories, dailyMasils);
     }
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
@@ -107,12 +108,12 @@ public class MasilService {
             .depth4(request.depth4())
             .distance(request.distance())
             .thumbnailUrl(request.thumbnailUrl())
-            .title(request.title())
             .content(request.content())
             .path(KakaoPointMapper.mapToLineString(request.path()))
             .postId(request.postId())
             .startedAt(request.startedAt())
             .totalTime(request.totalTime())
+            .calories(request.calories())
             .user(user)
             .build();
     }
@@ -178,6 +179,22 @@ public class MasilService {
             .orElse(0);
     }
 
+    private int getTotalCalories(List<MasilDailyDto> dailyMasils) {
+        return dailyMasils.stream()
+            .map(this::getDailyCalories)
+            .reduce(Integer::sum)
+            .orElse(0);
+    }
+
+    private int getDailyCalories(MasilDailyDto dailyMasil) {
+        BiFunction<Integer, MasilDailyDetailDto, Integer> accumulator = (accumulated, nextMasil) ->
+            accumulated + nextMasil.getCalories();
+
+        return dailyMasil.masils()
+            .stream()
+            .reduce(0, accumulator, Integer::sum);
+    }
+
     private int getDailyDistance(MasilDailyDto dailyMasil) {
         BiFunction<Integer, MasilDailyDetailDto, Integer> accumulator = (accumulated, nextMasil) ->
             accumulated + nextMasil.getDistance();
@@ -186,6 +203,5 @@ public class MasilService {
             .stream()
             .reduce(0, accumulator, Integer::sum);
     }
-
 
 }

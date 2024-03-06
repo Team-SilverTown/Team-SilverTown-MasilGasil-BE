@@ -32,6 +32,7 @@ class MasilTest {
     LineString path;
     String title;
     int totalTime;
+    int calories;
 
     @BeforeEach
     void setUp() {
@@ -43,6 +44,7 @@ class MasilTest {
         path = MapTexture.createLineString(10000);
         title = MasilTexture.getRandomSentenceWithMax(29);
         totalTime = MasilTexture.getRandomPositive();
+        calories = MasilTexture.getRandomPositive();
     }
 
     @Test
@@ -55,9 +57,9 @@ class MasilTest {
             .depth3(addressDepth3)
             .depth4(addressDepth4)
             .path(path)
-            .title(title)
             .distance((int) path.getLength())
             .totalTime(totalTime)
+            .calories(calories)
             .startedAt(OffsetDateTime.now());
 
         // when
@@ -75,9 +77,9 @@ class MasilTest {
             .depth2(addressDepth2)
             .depth3(addressDepth3)
             .path(path)
-            .title(title)
             .distance((int) path.getLength())
             .totalTime(totalTime)
+            .calories(calories)
             .startedAt(OffsetDateTime.now());
 
         // when
@@ -98,9 +100,9 @@ class MasilTest {
             .depth2(addressDepth2)
             .depth3(addressDepth3)
             .path(path)
-            .title(title)
             .distance((int) path.getLength())
             .totalTime(totalTime)
+            .calories(calories)
             .thumbnailUrl(thumbnailUrl)
             .startedAt(OffsetDateTime.now());
 
@@ -124,9 +126,9 @@ class MasilTest {
             .depth3(addressDepth3)
             .depth4(addressDepth4)
             .path(path)
-            .title(title)
             .totalTime(totalTime)
             .distance(invalidDistance)
+            .calories(calories)
             .startedAt(OffsetDateTime.now());
 
         // when
@@ -149,9 +151,9 @@ class MasilTest {
             .depth3(addressDepth3)
             .depth4(addressDepth4)
             .path(path)
-            .title(title)
             .totalTime(invalidTotalTime)
             .distance((int) path.getLength())
+            .calories(calories)
             .startedAt(OffsetDateTime.now());
 
         // when
@@ -160,6 +162,31 @@ class MasilTest {
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
             .withMessage(MasilErrorCode.INVALID_TOTAL_TIME.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(ints = -1)
+    void 마실_소모_칼로리가_양수가_아니면_마실_생성을_실패한다(Integer invalidCalories) {
+        // given
+        MasilBuilder builder = Masil.builder()
+            .user(user)
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .depth4(addressDepth4)
+            .path(path)
+            .totalTime(totalTime)
+            .distance((int) path.getLength())
+            .calories(invalidCalories)
+            .startedAt(OffsetDateTime.now());
+
+        // when
+        ThrowingCallable create = builder::build;
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+            .withMessage(MasilErrorCode.NON_POSITIVE_CALORIES.getMessage());
     }
 
 }
