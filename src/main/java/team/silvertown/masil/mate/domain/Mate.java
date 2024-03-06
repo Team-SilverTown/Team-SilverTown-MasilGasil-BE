@@ -106,13 +106,15 @@ public class Mate extends BaseEntity {
     }
 
     public KakaoPoint getGatheringPlacePoint() {
-        Point point = this.gathering.getPoint();
-
-        return KakaoPoint.from(point.getCoordinate());
+        return this.gathering.getKakaoPoint();
     }
 
     public String getGatheringPlaceDetail() {
         return this.gathering.getDetail();
+    }
+
+    public OffsetDateTime getGatheringAt() {
+        return this.gathering.getGatheringAt();
     }
 
 }

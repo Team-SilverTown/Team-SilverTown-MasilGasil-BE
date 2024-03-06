@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.TimeZoneStorage;
 import org.hibernate.annotations.TimeZoneStorageType;
 import org.locationtech.jts.geom.Point;
+import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.mate.validator.MateValidator;
 
 @Embeddable
@@ -33,6 +34,10 @@ public class Gathering {
         this.point = point;
         this.detail = detail;
         this.gatheringAt = gatheringAt;
+    }
+
+    public KakaoPoint getKakaoPoint() {
+        return KakaoPoint.from(this.point.getCoordinate());
     }
 
 }
