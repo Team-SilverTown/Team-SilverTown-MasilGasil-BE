@@ -11,7 +11,7 @@ CREATE TABLE mates
     content                TEXT         NOT NULL,
     gathering_place_point  POINT        NOT NULL,
     gathering_place_detail VARCHAR(50)  NOT NULL,
-    gather_at              TIMESTAMP(6) NOT NULL,
+    gathering_at           TIMESTAMP(6) NOT NULL,
     capacity               INTEGER      NOT NULL,
     created_at             TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at             TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
