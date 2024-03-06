@@ -18,11 +18,14 @@ public enum MateErrorCode implements ErrorCode {
     GATHER_AT_PAST(30014000, "메이트 모집 시간은 현재 이후여야 합니다"),
 
     NULL_MATE(30020001, "해당 참여자의 메이트를 확인할 수 없습니다"),
+    OVERGENERATION_IN_SIMILAR_TIME(30020002, "비슷한 시간대에 참여하는 메이트가 있습니다"),
 
     NULL_POST(30030000, "메이트 모집의 산책로 포스트를 확인할 수 없습니다"),
+    POST_NOT_FOUND(300304000, "기존의 산책로 포스트를 찾을 수 없습니다"),
 
     NULL_AUTHOR(30090000, "메이트 모집의 작성자를 확인할 수 없습니다"),
-    NULL_USER(30090001, "해당 메이트 참여자를 확인할 수 없습니다");
+    NULL_USER(30090001, "해당 메이트 참여자를 확인할 수 없습니다"),
+    USER_NOT_FOUND(20190400, "메이트 작성자가 존재하지 않습니다");
 
     private final int code;
     private final String message;
