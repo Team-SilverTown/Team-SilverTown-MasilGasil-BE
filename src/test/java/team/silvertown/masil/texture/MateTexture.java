@@ -43,7 +43,7 @@ public class MateTexture extends BaseDomainTexture {
         Point point = MapTexture.createPoint();
         String detail = getRandomSentenceWithMax(50);
         OffsetDateTime gatherAt = getFutureDateTime();
-        int capacity = getRandomInt(1, 9);
+        int capacity = getRandomInt(1, 10);
 
         return createMate(user, post, addressDepth1, addressDepth2, addressDepth3, "", title,
             content, point, detail, gatherAt, capacity);
