@@ -1,7 +1,12 @@
 package team.silvertown.masil.masil.service;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,15 +14,20 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
+import team.silvertown.masil.common.util.DateTimeConverter;
 import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
-import team.silvertown.masil.masil.dto.CreatePinRequest;
-import team.silvertown.masil.masil.dto.CreateRequest;
-import team.silvertown.masil.masil.dto.CreateResponse;
-import team.silvertown.masil.masil.dto.MasilResponse;
-import team.silvertown.masil.masil.dto.PinResponse;
-import team.silvertown.masil.masil.dto.RecentMasilResponse;
-import team.silvertown.masil.masil.dto.SimpleMasilResponse;
+import team.silvertown.masil.masil.dto.MasilDailyDetailDto;
+import team.silvertown.masil.masil.dto.MasilDailyDto;
+import team.silvertown.masil.masil.dto.request.CreatePinRequest;
+import team.silvertown.masil.masil.dto.request.CreateRequest;
+import team.silvertown.masil.masil.dto.request.PeriodRequest;
+import team.silvertown.masil.masil.dto.response.CreateResponse;
+import team.silvertown.masil.masil.dto.response.MasilResponse;
+import team.silvertown.masil.masil.dto.response.PeriodResponse;
+import team.silvertown.masil.masil.dto.response.PinResponse;
+import team.silvertown.masil.masil.dto.response.RecentMasilResponse;
+import team.silvertown.masil.masil.dto.response.SimpleMasilResponse;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
 import team.silvertown.masil.masil.repository.MasilPinRepository;
 import team.silvertown.masil.masil.repository.MasilRepository;
@@ -71,6 +81,20 @@ public class MasilService {
         return new RecentMasilResponse(masils, masils.isEmpty());
     }
 
+    @Transactional(readOnly = true)
+    public PeriodResponse getInGivenPeriod(Long userId, PeriodRequest request) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
+        OffsetDateTime startDateTime = getStartDateTime(request.startDate());
+        OffsetDateTime endDateTime = getEndDateTime(request.endDate(), startDateTime);
+        List<MasilDailyDto> dailyMasils = masilRepository.findInGivenPeriod(user, startDateTime,
+            endDateTime);
+        int totalCount = getTotalCount(dailyMasils);
+        int totalDistance = getTotalDistance(dailyMasils);
+
+        return new PeriodResponse(totalDistance, totalCount, dailyMasils);
+    }
+
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
@@ -116,5 +140,52 @@ public class MasilService {
             .masil(masil)
             .build();
     }
+
+    private OffsetDateTime getStartDateTime(LocalDate date) {
+        LocalDate startDate = date;
+
+        if (Objects.isNull(date)) {
+            startDate = OffsetDateTime.now(ZoneId.of("Asia/Seoul"))
+                .toLocalDate()
+                .withDayOfMonth(1);
+        }
+
+        return DateTimeConverter.toBeginningOfDay(startDate);
+    }
+
+    private OffsetDateTime getEndDateTime(LocalDate date, OffsetDateTime startDateTime) {
+        LocalDate endDate = date;
+
+        if (Objects.isNull(date)) {
+            YearMonth yearMonth = YearMonth.of(startDateTime.getYear(), startDateTime.getMonth());
+            endDate = yearMonth.atEndOfMonth();
+        }
+
+        return DateTimeConverter.toEndOfDay(endDate);
+    }
+
+    private int getTotalCount(List<MasilDailyDto> dailyMasils) {
+        return dailyMasils.stream()
+            .mapToInt(dailyMasil -> dailyMasil.masils()
+                .size())
+            .sum();
+    }
+
+    private int getTotalDistance(List<MasilDailyDto> dailyMasils) {
+        return dailyMasils.stream()
+            .map(this::getDailyDistance)
+            .reduce(Integer::sum)
+            .orElse(0);
+    }
+
+    private int getDailyDistance(MasilDailyDto dailyMasil) {
+        BiFunction<Integer, MasilDailyDetailDto, Integer> accumulator = (accumulated, nextMasil) ->
+            accumulated + nextMasil.getDistance();
+
+        return dailyMasil.masils()
+            .stream()
+            .reduce(0, accumulator, Integer::sum);
+    }
+
 
 }
