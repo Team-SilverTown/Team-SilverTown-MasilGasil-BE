@@ -1,20 +1,18 @@
 package team.silvertown.masil.user.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
-import team.silvertown.masil.security.exception.OAuthValidator;
+import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.LoginResponseDto;
+import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.exception.UserValidator;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
 
@@ -25,23 +23,30 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserAuthorityRepository userAuthorityRepository;
+    private final KakaoOAuthService kakaoOAuthService;
+    private final JwtTokenProvider tokenProvider;
 
-    public LoginResponseDto login(String jwtToken, User user) {
-        List<UserAuthority> userAuthorities = userAuthorityRepository.findByUser(user);
-        UserValidator.validateAuthority(userAuthorities);
+    public LoginResponse login(String kakaoToken) {
+        OAuthResponse oAuthResponse = kakaoOAuthService.oauthResponse(kakaoToken);
+        Provider provider = Provider.get(oAuthResponse.provider());
+        boolean isJoined = userRepository.existsByProviderAndSocialId(provider,
+            oAuthResponse.providerId());
+        if (isJoined) {
+            return joinedUserResponse(provider, oAuthResponse);
+        }
 
-        return new LoginResponseDto(jwtToken);
+        User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
+        assignDefaultAuthority(justSavedUser);
+        String newUserToken = tokenProvider.createToken(justSavedUser.getId());
+
+        return new LoginResponse(newUserToken);
     }
 
-    @Transactional
-    public User join(OAuth2User oAuth2User, String provider) {
-        OAuthValidator.validateSocialUser(oAuth2User);
-        Provider authenticatedProvider = OAuthValidator.validateProvider(provider);
+    private LoginResponse joinedUserResponse(Provider provider, OAuthResponse oAuthResponse) {
+        User alreadyJoinedUser = createAndSave(provider, oAuthResponse.providerId());
+        String token = tokenProvider.createToken(alreadyJoinedUser.getId());
 
-        String providerId = oAuth2User.getName();
-
-        return userRepository.findByProviderAndSocialId(authenticatedProvider, providerId)
-            .orElseGet(() -> createAndSave(authenticatedProvider, providerId));
+        return new LoginResponse(token);
     }
 
     public void checkNickname(String nickname) {
