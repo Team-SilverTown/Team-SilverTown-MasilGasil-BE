@@ -41,11 +41,10 @@ spring:
   cloud:
     aws:
       credentials:
-        accessKey: ${AWS_ACCESS_KEY}
-        secretKey: ${AWS_SECRET_KEY}
+        accessKey: ${AWS_ACCESS_KEY_ID}
+        secretKey: ${AWS_SECRET_ACCESS_KEY}
       region:
         static: ap-northeast-2
-      endpoint: ${AWS_ENDPOINT}
       s3:
         bucket: ${AWS_S3_IMAGE_BUCKET}
         endpoint: ${AWS_S3_IMAGE_ENDPOINT}
