@@ -74,7 +74,7 @@ public class MateTexture extends BaseDomainTexture {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatherAt)
             .capacity(capacity)
             .build();
     }

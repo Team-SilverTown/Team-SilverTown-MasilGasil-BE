@@ -2,16 +2,19 @@ package team.silvertown.masil.mate.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.time.OffsetDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.TimeZoneStorage;
+import org.hibernate.annotations.TimeZoneStorageType;
 import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.mate.validator.MateValidator;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class GatheringPlace {
+public class Gathering {
 
     @Column(name = "gathering_place_point", nullable = false)
     private Point point;
@@ -19,11 +22,17 @@ public class GatheringPlace {
     @Column(name = "gathering_place_detail", length = 50, nullable = false)
     private String detail;
 
-    public GatheringPlace(Point point, String detail) {
+    @Column(name = "gather_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
+    @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
+    private OffsetDateTime gatheringAt;
+
+    public Gathering(Point point, String detail, OffsetDateTime gatheringAt) {
         MateValidator.validateDetail(detail);
+        MateValidator.validateGatheringAt(gatheringAt);
 
         this.point = point;
         this.detail = detail;
+        this.gatheringAt = gatheringAt;
     }
 
 }

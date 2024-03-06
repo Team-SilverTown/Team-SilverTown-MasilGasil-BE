@@ -35,7 +35,7 @@ class MateTest {
     String content;
     Point gatheringPlacePoint;
     String gatheringPlaceDetail;
-    OffsetDateTime gatherAt;
+    OffsetDateTime gatheringAt;
     Integer capacity;
 
     @BeforeEach
@@ -53,7 +53,7 @@ class MateTest {
         content = MateTexture.getRandomSentenceWithMax(1000);
         gatheringPlacePoint = MapTexture.createPoint();
         gatheringPlaceDetail = MateTexture.getRandomSentenceWithMax(50);
-        gatherAt = MateTexture.getFutureDateTime();
+        gatheringAt = MateTexture.getFutureDateTime();
         capacity = MateTexture.getRandomInt(1, 10);
     }
 
@@ -71,7 +71,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(capacity);
 
         // when
@@ -94,7 +94,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(capacity);
 
         // when
@@ -118,7 +118,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(capacity);
 
         // when
@@ -145,7 +145,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(capacity);
 
         // when
@@ -171,7 +171,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(capacity);
 
         // when
@@ -198,7 +198,7 @@ class MateTest {
             .content(blankContent)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(capacity);
 
         // when
@@ -207,32 +207,6 @@ class MateTest {
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
             .withMessage(MateErrorCode.BLANK_CONTENT.getMessage());
-    }
-
-    @Test
-    void 메이트_모집_시간이_현재보다_이전이면_메이트_생성을_실패한다() {
-        // given
-        OffsetDateTime past = MateTexture.getPastDateTime();
-        MateBuilder builder = Mate.builder()
-            .author(user)
-            .post(post)
-            .depth1(addressDepth1)
-            .depth2(addressDepth2)
-            .depth3(addressDepth3)
-            .depth4("")
-            .title(title)
-            .content(content)
-            .gatheringPlacePoint(gatheringPlacePoint)
-            .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(past)
-            .capacity(capacity);
-
-        // when
-        ThrowingCallable create = builder::build;
-
-        // then
-        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(MateErrorCode.GATHER_AT_PAST.getMessage());
     }
 
     @Test
@@ -249,7 +223,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt);
+            .gatheringAt(gatheringAt);
 
         // when
         ThrowingCallable create = builder::build;
@@ -274,7 +248,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(negativeCapacity);
 
         // when
@@ -300,7 +274,7 @@ class MateTest {
             .content(content)
             .gatheringPlacePoint(gatheringPlacePoint)
             .gatheringPlaceDetail(gatheringPlaceDetail)
-            .gatherAt(gatherAt)
+            .gatheringAt(gatheringAt)
             .capacity(excessiveCapacity);
 
         // when

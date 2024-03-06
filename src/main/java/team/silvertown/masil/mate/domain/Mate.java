@@ -15,8 +15,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.TimeZoneStorage;
-import org.hibernate.annotations.TimeZoneStorageType;
 import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.map.Address;
@@ -56,11 +54,7 @@ public class Mate extends BaseEntity {
 
     @Embedded
     @Getter(AccessLevel.NONE)
-    private GatheringPlace gatheringPlace;
-
-    @Column(name = "gather_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
-    @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
-    private OffsetDateTime gatherAt;
+    private Gathering gathering;
 
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
@@ -77,14 +71,13 @@ public class Mate extends BaseEntity {
         String content,
         Point gatheringPlacePoint,
         String gatheringPlaceDetail,
-        OffsetDateTime gatherAt,
+        OffsetDateTime gatheringAt,
         Integer capacity
     ) {
         MateValidator.notNull(author, MateErrorCode.NULL_AUTHOR);
         MateValidator.notNull(post, MateErrorCode.NULL_POST);
         MateValidator.validateTitle(title);
         MateValidator.notBlank(content, MateErrorCode.BLANK_CONTENT);
-        MateValidator.validateGatherAt(gatherAt);
         MateValidator.validateCapacity(capacity);
 
         this.author = author;
@@ -92,8 +85,7 @@ public class Mate extends BaseEntity {
         this.address = new Address(depth1, depth2, depth3, depth4);
         this.title = title;
         this.content = content;
-        this.gatheringPlace = new GatheringPlace(gatheringPlacePoint, gatheringPlaceDetail);
-        this.gatherAt = gatherAt;
+        this.gathering = new Gathering(gatheringPlacePoint, gatheringPlaceDetail, gatheringAt);
         this.capacity = capacity;
     }
 
@@ -114,13 +106,13 @@ public class Mate extends BaseEntity {
     }
 
     public KakaoPoint getGatheringPlacePoint() {
-        Point point = this.gatheringPlace.getPoint();
+        Point point = this.gathering.getPoint();
 
         return KakaoPoint.from(point.getCoordinate());
     }
 
     public String getGatheringPlaceDetail() {
-        return this.gatheringPlace.getDetail();
+        return this.gathering.getDetail();
     }
 
 }
