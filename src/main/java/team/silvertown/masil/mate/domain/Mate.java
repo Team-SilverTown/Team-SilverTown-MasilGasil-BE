@@ -81,7 +81,7 @@ public class Mate extends BaseEntity {
         Integer capacity
     ) {
         MateValidator.notNull(author, MateErrorCode.NULL_AUTHOR);
-//        MateValidator.notNull(post, MateErrorCode.NULL_POST);
+        MateValidator.notNull(post, MateErrorCode.NULL_POST);
         MateValidator.validateTitle(title);
         MateValidator.notBlank(content, MateErrorCode.BLANK_CONTENT);
         MateValidator.validateGatherAt(gatherAt);
