@@ -26,9 +26,9 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
     private static final int DEFAULT_RECENT_SIZE = 10;
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final QMasil masil = QMasil.masil;
 
     public List<Masil> findRecent(User user, Integer size) {
-        QMasil masil = QMasil.masil;
         int limit = DEFAULT_RECENT_SIZE;
 
         if (Objects.nonNull(size) && size != 0) {
@@ -49,7 +49,6 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
         OffsetDateTime startDateTime,
         OffsetDateTime endDateTime
     ) {
-        QMasil masil = QMasil.masil;
         BooleanBuilder condition = new BooleanBuilder();
         StringTemplate startDate = convertToLocalDate(masil.startedAt);
 
@@ -62,7 +61,7 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
             .orderBy(masil.startedAt.asc())
             .transform(
                 GroupBy.groupBy(startDate)
-                    .as(projectDailyDetail(masil))
+                    .as(projectDailyDetail())
             )
             .entrySet()
             .stream()
@@ -77,9 +76,7 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
         );
     }
 
-    private GroupExpression<MasilDailyDetailDto, List<MasilDailyDetailDto>> projectDailyDetail(
-        QMasil masil
-    ) {
+    private GroupExpression<MasilDailyDetailDto, List<MasilDailyDetailDto>> projectDailyDetail() {
         return GroupBy.list(
             Projections.constructor(
                 MasilDailyDetailDto.class,
