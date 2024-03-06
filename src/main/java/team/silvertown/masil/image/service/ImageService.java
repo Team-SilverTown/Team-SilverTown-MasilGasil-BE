@@ -28,7 +28,7 @@ public class ImageService {
         try {
             s3Template.upload(s3Properties.bucket(), key, file.getInputStream());
 
-            return getUri(key);
+            return createURI(key);
         } catch (IOException e) {
             throw new UncheckedIOException(e.getMessage(), e);
         }
@@ -41,7 +41,7 @@ public class ImageService {
         return encoder.encodeToString(key);
     }
 
-    private URI getUri(String key) {
+    private URI createURI(String key) {
         String uri = MessageFormat.format(
             "{0}/{1}/{2}",
             s3Properties.endpoint(),
