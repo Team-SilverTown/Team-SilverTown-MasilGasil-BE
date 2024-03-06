@@ -1,7 +1,6 @@
 package team.silvertown.masil.mate.validator;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.exception.BadRequestException;
@@ -25,10 +24,10 @@ public final class MateValidator extends Validator {
         notOver(detail.length(), MAX_DETAIL_LENGTH, MateErrorCode.DETAIL_TOO_LONG);
     }
 
-    public static void validateGatherAt(OffsetDateTime gatherAt) {
-        OffsetDateTime now = OffsetDateTime.now(ZoneId.of("Asia/Seoul"));
+    public static void validateGatheringAt(OffsetDateTime gatheringAt) {
+        OffsetDateTime now = OffsetDateTime.now();
 
-        throwIf(gatherAt.isBefore(now),
+        throwIf(gatheringAt.isBefore(now),
             () -> new BadRequestException(MateErrorCode.GATHER_AT_PAST));
     }
 
