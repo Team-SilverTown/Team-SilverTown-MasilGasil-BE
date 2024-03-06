@@ -60,6 +60,18 @@ dependencies {
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // query dsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+}
+
+def querydslSrcDir = 'src/main/generated'
+
+compileJava {
+    options.generatedSourceOutputDirectory = file(querydslSrcDir)
 }
 
 test {
@@ -111,8 +123,17 @@ jacocoTestCoverageVerification {
                     '*.domain.*',
                     '*.service.*'
             ]
+
+            excludes = [
+                    "*.Q*"
+            ]
         }
     }
 
     dependsOn jacocoTestReport
 }
+
+clean {
+    delete file(querydslSrcDir)
+}
+

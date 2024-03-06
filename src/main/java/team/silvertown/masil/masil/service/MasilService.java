@@ -16,6 +16,8 @@ import team.silvertown.masil.masil.dto.CreateRequest;
 import team.silvertown.masil.masil.dto.CreateResponse;
 import team.silvertown.masil.masil.dto.MasilResponse;
 import team.silvertown.masil.masil.dto.PinResponse;
+import team.silvertown.masil.masil.dto.RecentMasilResponse;
+import team.silvertown.masil.masil.dto.SimpleMasilResponse;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
 import team.silvertown.masil.masil.repository.MasilPinRepository;
 import team.silvertown.masil.masil.repository.MasilRepository;
@@ -34,7 +36,7 @@ public class MasilService {
     @Transactional
     public CreateResponse create(Long userId, CreateRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(throwNotFound(MasilErrorCode.USER_NOT_FOUND));
+            .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = createMasil(request, user);
         Masil savedMasil = masilRepository.save(masil);
 
@@ -46,9 +48,9 @@ public class MasilService {
     @Transactional(readOnly = true)
     public MasilResponse getById(Long userId, Long id) {
         User user = userRepository.findById(userId)
-            .orElseThrow(throwNotFound(MasilErrorCode.USER_NOT_FOUND));
+            .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = masilRepository.findById(id)
-            .orElseThrow(throwNotFound(MasilErrorCode.MASIL_NOT_FOUND));
+            .orElseThrow(getNotFoundException(MasilErrorCode.MASIL_NOT_FOUND));
 
         MasilValidator.validateMasilOwner(masil, user);
 
@@ -57,7 +59,19 @@ public class MasilService {
         return MasilResponse.from(masil, pins);
     }
 
-    private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
+    @Transactional(readOnly = true)
+    public RecentMasilResponse getRecent(Long userId, Integer size) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
+        List<SimpleMasilResponse> masils = masilRepository.findRecent(user, size)
+            .stream()
+            .map(SimpleMasilResponse::from)
+            .toList();
+
+        return new RecentMasilResponse(masils, masils.isEmpty());
+    }
+
+    private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
 
