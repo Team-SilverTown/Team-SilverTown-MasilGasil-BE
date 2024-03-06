@@ -53,9 +53,6 @@ public class Masil extends BaseEntity {
     @Column(name = "path", nullable = false)
     private LineString path;
 
-    @Embedded
-    private MasilTitle title;
-
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
@@ -67,6 +64,9 @@ public class Masil extends BaseEntity {
 
     @Column(name = "total_time", nullable = false)
     private Integer totalTime;
+
+    @Column(name = "calories", nullable = false)
+    private Integer calories;
 
     @Column(name = "started_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
@@ -84,32 +84,29 @@ public class Masil extends BaseEntity {
         String depth3,
         String depth4,
         LineString path,
-        String title,
         String content,
         String thumbnailUrl,
         Integer distance,
         Integer totalTime,
+        Integer calories,
         OffsetDateTime startedAt
     ) {
         MasilValidator.notNull(user, MasilErrorCode.NULL_USER);
         MasilValidator.validateUrl(thumbnailUrl);
         MasilValidator.notUnder(distance, 0, MasilErrorCode.INVALID_DISTANCE);
         MasilValidator.notUnder(totalTime, 0, MasilErrorCode.INVALID_TOTAL_TIME);
+        MasilValidator.notUnder(calories, 0, MasilErrorCode.NON_POSITIVE_CALORIES);
 
         this.user = user;
         this.postId = postId;
         this.address = new Address(depth1, depth2, depth3, depth4);
         this.path = path;
-        this.title = new MasilTitle(title);
         this.content = content;
         this.thumbnailUrl = thumbnailUrl;
         this.distance = distance;
         this.totalTime = totalTime;
+        this.calories = calories;
         this.startedAt = startedAt;
-    }
-
-    public String getTitle() {
-        return this.title.getTitle();
     }
 
     public List<KakaoPoint> getKakaoPath() {
