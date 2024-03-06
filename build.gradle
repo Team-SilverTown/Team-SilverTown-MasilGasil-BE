@@ -74,6 +74,10 @@ dependencies {
     // aws
     implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.0.0'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.0'
+
+    // test container
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:localstack"
 }
 
 def querydslSrcDir = 'src/main/generated'
