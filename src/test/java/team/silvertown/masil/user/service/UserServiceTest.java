@@ -35,6 +35,7 @@ import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
+import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
@@ -295,6 +296,71 @@ class UserServiceTest {
                 assertThat(updatedAuthority.get(1)
                     .getAuthority()).isEqualTo(Authority.NORMAL);
 
+            }
+
+        }
+
+        @Nested
+        class 유저정보를_내려받는_테스트 {
+
+            private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
+                "yyyy-MM-dd");
+            private User unTypedUser;
+
+            private static OnboardRequest getNormalRequest() {
+                return new OnboardRequest(
+                    "nickname",
+                    Sex.MALE.name(),
+                    format.format(faker.date()
+                        .birthdayLocalDate(20, 40)),
+                    getRandomInt(170, 190),
+                    getRandomInt(70, 90),
+                    ExerciseIntensity.MIDDLE.name(),
+                    true,
+                    true,
+                    true,
+                    true
+                );
+            }
+
+            @BeforeEach
+            void setup() {
+                String socialId = String.valueOf(faker.barcode());
+                given(oAuth2User.getName()).willReturn(socialId);
+                unTypedUser = userService.join(oAuth2User, "kakao");
+            }
+
+
+            @Test
+            public void 정상적으로_유저정보를_내려받을_수_있다() throws Exception {
+                //given
+                OnboardRequest request = getNormalRequest();
+                List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
+                    unTypedUser);
+                assertThat(beforeUpdatedAuthority).hasSize(1);
+                assertThat(beforeUpdatedAuthority.get(0)
+                    .getAuthority()).isEqualTo(Authority.RESTRICTED);
+
+                //when
+                userService.onboard(unTypedUser.getId(), request);
+
+                //then
+                User updatedUser = userRepository.findById(unTypedUser.getId())
+                    .get();
+                assertDoesNotThrow(() -> userService.getMe(updatedUser.getId()));
+                MeInfoResponse me = userService.getMe(updatedUser.getId());
+                assertAll(
+                    () -> assertThat(updatedUser.getNickname()).isEqualTo(me.nickname()),
+                    () -> assertThat(updatedUser.getBirthDate()
+                        .toString()).isEqualTo(
+                        me.birthDate().toString()),
+                    () -> assertThat(updatedUser.getHeight()).isEqualTo(me.height()),
+                    () -> assertThat(updatedUser.getWeight()).isEqualTo(me.weight()),
+                    () -> assertThat(updatedUser.getSex()
+                        .name()).isEqualTo(me.sex().name()),
+                    () -> assertThat(updatedUser.getExerciseIntensity()
+                        .name()).isEqualTo(me.exerciseIntensity().name())
+                );
             }
 
         }
