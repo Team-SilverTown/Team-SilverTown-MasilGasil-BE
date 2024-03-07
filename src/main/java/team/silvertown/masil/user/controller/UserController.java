@@ -35,6 +35,7 @@ public class UserController {
         Long userId
     ) {
         userService.onboard(userId, request);
+
         return ResponseEntity.ok()
             .build();
     }
@@ -53,6 +54,7 @@ public class UserController {
         String nickname
     ) {
         userService.checkNickname(nickname);
+
         return ResponseEntity.ok()
             .build();
     }
@@ -77,9 +79,11 @@ public class UserController {
     public ResponseEntity<Void> changePublic(
         @AuthenticationPrincipal
         Long memberId
-    ){
+    ) {
         userService.changePublic(memberId);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok()
+            .build();
     }
-    
+
 }
