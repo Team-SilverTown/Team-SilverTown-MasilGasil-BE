@@ -1,24 +1,28 @@
 package team.silvertown.masil.user.service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
+import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.security.exception.OAuthValidator;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
+import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.exception.UserValidator;
+import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
+import team.silvertown.masil.user.validator.UserValidator;
 
 @Slf4j
 @Service
@@ -26,6 +30,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserAgreementRepository agreementRepository;
     private final UserAuthorityRepository userAuthorityRepository;
 
     public LoginResponse login(String jwtToken, User user) {
@@ -46,16 +51,62 @@ public class UserService {
             .orElseGet(() -> createAndSave(authenticatedProvider, providerId));
     }
 
+    @Transactional
+    public void onboard(long userId, OnboardRequest request) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        checkNickname(request.nickname());
+        user.update(request);
+        UserAgreement userAgreement = getUserAgreement(request, user);
+        Validator.throwIf(agreementRepository.existsByUser(user),
+            () -> new DuplicateResourceException(UserErrorCode.ALREADY_ONBOARDED));
+        agreementRepository.save(userAgreement);
+
+        List<UserAuthority> authorities = userAuthorityRepository.findByUser(user)
+            .stream()
+            .toList();
+        updatingAuthority(authorities, user);
+    }
+
     public void checkNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
         }
     }
 
+    private void updatingAuthority(List<UserAuthority> authorities, User user) {
+        boolean hasNormalAuthority = authorities.stream()
+            .map(UserAuthority::getAuthority)
+            .anyMatch(a -> a.equals(Authority.NORMAL));
+
+        if (!hasNormalAuthority) {
+            UserAuthority normalAuthority = generateUserAuthority(user, Authority.NORMAL);
+            userAuthorityRepository.save(normalAuthority);
+        }
+    }
+
+    private UserAgreement getUserAgreement(OnboardRequest request, User user) {
+        OffsetDateTime marketingConsentedAt = request.isAllowingMarketing() ? OffsetDateTime.now()
+            : null;
+
+        UserAgreement userAgreement = UserAgreement.builder()
+            .user(user)
+            .isAllowingMarketing(request.isAllowingMarketing())
+            .isLocationInfoConsented(request.isLocationInfoConsented())
+            .isPersonalInfoConsented(request.isPersonalInfoConsented())
+            .isUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed())
+            .marketingConsentedAt(marketingConsentedAt)
+            .build();
+
+        return userAgreement;
+    }
+
     private User createAndSave(Provider authenticatedProvider, String providerId) {
         User newUser = create(authenticatedProvider, providerId);
         User savedUser = userRepository.save(newUser);
         assignDefaultAuthority(savedUser);
+
         return savedUser;
     }
 
@@ -67,10 +118,7 @@ public class UserService {
     }
 
     private void assignDefaultAuthority(User user) {
-        UserAuthority newAuthority = UserAuthority.builder()
-            .authority(Authority.RESTRICTED)
-            .user(user)
-            .build();
+        UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
     }
 
@@ -79,6 +127,13 @@ public class UserService {
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         return MeInfoResponse.from(user);
+    }
+
+    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
+            .build();
     }
 
 }

@@ -25,6 +25,18 @@ public class OAuth2AuthenticationSuccessHandler
     private final JwtTokenProvider tokenProvider;
     private final ObjectMapper objectMapper;
 
+    private static void setResponseBody(HttpServletResponse response, String loginResponse)
+        throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter()
+            .write(loginResponse);
+        response.getWriter()
+            .flush();
+        response.getWriter()
+            .close();
+    }
+
     @Override
     public void onAuthenticationSuccess(
         HttpServletRequest request,
@@ -42,18 +54,6 @@ public class OAuth2AuthenticationSuccessHandler
 
             setResponseBody(response, loginResponse);
         }
-    }
-
-    private static void setResponseBody(HttpServletResponse response, String loginResponse)
-        throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter()
-            .write(loginResponse);
-        response.getWriter()
-            .flush();
-        response.getWriter()
-            .close();
     }
 
 }
