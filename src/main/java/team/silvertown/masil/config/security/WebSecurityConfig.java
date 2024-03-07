@@ -31,6 +31,7 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ObjectMapper objectMapper;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final HttpRequestsConfigurer httpRequestsConfigurer;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -50,6 +51,7 @@ public class WebSecurityConfig {
             .logout(AbstractHttpConfigurer::disable)
             .sessionManagement(
                 management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(httpRequestsConfigurer)
             .oauth2Login(oauth2Login -> oauth2Login
                 .userInfoEndpoint(userInfo -> userInfo
                     .userAuthoritiesMapper(grantedAuthoritiesMapper()))

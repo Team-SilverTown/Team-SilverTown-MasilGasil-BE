@@ -1,4 +1,4 @@
-package team.silvertown.masil.masil.dto;
+package team.silvertown.masil.masil.dto.request;
 
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.map.MapErrorCode;
