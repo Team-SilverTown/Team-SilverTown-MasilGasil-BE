@@ -18,6 +18,7 @@ import team.silvertown.masil.user.dto.LoginRequest;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.service.UserService;
 
 @RestController
@@ -81,6 +82,19 @@ public class UserController {
         Long memberId
     ) {
         userService.changePublic(memberId);
+
+        return ResponseEntity.ok()
+            .build();
+    }
+
+    @PutMapping("/api/v1/users")
+    public ResponseEntity<Void> updateInfo(
+        @RequestBody
+        UpdateRequest updateRequest,
+        @AuthenticationPrincipal
+        Long memberId
+    ) {
+        userService.updateInfo(memberId, updateRequest);
 
         return ResponseEntity.ok()
             .build();
