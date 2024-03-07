@@ -64,7 +64,10 @@ public class UserController {
     }
 
     @GetMapping("/api/v1/users/me")
-    public ResponseEntity<MeInfoResponse> getMyInfo(@AuthenticationPrincipal Long memberId){
+    public ResponseEntity<MeInfoResponse> getMyInfo(
+        @AuthenticationPrincipal
+        Long memberId
+    ) {
         return ResponseEntity.ok(userService.getMe(memberId));
     }
 
