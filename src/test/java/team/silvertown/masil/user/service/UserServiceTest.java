@@ -30,8 +30,8 @@ import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -48,6 +48,7 @@ class UserServiceTest {
     private static final String VALID_PROVIDER = "kakao";
     private static final String INVALID_PROVIDER = faker.animal()
         .name();
+    private static final String VALID_KAKAO_TOKEN = "valid token";
 
     @Autowired
     UserService userService;
@@ -240,8 +241,16 @@ class UserServiceTest {
             @BeforeEach
             void setup() {
                 String socialId = String.valueOf(faker.barcode());
-                given(oAuth2User.getName()).willReturn(socialId);
-                unTypedUser = userService.join(oAuth2User, "kakao");
+                User user = User.builder()
+                    .provider(Provider.KAKAO)
+                    .socialId(socialId)
+                    .build();
+                UserAuthority newAuthority = UserAuthority.builder()
+                    .authority(Authority.RESTRICTED)
+                    .user(user)
+                    .build();
+                userAuthorityRepository.save(newAuthority);
+                unTypedUser = userRepository.save(user);
             }
 
 
@@ -267,13 +276,16 @@ class UserServiceTest {
                     () -> assertThat(updatedUser.getNickname()).isEqualTo(me.nickname()),
                     () -> assertThat(updatedUser.getBirthDate()
                         .toString()).isEqualTo(
-                        me.birthDate().toString()),
+                        me.birthDate()
+                            .toString()),
                     () -> assertThat(updatedUser.getHeight()).isEqualTo(me.height()),
                     () -> assertThat(updatedUser.getWeight()).isEqualTo(me.weight()),
                     () -> assertThat(updatedUser.getSex()
-                        .name()).isEqualTo(me.sex().name()),
+                        .name()).isEqualTo(me.sex()
+                        .name()),
                     () -> assertThat(updatedUser.getExerciseIntensity()
-                        .name()).isEqualTo(me.exerciseIntensity().name())
+                        .name()).isEqualTo(me.exerciseIntensity()
+                        .name())
                 );
             }
 

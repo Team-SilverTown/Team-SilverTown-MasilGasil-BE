@@ -21,7 +21,8 @@ public class HttpRequestsConfigurer
         authorizeRequests
             .requestMatchers(AUTH_RESOURCE)
             .permitAll()
-            .requestMatchers(USER_INFO_REQUEST).hasRole(NORMAL_USER_ROLE)
+            .requestMatchers(USER_INFO_REQUEST)
+            .hasRole(NORMAL_USER_ROLE)
             .anyRequest()
             .authenticated();
     }
