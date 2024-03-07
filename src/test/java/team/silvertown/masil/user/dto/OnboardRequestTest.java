@@ -1,7 +1,6 @@
 package team.silvertown.masil.user.dto;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.text.SimpleDateFormat;
@@ -86,7 +85,10 @@ class OnboardRequestTest {
         @BeforeEach
         void setup() {
             String socialId = String.valueOf(faker.barcode());
-            User user = User.builder().provider(Provider.KAKAO).socialId(socialId).build();
+            User user = User.builder()
+                .provider(Provider.KAKAO)
+                .socialId(socialId)
+                .build();
             unTypedUser = userRepository.save(user);
         }
 

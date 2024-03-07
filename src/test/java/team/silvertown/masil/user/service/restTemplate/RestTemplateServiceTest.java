@@ -1,8 +1,5 @@
 package team.silvertown.masil.user.service.restTemplate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.Assertions;
@@ -26,15 +23,12 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootTest
 class RestTemplateServiceTest {
 
-    @MockBean
-    RestTemplate restTemplate;
-
-    @Autowired
-    RestTemplateService restTemplateService;
-
     private static final String VALID_TOKEN = "valid token";
     private static final String KAKAO_USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
-
+    @MockBean
+    RestTemplate restTemplate;
+    @Autowired
+    RestTemplateService restTemplateService;
 
     @Test
     public void 정상적으로_값을_받은_경우_response_반환에_성공한다() throws Exception {
@@ -55,6 +49,7 @@ class RestTemplateServiceTest {
         )).willReturn(mockEntity);
 
         //when, then
-        Assertions.assertDoesNotThrow(() ->restTemplateService.requestKaKaoInfo(VALID_TOKEN));
+        Assertions.assertDoesNotThrow(() -> restTemplateService.requestKaKaoInfo(VALID_TOKEN));
     }
+
 }

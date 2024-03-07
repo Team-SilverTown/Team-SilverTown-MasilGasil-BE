@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
@@ -13,6 +14,7 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,21 +24,18 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
-import team.silvertown.masil.user.domain.Provider;
-import team.silvertown.masil.user.dto.LoginResponse;
-import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
+import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
+import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
-import org.junit.jupiter.api.Nested;
-
-import static org.mockito.ArgumentMatchers.anyString;
 
 @AutoConfigureMockMvc
 @DisplayNameGeneration(ReplaceUnderscores.class)
@@ -123,7 +122,7 @@ class UserServiceTest {
             given(kakaoOAuthService.getUserInfo(anyString())).willThrow(RuntimeException.class);
 
             //when, then
-            assertThatThrownBy(() ->userService.login(VALID_KAKAO_TOKEN))
+            assertThatThrownBy(() -> userService.login(VALID_KAKAO_TOKEN))
                 .isInstanceOf(InvalidAuthenticationException.class)
                 .hasMessage(UserErrorCode.INVALID_OAUTH2_TOKEN.getMessage());
         }
@@ -135,7 +134,7 @@ class UserServiceTest {
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
 
             //when, then
-            assertThatThrownBy(() ->userService.login(VALID_KAKAO_TOKEN))
+            assertThatThrownBy(() -> userService.login(VALID_KAKAO_TOKEN))
                 .isInstanceOf(InvalidAuthenticationException.class)
                 .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
         }
@@ -146,18 +145,6 @@ class UserServiceTest {
             private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
                 "yyyy-MM-dd");
             private User unTypedUser;
-
-            @BeforeEach
-            void setup() {
-                String socialId = String.valueOf(faker.barcode());
-                User user = User.builder().provider(Provider.KAKAO).socialId(socialId).build();
-                UserAuthority newAuthority =  UserAuthority.builder()
-                    .authority(Authority.RESTRICTED)
-                    .user(user)
-                    .build();
-                userAuthorityRepository.save(newAuthority);
-                unTypedUser = userRepository.save(user);
-            }
 
             private static OnboardRequest getNormalRequest() {
                 return new OnboardRequest(
@@ -174,7 +161,22 @@ class UserServiceTest {
                     true
                 );
             }
-            
+
+            @BeforeEach
+            void setup() {
+                String socialId = String.valueOf(faker.barcode());
+                User user = User.builder()
+                    .provider(Provider.KAKAO)
+                    .socialId(socialId)
+                    .build();
+                UserAuthority newAuthority = UserAuthority.builder()
+                    .authority(Authority.RESTRICTED)
+                    .user(user)
+                    .build();
+                userAuthorityRepository.save(newAuthority);
+                unTypedUser = userRepository.save(user);
+            }
+
             @Test
             public void 정상적으로_추가정보를_작성한_경우_회원정보가_제대로_업데이트_되고_모든_서비스를_이용할_수_있다() throws Exception {
                 //given

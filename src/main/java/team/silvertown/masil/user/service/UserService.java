@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
+import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
-import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
@@ -34,6 +34,13 @@ public class UserService {
     private final UserAuthorityRepository userAuthorityRepository;
     private final KakaoOAuthService kakaoOAuthService;
     private final JwtTokenProvider tokenProvider;
+
+    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
+            .build();
+    }
 
     public LoginResponse login(String kakaoToken) {
         OAuthResponse oAuthResponse;
@@ -134,13 +141,6 @@ public class UserService {
     private void assignDefaultAuthority(User user) {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
-    }
-
-    private static UserAuthority generateUserAuthority(User user, Authority authority) {
-        return UserAuthority.builder()
-            .authority(authority)
-            .user(user)
-            .build();
     }
 
 }
