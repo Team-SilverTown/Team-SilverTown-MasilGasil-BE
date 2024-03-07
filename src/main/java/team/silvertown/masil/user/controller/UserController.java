@@ -11,9 +11,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import team.silvertown.masil.user.dto.LoginRequest;
+import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -72,4 +77,12 @@ public class UserController {
     }
 
 }
+    @PostMapping("/api/v1/users/login")
+    public ResponseEntity<LoginResponse> login(
+        @RequestBody
+        LoginRequest request
+    ) {
+        return ResponseEntity.ok(userService.login(request.accessToken()));
+    }
 
+}
