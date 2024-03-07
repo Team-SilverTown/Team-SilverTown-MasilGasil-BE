@@ -4,7 +4,7 @@ import java.util.Arrays;
 import lombok.Getter;
 
 @Getter
-public enum ImageTypes {
+public enum ImageFileType {
     APNG("image/apng"),
     AVIF("image/avif"),
     GIF("image/gif"),
@@ -15,13 +15,13 @@ public enum ImageTypes {
 
     private final String type;
 
-    ImageTypes(String type) {
+    ImageFileType(String type) {
         this.type = type;
     }
 
     public static boolean isImage(String contentType) {
-        return Arrays.stream(ImageTypes.values())
-            .map(ImageTypes::getType)
+        return Arrays.stream(ImageFileType.values())
+            .map(ImageFileType::getType)
             .anyMatch(type -> type.equals(contentType));
     }
 }

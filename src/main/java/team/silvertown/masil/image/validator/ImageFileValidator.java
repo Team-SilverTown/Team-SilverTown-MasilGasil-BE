@@ -15,7 +15,7 @@ public class ImageFileValidator implements ConstraintValidator<ImageFile, Multip
 
         String contentType = file.getContentType();
 
-        return ImageTypes.isImage(contentType);
+        return ImageFileType.isImage(contentType);
     }
 
 }
