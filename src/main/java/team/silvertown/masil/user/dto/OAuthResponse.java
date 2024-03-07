@@ -9,7 +9,7 @@ public record OAuthResponse (
 
     public static OAuthResponse from(HashMap<String, Object> userInfo) {
         String provider = (String) userInfo.get("provider");
-        String providerId = (String) userInfo.get("providerId");
+        String providerId = (String) userInfo.get("id");
         return new OAuthResponse(provider, providerId);
     }
 

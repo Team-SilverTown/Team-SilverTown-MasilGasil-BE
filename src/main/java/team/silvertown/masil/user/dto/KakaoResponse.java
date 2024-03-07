@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class KakaoResponse {
 
-    private Long id;
+    private String id;
 
 }
