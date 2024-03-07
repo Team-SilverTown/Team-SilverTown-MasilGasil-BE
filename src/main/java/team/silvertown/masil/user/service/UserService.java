@@ -17,6 +17,7 @@ import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -94,6 +95,13 @@ public class UserService {
         if (userRepository.existsByNickname(nickname)) {
             throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
         }
+    }
+
+    public MeInfoResponse getMe(Long memberId) {
+        User user = userRepository.findById(memberId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        return MeInfoResponse.from(user);
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {

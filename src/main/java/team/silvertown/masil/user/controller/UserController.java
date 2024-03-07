@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.user.dto.LoginRequest;
 import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.service.UserService;
 
@@ -53,6 +54,14 @@ public class UserController {
         userService.checkNickname(nickname);
         return ResponseEntity.ok()
             .build();
+    }
+
+    @GetMapping("/api/v1/users/me")
+    public ResponseEntity<MeInfoResponse> getMyInfo(
+        @AuthenticationPrincipal
+        Long memberId
+    ) {
+        return ResponseEntity.ok(userService.getMe(memberId));
     }
 
     @PostMapping("/api/v1/users/login")
