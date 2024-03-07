@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.validator.DateValidator;
 import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.validator.UserValidator;
 
@@ -74,21 +75,21 @@ public class User extends BaseEntity {
     @Column(name = "social_id", length = 50)
     private String socialId;
 
-    public void update(OnboardRequest request) {
-        UserValidator.validateNickname(request.nickname(), UserErrorCode.INVALID_NICKNAME);
-        UserValidator.validateSex(request.sex(), UserErrorCode.INVALID_SEX);
-        UserValidator.validateBirthDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
-        UserValidator.validateHeight(request.height(), UserErrorCode.INVALID_HEIGHT);
-        UserValidator.validateWeight(request.weight(), UserErrorCode.INVALID_WEIGHT);
-        UserValidator.validateExerciseIntensity(request.exerciseIntensity());
+    public void update(UpdateRequest request) {
+        UserValidator.validateNickname(request.getNickname(), UserErrorCode.INVALID_NICKNAME);
+        UserValidator.validateSex(request.getSex(), UserErrorCode.INVALID_SEX);
+        UserValidator.validateBirthDate(request.getBirthDate(), UserErrorCode.INVALID_BIRTH_DATE);
+        UserValidator.validateHeight(request.getHeight(), UserErrorCode.INVALID_HEIGHT);
+        UserValidator.validateWeight(request.getWeight(), UserErrorCode.INVALID_WEIGHT);
+        UserValidator.validateExerciseIntensity(request.getExerciseIntensity());
 
-        this.nickname = request.nickname();
-        this.sex = Sex.valueOf(request.sex());
-        this.birthDate = DateValidator.parseDate(request.birthDate(),
+        this.nickname = request.getNickname();
+        this.sex = Sex.valueOf(request.getSex());
+        this.birthDate = DateValidator.parseDate(request.getBirthDate(),
             UserErrorCode.INVALID_BIRTH_DATE);
-        this.height = request.height();
-        this.weight = request.weight();
-        this.exerciseIntensity = ExerciseIntensity.valueOf(request.exerciseIntensity());
+        this.height = request.getHeight();
+        this.weight = request.getWeight();
+        this.exerciseIntensity = ExerciseIntensity.valueOf(request.getExerciseIntensity());
     }
 
     public void updateIsPublic() {

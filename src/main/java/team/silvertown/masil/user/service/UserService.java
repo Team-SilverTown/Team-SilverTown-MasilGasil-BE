@@ -20,6 +20,7 @@ import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
@@ -79,7 +80,7 @@ public class UserService {
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         checkNickname(request.nickname());
-        user.update(request);
+        user.update(UpdateRequest.fromOnboardRequest(request));
         UserAgreement userAgreement = getUserAgreement(request, user);
         Validator.throwIf(agreementRepository.existsByUser(user),
             () -> new DuplicateResourceException(UserErrorCode.ALREADY_ONBOARDED));
@@ -157,6 +158,13 @@ public class UserService {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
         user.updateIsPublic();
+    }
+
+    @Transactional
+    public void updateInfo(Long memberId, UpdateRequest updateRequest) {
+        User user = userRepository.findById(memberId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+        user.update(updateRequest);
     }
 
 }
