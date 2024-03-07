@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -72,4 +73,13 @@ public class UserController {
         return ResponseEntity.ok(userService.login(request.accessToken()));
     }
 
+    @PatchMapping("/api/v1/users/is-public")
+    public ResponseEntity<Void> changePublic(
+        @AuthenticationPrincipal
+        Long memberId
+    ){
+        userService.changePublic(memberId);
+        return ResponseEntity.ok().build();
+    }
+    
 }
