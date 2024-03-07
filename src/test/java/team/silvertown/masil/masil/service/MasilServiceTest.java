@@ -31,7 +31,7 @@ import team.silvertown.masil.masil.dto.request.CreatePinRequest;
 import team.silvertown.masil.masil.dto.request.CreateRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
 import team.silvertown.masil.masil.dto.response.CreateResponse;
-import team.silvertown.masil.masil.dto.response.MasilResponse;
+import team.silvertown.masil.masil.dto.response.MasilDetailResponse;
 import team.silvertown.masil.masil.dto.response.PeriodResponse;
 import team.silvertown.masil.masil.dto.response.RecentMasilResponse;
 import team.silvertown.masil.masil.dto.response.SimpleMasilResponse;
@@ -140,7 +140,7 @@ class MasilServiceTest {
         entityManager.clear();
 
         // when
-        MasilResponse actual = masilService.getById(user.getId(), expected.getId());
+        MasilDetailResponse actual = masilService.getById(user.getId(), expected.getId());
 
         // then
         assertThat(actual).extracting("id", "depth1", "depth2", "depth3", "depth4", "title",

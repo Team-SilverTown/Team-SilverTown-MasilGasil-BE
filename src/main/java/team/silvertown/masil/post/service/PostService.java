@@ -14,8 +14,8 @@ import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePinRequest;
 import team.silvertown.masil.post.dto.request.CreateRequest;
 import team.silvertown.masil.post.dto.response.CreateResponse;
-import team.silvertown.masil.post.dto.response.PinResponse;
-import team.silvertown.masil.post.dto.response.PostResponse;
+import team.silvertown.masil.post.dto.response.PinDetailResponse;
+import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
@@ -42,12 +42,12 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponse getById(Long id) {
+    public PostDetailResponse getById(Long id) {
         Post post = postRepository.findById(id)
             .orElseThrow(throwNotFound(PostErrorCode.POST_NOT_FOUND));
-        List<PinResponse> pins = PinResponse.listFrom(post);
+        List<PinDetailResponse> pins = PinDetailResponse.listFrom(post);
 
-        return PostResponse.from(post, pins);
+        return PostDetailResponse.from(post, pins);
     }
 
     private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {

@@ -7,7 +7,7 @@ import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.masil.domain.Masil;
 
 @Builder
-public record MasilResponse(
+public record MasilDetailResponse(
     long id,
     String depth1,
     String depth2,
@@ -19,13 +19,13 @@ public record MasilResponse(
     int distance,
     int totalTime,
     OffsetDateTime startedAt,
-    List<PinResponse> pins,
+    List<PinDetailResponse> pins,
     Long postId,
     String thumbnailUrl
 ) {
 
-    public static MasilResponse from(Masil masil, List<PinResponse> pins) {
-        return MasilResponse.builder()
+    public static MasilDetailResponse from(Masil masil, List<PinDetailResponse> pins) {
+        return MasilDetailResponse.builder()
             .id(masil.getId())
             .depth1(masil.getDepth1())
             .depth2(masil.getDepth2())

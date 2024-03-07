@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.post.dto.request.CreateRequest;
 import team.silvertown.masil.post.dto.response.CreateResponse;
-import team.silvertown.masil.post.dto.response.PostResponse;
+import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.service.PostService;
 
 @RestController
@@ -35,11 +35,11 @@ public class PostController {
     }
 
     @GetMapping("/api/v1/posts/{id}")
-    public ResponseEntity<PostResponse> getById(
+    public ResponseEntity<PostDetailResponse> getById(
         @PathVariable
         Long id
     ) {
-        PostResponse response = postService.getById(id);
+        PostDetailResponse response = postService.getById(id);
 
         return ResponseEntity.ok(response);
     }

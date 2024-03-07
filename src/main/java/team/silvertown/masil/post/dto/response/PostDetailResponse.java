@@ -7,7 +7,7 @@ import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.user.domain.User;
 
 @Builder
-public record PostResponse(
+public record PostDetailResponse(
     long id,
     String depth1,
     String depth2,
@@ -21,16 +21,16 @@ public record PostResponse(
     boolean isPublic,
     int viewCount,
     int likeCount,
-    List<PinResponse> pins,
+    List<PinDetailResponse> pins,
     long authorId,
     String authorName,
     String thumbnailUrl
 ) {
 
-    public static PostResponse from(Post post, List<PinResponse> pins) {
+    public static PostDetailResponse from(Post post, List<PinDetailResponse> pins) {
         User author = post.getUser();
 
-        return PostResponse.builder()
+        return PostDetailResponse.builder()
             .id(post.getId())
             .depth1(post.getDepth1())
             .depth2(post.getDepth2())

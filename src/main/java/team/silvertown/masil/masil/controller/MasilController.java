@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.masil.dto.request.CreateRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
 import team.silvertown.masil.masil.dto.response.CreateResponse;
-import team.silvertown.masil.masil.dto.response.MasilResponse;
+import team.silvertown.masil.masil.dto.response.MasilDetailResponse;
 import team.silvertown.masil.masil.dto.response.PeriodResponse;
 import team.silvertown.masil.masil.dto.response.RecentMasilResponse;
 import team.silvertown.masil.masil.service.MasilService;
@@ -103,16 +103,16 @@ public class MasilController {
         responseCode = "200",
         content = @Content(
             mediaType = "application/json",
-            schema = @Schema(implementation = MasilResponse.class)
+            schema = @Schema(implementation = MasilDetailResponse.class)
         )
     )
-    public ResponseEntity<MasilResponse> getById(
+    public ResponseEntity<MasilDetailResponse> getById(
         @AuthenticationPrincipal
         Long userId,
         @PathVariable
         Long id
     ) {
-        MasilResponse response = masilService.getById(userId, id);
+        MasilDetailResponse response = masilService.getById(userId, id);
 
         return ResponseEntity.ok(response);
     }

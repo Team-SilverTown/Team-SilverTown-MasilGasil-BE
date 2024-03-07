@@ -24,7 +24,7 @@ import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePinRequest;
 import team.silvertown.masil.post.dto.request.CreateRequest;
 import team.silvertown.masil.post.dto.response.CreateResponse;
-import team.silvertown.masil.post.dto.response.PostResponse;
+import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
@@ -125,7 +125,7 @@ class PostServiceTest {
         entityManager.clear();
 
         // when
-        PostResponse actual = postService.getById(expected.getId());
+        PostDetailResponse actual = postService.getById(expected.getId());
 
         // then
         assertThat(actual)
