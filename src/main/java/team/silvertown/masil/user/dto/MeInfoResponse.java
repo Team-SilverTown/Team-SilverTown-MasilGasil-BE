@@ -13,7 +13,7 @@ public record MeInfoResponse(
     String profileImg,
     Integer height,
     Integer weight,
-    LocalDate age,
+    LocalDate birthDate,
     Sex sex,
     ExerciseIntensity exerciseIntensity
 ) {
@@ -25,7 +25,7 @@ public record MeInfoResponse(
             .profileImg(user.getProfileImg())
             .height(user.getHeight())
             .weight(user.getWeight())
-            .age(user.getBirthDate())
+            .birthDate(user.getBirthDate())
             .sex(user.getSex())
             .exerciseIntensity(user.getExerciseIntensity())
             .build();
