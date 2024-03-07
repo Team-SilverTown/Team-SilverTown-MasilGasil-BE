@@ -81,5 +81,5 @@ public class UserController {
         userService.changePublic(memberId);
         return ResponseEntity.ok().build();
     }
-    
+
 }
