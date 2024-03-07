@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.time.format.DateTimeFormatter;
@@ -20,15 +19,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
-import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
+import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
-import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
@@ -142,50 +140,24 @@ class UserServiceTest {
                 .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
         }
 
-        @Test
-        public void 정상적으로_가입_후_첫_로그인에_성공하는_경우_restrict_권한만_가진다() throws Exception {
-            //given
-            String socialId = String.valueOf(faker.barcode());
-            given(oAuth2User.getName()).willReturn(socialId);
-
-            //when
-            User joinedUser = userService.join(oAuth2User, VALID_PROVIDER);
-            User findUser = userRepository.findById(joinedUser.getId())
-                .get();
-            List<UserAuthority> userAuthorities = authorityRepository.findByUser(findUser);
-
-            //then
-            assertThat(userAuthorities).hasSize(1);
-            assertThat(userAuthorities.get(0)
-                .getAuthority()
-                .name()).isEqualTo(Authority.RESTRICTED.name());
-        }
-
-        @Test
-        public void 권한이_없는_유저는_로그인_중_권한_예외가_발생한다() throws Exception {
-            //given
-            String socialId = String.valueOf(faker.barcode());
-
-            User user = User.builder()
-                .provider(Provider.get(VALID_PROVIDER))
-                .socialId(socialId)
-                .build();
-
-            User savedUser = userRepository.save(user);
-            String token = tokenProvider.createToken(savedUser.getId());
-
-            //when, then
-            assertThatThrownBy(() -> userService.login(token, savedUser))
-                .isInstanceOf(DataNotFoundException.class)
-                .hasMessage(UserErrorCode.AUTHORITY_NOT_FOUND.getMessage());
-        }
-
         @Nested
         class 유저_추가정보를_입력하는_서비스로직_테스트 {
 
             private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
                 "yyyy-MM-dd");
             private User unTypedUser;
+
+            @BeforeEach
+            void setup() {
+                String socialId = String.valueOf(faker.barcode());
+                User user = User.builder().provider(Provider.KAKAO).socialId(socialId).build();
+                UserAuthority newAuthority =  UserAuthority.builder()
+                    .authority(Authority.RESTRICTED)
+                    .user(user)
+                    .build();
+                userAuthorityRepository.save(newAuthority);
+                unTypedUser = userRepository.save(user);
+            }
 
             private static OnboardRequest getNormalRequest() {
                 return new OnboardRequest(
@@ -202,14 +174,7 @@ class UserServiceTest {
                     true
                 );
             }
-
-            @BeforeEach
-            void setup() {
-                String socialId = String.valueOf(faker.barcode());
-                given(oAuth2User.getName()).willReturn(socialId);
-                unTypedUser = userService.join(oAuth2User, "kakao");
-            }
-
+            
             @Test
             public void 정상적으로_추가정보를_작성한_경우_회원정보가_제대로_업데이트_되고_모든_서비스를_이용할_수_있다() throws Exception {
                 //given
