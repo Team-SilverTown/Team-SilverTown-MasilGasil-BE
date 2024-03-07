@@ -3,9 +3,9 @@ package team.silvertown.masil.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
@@ -27,7 +27,14 @@ public class UserService {
     private final JwtTokenProvider tokenProvider;
 
     public LoginResponse login(String kakaoToken) {
-        OAuthResponse oAuthResponse = kakaoOAuthService.oauthResponse(kakaoToken);
+        OAuthResponse oAuthResponse;
+        try {
+            oAuthResponse = kakaoOAuthService.getUserInfo(kakaoToken);
+        } catch (Exception e){
+            log.error("social login error occured, the reason is: {}", e.getMessage(), e);
+            throw new InvalidAuthenticationException(UserErrorCode.INVALID_OAUTH2_TOKEN);
+        }
+
         Provider provider = Provider.get(oAuthResponse.provider());
         boolean isJoined = userRepository.existsByProviderAndSocialId(provider,
             oAuthResponse.providerId());
