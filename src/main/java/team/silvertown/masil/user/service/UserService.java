@@ -3,26 +3,28 @@ package team.silvertown.masil.user.service;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.validator.Validator;
-import team.silvertown.masil.security.exception.OAuthValidator;
+import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.LoginResponseDto;
+import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
-import team.silvertown.masil.user.validator.UserValidator;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -30,6 +32,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAgreementRepository agreementRepository;
     private final UserAuthorityRepository userAuthorityRepository;
+    private final KakaoOAuthService kakaoOAuthService;
+    private final JwtTokenProvider tokenProvider;
 
     private static UserAuthority generateUserAuthority(User user, Authority authority) {
         return UserAuthority.builder()
@@ -38,22 +42,34 @@ public class UserService {
             .build();
     }
 
-    public LoginResponseDto login(String jwtToken, User user) {
-        List<UserAuthority> userAuthorities = userAuthorityRepository.findByUser(user);
-        UserValidator.validateAuthority(userAuthorities);
+    public LoginResponse login(String kakaoToken) {
+        OAuthResponse oAuthResponse;
+        try {
+            oAuthResponse = kakaoOAuthService.getUserInfo(kakaoToken);
+        } catch (Exception e) {
+            log.error("social login error occured, the reason is: {}", e.getMessage(), e);
+            throw new InvalidAuthenticationException(UserErrorCode.INVALID_OAUTH2_TOKEN);
+        }
 
-        return new LoginResponseDto(jwtToken);
+        Provider provider = Provider.get(oAuthResponse.provider());
+        boolean isJoined = userRepository.existsByProviderAndSocialId(provider,
+            oAuthResponse.providerId());
+        if (isJoined) {
+            return joinedUserResponse(provider, oAuthResponse);
+        }
+
+        User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
+        assignDefaultAuthority(justSavedUser);
+        String newUserToken = tokenProvider.createToken(justSavedUser.getId());
+
+        return new LoginResponse(newUserToken);
     }
 
-    @Transactional
-    public User join(OAuth2User oAuth2User, String provider) {
-        OAuthValidator.validateSocialUser(oAuth2User);
-        Provider authenticatedProvider = OAuthValidator.validateProvider(provider);
+    private LoginResponse joinedUserResponse(Provider provider, OAuthResponse oAuthResponse) {
+        User alreadyJoinedUser = createAndSave(provider, oAuthResponse.providerId());
+        String token = tokenProvider.createToken(alreadyJoinedUser.getId());
 
-        String providerId = oAuth2User.getName();
-
-        return userRepository.findByProviderAndSocialId(authenticatedProvider, providerId)
-            .orElseGet(() -> createAndSave(authenticatedProvider, providerId));
+        return new LoginResponse(token);
     }
 
     @Transactional

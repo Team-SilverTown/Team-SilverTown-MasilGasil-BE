@@ -66,6 +66,9 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    // RestTemplate(retry)
+    implementation 'org.springframework.retry:spring-retry:1.2.5.RELEASE'
 }
 
 def querydslSrcDir = 'src/main/generated'
