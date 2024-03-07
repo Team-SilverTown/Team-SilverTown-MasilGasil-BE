@@ -18,6 +18,7 @@ public class WebSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final HttpRequestsConfigurer httpRequestsConfigurer;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,7 +37,8 @@ public class WebSecurityConfig {
             .rememberMe(AbstractHttpConfigurer::disable)
             .logout(AbstractHttpConfigurer::disable)
             .sessionManagement(
-                management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(httpRequestsConfigurer);
         return http.build();
     }
 

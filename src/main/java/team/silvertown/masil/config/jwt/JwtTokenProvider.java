@@ -9,21 +9,17 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.MacAlgorithm;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.crypto.SecretKey;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.exception.UserValidator;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
+import team.silvertown.masil.user.validator.UserValidator;
 
 @Slf4j
 @Component
