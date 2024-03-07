@@ -12,7 +12,7 @@ public class HttpRequestsConfigurer
 
     private static final String AUTH_RESOURCE = "/oauth2/**";
     private static final String USER_INFO_REQUEST = "/api/v1/users/me";
-    private static final String NORMAL_USER_ROLE = "ROLE_NORMAL";
+    private static final String NORMAL_USER_ROLE = "NORMAL";
 
     @Override
     public void customize(
@@ -21,9 +21,9 @@ public class HttpRequestsConfigurer
         authorizeRequests
             .requestMatchers(AUTH_RESOURCE)
             .permitAll()
+            .requestMatchers(USER_INFO_REQUEST).hasRole(NORMAL_USER_ROLE)
             .anyRequest()
-            .authenticated()
-            .requestMatchers(USER_INFO_REQUEST).hasRole(NORMAL_USER_ROLE);
+            .authenticated();
     }
 
 }
