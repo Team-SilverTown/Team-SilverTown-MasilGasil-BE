@@ -104,7 +104,7 @@ class UserServiceTest {
     class 유저_소셜_로그인_회원가입_로직_테스트 {
 
         @Test
-        public void 정상적으로_처음_회원가입하는_유저는_유저_정보를_저장한_후_정상적인_토큰을_반환한다() throws Exception {
+        public void 정상적으로_처음_회원가입하는_유저는_유저_정보를_저장한_후_토큰을_반환한다() throws Exception {
             //given
             OAuthResponse mockOAuthResponse = new OAuthResponse(VALID_PROVIDER, "123456");
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);

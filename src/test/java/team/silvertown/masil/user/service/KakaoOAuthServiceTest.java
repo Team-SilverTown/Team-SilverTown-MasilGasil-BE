@@ -32,7 +32,6 @@ class KakaoOAuthServiceTest {
     @Autowired
     KakaoOAuthService kakaoOAuthService;
 
-
     @Test
     public void 정상적으로_소셜로그인을_끝내고_response를_반환한다() throws Exception {
         //given
