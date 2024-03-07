@@ -1,7 +1,6 @@
 package team.silvertown.masil.user.dto;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.text.SimpleDateFormat;
@@ -15,17 +14,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
+import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.exception.UserErrorCode;
+import team.silvertown.masil.user.repository.UserRepository;
 import team.silvertown.masil.user.service.UserService;
 
 @AutoConfigureMockMvc
@@ -38,8 +37,8 @@ class OnboardRequestTest {
     @Autowired
     UserService userService;
 
-    @Mock
-    OAuth2User oAuth2User;
+    @Autowired
+    UserRepository userRepository;
 
     @Nested
     class 유저_추가정보를_입력하는_서비스로직_테스트 {
@@ -86,8 +85,11 @@ class OnboardRequestTest {
         @BeforeEach
         void setup() {
             String socialId = String.valueOf(faker.barcode());
-            given(oAuth2User.getName()).willReturn(socialId);
-            unTypedUser = userService.join(oAuth2User, "kakao");
+            User user = User.builder()
+                .provider(Provider.KAKAO)
+                .socialId(socialId)
+                .build();
+            unTypedUser = userRepository.save(user);
         }
 
         @ParameterizedTest
