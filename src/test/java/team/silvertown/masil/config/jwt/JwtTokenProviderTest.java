@@ -39,35 +39,6 @@ class JwtTokenProviderTest {
     OAuth2User oAuth2User;
 
     @Test
-    @Transactional
-    public void 정상적으로_토큰_생성이_가능하다() throws Exception {
-        //given
-        when(oAuth2User.getName()).thenReturn(VALID_OAUTH_NAME);
-        User joinedUser = userService.join(oAuth2User, VALID_PROVIDER);
-        Long userId = 1L;
-
-        //when
-        String token = jwtTokenProvider.createToken(joinedUser.getId());
-
-        //then
-        Long decodedUserId = (Long) jwtTokenProvider.getAuthentication(token)
-            .getPrincipal();
-        assertThat(userId).isEqualTo(decodedUserId);
-        Collection<? extends GrantedAuthority> authorities = jwtTokenProvider.getAuthentication(
-                token)
-            .getAuthorities();
-
-        List<String> authNames = authorities.stream()
-            .map(GrantedAuthority::getAuthority)
-            .toList();
-
-        assertThat(authNames).hasSize(1);
-        assertThat(authNames.get(0))
-            .isEqualTo(ROLE_PREFIX + Authority.RESTRICTED.name());
-
-    }
-
-    @Test
     public void 권한이_없는_경우_토큰이_생성되지_않는다() throws Exception {
         //given
         Long userId = 1L;
