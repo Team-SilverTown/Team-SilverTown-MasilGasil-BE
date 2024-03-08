@@ -14,6 +14,8 @@ import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePinRequest;
 import team.silvertown.masil.post.dto.request.CreateRequest;
 import team.silvertown.masil.post.dto.response.CreateResponse;
+import team.silvertown.masil.post.dto.response.PinResponse;
+import team.silvertown.masil.post.dto.response.PostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
@@ -31,7 +33,7 @@ public class PostService {
     @Transactional
     public CreateResponse create(Long userId, CreateRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(getNotFoundException(PostErrorCode.USER_NOT_FOUND));
+            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
         Post post = createPost(request, user);
 
         savePins(request.pins(), post);
@@ -39,7 +41,16 @@ public class PostService {
         return new CreateResponse(post.getId());
     }
 
-    private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
+    @Transactional(readOnly = true)
+    public PostResponse getById(Long id) {
+        Post post = postRepository.findById(id)
+            .orElseThrow(throwNotFound(PostErrorCode.POST_NOT_FOUND));
+        List<PinResponse> pins = PinResponse.listFrom(post);
+
+        return PostResponse.from(post, pins);
+    }
+
+    private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
 
