@@ -1,4 +1,4 @@
-package team.silvertown.masil.masil.dto;
+package team.silvertown.masil.masil.dto.request;
 
 
 import java.time.OffsetDateTime;
