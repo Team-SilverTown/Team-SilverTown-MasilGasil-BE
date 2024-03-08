@@ -136,7 +136,7 @@ class MasilTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(MasilErrorCode.INVALID_DISTANCE.getMessage());
+            .withMessage(MasilErrorCode.NEGATIVE_DISTANCE.getMessage());
     }
 
     @ParameterizedTest
@@ -161,7 +161,7 @@ class MasilTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(MasilErrorCode.INVALID_TOTAL_TIME.getMessage());
+            .withMessage(MasilErrorCode.NEGATIVE_TIME.getMessage());
     }
 
     @ParameterizedTest
@@ -186,7 +186,7 @@ class MasilTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
-            .withMessage(MasilErrorCode.NON_POSITIVE_CALORIES.getMessage());
+            .withMessage(MasilErrorCode.NEGATIVE_CALORIES.getMessage());
     }
 
 }

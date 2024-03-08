@@ -93,9 +93,9 @@ public class Masil extends BaseEntity {
     ) {
         MasilValidator.notNull(user, MasilErrorCode.NULL_USER);
         MasilValidator.validateUrl(thumbnailUrl);
-        MasilValidator.notUnder(distance, 0, MasilErrorCode.INVALID_DISTANCE);
-        MasilValidator.notUnder(totalTime, 0, MasilErrorCode.INVALID_TOTAL_TIME);
-        MasilValidator.notUnder(calories, 0, MasilErrorCode.NON_POSITIVE_CALORIES);
+        MasilValidator.notUnder(distance, 0, MasilErrorCode.NEGATIVE_DISTANCE);
+        MasilValidator.notUnder(totalTime, 0, MasilErrorCode.NEGATIVE_TIME);
+        MasilValidator.notUnder(calories, 0, MasilErrorCode.NEGATIVE_CALORIES);
 
         this.user = user;
         this.postId = postId;
