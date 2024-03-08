@@ -21,7 +21,8 @@ public enum UserErrorCode implements ErrorCode {
     INVALID_JWT_TOKEN(10030100,
         "Access Denied: Authentication token was either missing or invalid."),
     ALREADY_ONBOARDED(10030900, "이미 가입 시 추가 정보를 입력한 이력이 있는 사람입니다."),
-    INVALID_PROVIDER_ID(10011001, "유효하지 않은 provider id 입니다.");
+    INVALID_PROVIDER_ID(10011001, "유효하지 않은 provider id 입니다."),
+    INFO_BLOCKED_USER(10020401, "해당 유저는 정보 공개를 하지 않은 유저입니다.");
 
     private final int code;
     private final String message;
