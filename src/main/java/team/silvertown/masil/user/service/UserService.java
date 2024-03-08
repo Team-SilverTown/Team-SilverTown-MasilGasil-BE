@@ -54,10 +54,10 @@ public class UserService {
         }
 
         Provider provider = Provider.get(oAuthResponse.provider());
-        boolean isJoined = userRepository.existsByProviderAndSocialId(provider,
+        Optional<User> user = userRepository.findByProviderAndSocialId(provider,
             oAuthResponse.providerId());
-        if (isJoined) {
-            return joinedUserResponse(provider, oAuthResponse);
+        if (user.isPresent()) {
+            return joinedUserResponse(user.get());
         }
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
@@ -67,10 +67,7 @@ public class UserService {
         return new LoginResponse(newUserToken);
     }
 
-    private LoginResponse joinedUserResponse(Provider provider, OAuthResponse oAuthResponse) {
-        User joinedUser = userRepository.findByProviderAndSocialId(provider,
-                oAuthResponse.providerId())
-            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+    private LoginResponse joinedUserResponse(User joinedUser) {
         String token = tokenProvider.createToken(joinedUser.getId());
 
         return new LoginResponse(token);
