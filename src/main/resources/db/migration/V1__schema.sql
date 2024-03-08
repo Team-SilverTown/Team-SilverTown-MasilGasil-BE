@@ -7,6 +7,7 @@ CREATE TABLE users
     height                   INTEGER,
     weight                   INTEGER,
     exercise_intensity       VARCHAR(15),
+    profile_img              varchar(500),
     total_distance           INTEGER,
     total_count              INTEGER,
     is_public                TINYINT(1)            DEFAULT 1,

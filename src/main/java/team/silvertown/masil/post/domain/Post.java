@@ -10,21 +10,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.map.Address;
+import team.silvertown.masil.post.exception.PostErrorCode;
+import team.silvertown.masil.post.validator.PostValidator;
 import team.silvertown.masil.user.domain.User;
 
 @Entity
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Getter
 public class Post extends BaseEntity {
 
@@ -58,12 +58,46 @@ public class Post extends BaseEntity {
     private Integer totalTime;
 
     @Column(name = "is_public", nullable = false)
-    private Boolean isPublic;
+    private boolean isPublic;
 
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
     @Column(name = "like_count", nullable = false)
     private int likeCount;
+
+    @Builder
+    private Post(
+        User user,
+        String depth1,
+        String depth2,
+        String depth3,
+        String depth4,
+        LineString path,
+        String title,
+        String content,
+        String thumbnailUrl,
+        Integer distance,
+        Integer totalTime,
+        Boolean isPublic
+    ) {
+        PostValidator.notNull(user, PostErrorCode.NULL_USER);
+        PostValidator.validateUrl(thumbnailUrl);
+        PostValidator.validateTitle(title);
+        PostValidator.notUnder(distance, 0, PostErrorCode.NON_POSITIVE_DISTANCE);
+        PostValidator.notUnder(totalTime, 0, PostErrorCode.NON_POSITIVE_TOTAL_TIME);
+
+        this.user = user;
+        this.address = new Address(depth1, depth2, depth3, depth4);
+        this.path = path;
+        this.title = title;
+        this.content = content;
+        this.thumbnailUrl = thumbnailUrl;
+        this.distance = distance;
+        this.totalTime = totalTime;
+        this.isPublic = Objects.isNull(isPublic) || isPublic;
+        this.viewCount = 0;
+        this.likeCount = 0;
+    }
 
 }
