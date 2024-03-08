@@ -10,8 +10,6 @@ public class HttpRequestsConfigurer
     implements
     Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> {
 
-    private static final String USER_INFO_REQUEST = "/api/v1/users/me";
-    private static final String NORMAL_USER_ROLE = "NORMAL";
     private static final String AUTH_RESOURCE = "/api/v1/users/login";
 
     @Override
@@ -21,8 +19,6 @@ public class HttpRequestsConfigurer
         authorizeRequests
             .requestMatchers(AUTH_RESOURCE)
             .permitAll()
-            .requestMatchers(USER_INFO_REQUEST)
-            .hasRole(NORMAL_USER_ROLE)
             .anyRequest()
             .authenticated();
     }
