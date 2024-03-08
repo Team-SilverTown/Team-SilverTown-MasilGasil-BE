@@ -7,7 +7,7 @@ import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 
 @Builder
-public record MeInfoResponse(
+public record InfoResponse(
     Long userId,
     String nickname,
     String profileImg,
@@ -18,8 +18,8 @@ public record MeInfoResponse(
     ExerciseIntensity exerciseIntensity
 ) {
 
-    public static MeInfoResponse from(User user) {
-        return MeInfoResponse.builder()
+    public static InfoResponse from(User user) {
+        return InfoResponse.builder()
             .userId(user.getId())
             .nickname(user.getNickname())
             .profileImg(user.getProfileImg())
