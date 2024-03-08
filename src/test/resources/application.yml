@@ -9,14 +9,3 @@ spring:
     open-in-view: false
   flyway:
     enabled: false
-  cloud:
-    aws:
-      credentials:
-        accessKey: ${AWS_ACCESS_KEY_ID}
-        secretKey: ${AWS_SECRET_ACCESS_KEY}
-      region:
-        static: ap-northeast-2
-      s3:
-        bucket: ${AWS_S3_IMAGE_BUCKET}
-        endpoint: ${AWS_S3_IMAGE_ENDPOINT}
-        path-style-access-enabled: true
