@@ -93,7 +93,6 @@ public class UserController {
         @Parameter(hidden = true)
         String accessToken
     ) {
-        System.out.println(accessToken);
         return ResponseEntity.ok(userService.login(accessToken));
     }
 
