@@ -18,7 +18,7 @@ public final class PostValidator extends Validator {
 
     public static void validateTitle(String title) {
         notBlank(title, PostErrorCode.BLANK_TITLE);
-        range(title.length(), 0, MAX_TITLE_LENGTH, PostErrorCode.TITLE_TOO_LONG);
+        notOver(title.length(), MAX_TITLE_LENGTH, PostErrorCode.TITLE_TOO_LONG);
     }
 
     public static void validateUrl(String url) {

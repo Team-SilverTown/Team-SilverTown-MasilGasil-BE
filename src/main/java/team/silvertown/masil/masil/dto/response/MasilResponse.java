@@ -14,10 +14,10 @@ public record MasilResponse(
     String depth3,
     String depth4,
     List<KakaoPoint> path,
-    String title,
     String content,
     int distance,
     int totalTime,
+    int calories,
     OffsetDateTime startedAt,
     List<PinResponse> pins,
     Long postId,
@@ -32,10 +32,10 @@ public record MasilResponse(
             .depth3(masil.getDepth3())
             .depth4(masil.getDepth4())
             .path(masil.getKakaoPath())
-            .title(masil.getTitle())
             .content(masil.getContent())
             .distance(masil.getDistance())
             .totalTime(masil.getTotalTime())
+            .calories(masil.getCalories())
             .startedAt(masil.getStartedAt())
             .pins(pins)
             .postId(masil.getPostId())

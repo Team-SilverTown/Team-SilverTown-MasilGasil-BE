@@ -48,11 +48,10 @@ public class MasilService {
         User user = userRepository.findById(userId)
             .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = createMasil(request, user);
-        Masil savedMasil = masilRepository.save(masil);
 
-        savePins(request.pins(), savedMasil);
+        savePins(request.pins(), masil);
 
-        return new CreateResponse(savedMasil.getId());
+        return new CreateResponse(masil.getId());
     }
 
     @Transactional(readOnly = true)
@@ -91,8 +90,9 @@ public class MasilService {
             endDateTime);
         int totalCount = getTotalCount(dailyMasils);
         int totalDistance = getTotalDistance(dailyMasils);
+        int totalCalories = getTotalCalories(dailyMasils);
 
-        return new PeriodResponse(totalDistance, totalCount, dailyMasils);
+        return new PeriodResponse(totalDistance, totalCount, totalCalories, dailyMasils);
     }
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
@@ -100,21 +100,23 @@ public class MasilService {
     }
 
     private Masil createMasil(CreateRequest request, User user) {
-        return Masil.builder()
+        Masil masil = Masil.builder()
             .depth1(request.depth1())
             .depth2(request.depth2())
             .depth3(request.depth3())
             .depth4(request.depth4())
             .distance(request.distance())
             .thumbnailUrl(request.thumbnailUrl())
-            .title(request.title())
             .content(request.content())
             .path(KakaoPointMapper.mapToLineString(request.path()))
             .postId(request.postId())
             .startedAt(request.startedAt())
             .totalTime(request.totalTime())
+            .calories(request.calories())
             .user(user)
             .build();
+
+        return masilRepository.save(masil);
     }
 
     private void savePins(List<CreatePinRequest> pins, Masil masil) {
@@ -178,6 +180,22 @@ public class MasilService {
             .orElse(0);
     }
 
+    private int getTotalCalories(List<MasilDailyDto> dailyMasils) {
+        return dailyMasils.stream()
+            .map(this::getDailyCalories)
+            .reduce(Integer::sum)
+            .orElse(0);
+    }
+
+    private int getDailyCalories(MasilDailyDto dailyMasil) {
+        BiFunction<Integer, MasilDailyDetailDto, Integer> accumulator = (accumulated, nextMasil) ->
+            accumulated + nextMasil.getCalories();
+
+        return dailyMasil.masils()
+            .stream()
+            .reduce(0, accumulator, Integer::sum);
+    }
+
     private int getDailyDistance(MasilDailyDto dailyMasil) {
         BiFunction<Integer, MasilDailyDetailDto, Integer> accumulator = (accumulated, nextMasil) ->
             accumulated + nextMasil.getDistance();
@@ -186,6 +204,5 @@ public class MasilService {
             .stream()
             .reduce(0, accumulator, Integer::sum);
     }
-
 
 }
