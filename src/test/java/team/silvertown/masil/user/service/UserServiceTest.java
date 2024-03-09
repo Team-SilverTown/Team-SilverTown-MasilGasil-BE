@@ -11,6 +11,7 @@ import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -211,9 +212,10 @@ class UserServiceTest {
             List<UserAuthority> updatedAuthority = userAuthorityRepository.findByUser(
                 unTypedUser);
             assertThat(updatedAuthority).hasSize(2);
-            assertThat(updatedAuthority.get(1)
-                .getAuthority()).isEqualTo(Authority.NORMAL);
-
+            assertThat(updatedAuthority.stream()
+                .map(UserAuthority::getAuthority)
+                .collect(Collectors.toList()))
+                .contains(Authority.NORMAL);
         }
 
     }
@@ -327,7 +329,7 @@ class UserServiceTest {
             boolean changedIsPublic = changedUser.getIsPublic();
 
             //then
-            assertThat(changedIsPublic).isEqualTo(!beforeChangedIsPublic);
+            assertThat(changedIsPublic).isNotEqualTo(beforeChangedIsPublic);
         }
 
         @Test
