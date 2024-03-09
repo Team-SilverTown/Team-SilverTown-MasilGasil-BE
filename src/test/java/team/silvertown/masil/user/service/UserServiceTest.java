@@ -367,6 +367,7 @@ class UserServiceTest {
                     .name()).isEqualTo(me.exerciseIntensity()
                     .name())
             );
+            assertThat(me.birthDate()).isEqualTo(request.birthDate());
         }
 
         @Test
