@@ -35,7 +35,7 @@ public class UserValidator extends Validator {
     public static void validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
         if (birthDate != null) {
             notBlank(birthDate, userErrorCode);
-            DateValidator.parseDate(birthDate, userErrorCode);
+            DateValidator.parseToDate(birthDate, userErrorCode);
         }
     }
 
