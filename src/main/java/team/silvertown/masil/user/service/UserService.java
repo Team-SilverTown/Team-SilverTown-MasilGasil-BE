@@ -2,6 +2,7 @@ package team.silvertown.masil.user.service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,10 +54,10 @@ public class UserService {
         }
 
         Provider provider = Provider.get(oAuthResponse.provider());
-        boolean isJoined = userRepository.existsByProviderAndSocialId(provider,
+        Optional<User> user = userRepository.findByProviderAndSocialId(provider,
             oAuthResponse.providerId());
-        if (isJoined) {
-            return joinedUserResponse(provider, oAuthResponse);
+        if (user.isPresent()) {
+            return joinedUserResponse(user.get());
         }
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
@@ -66,9 +67,8 @@ public class UserService {
         return new LoginResponse(newUserToken);
     }
 
-    private LoginResponse joinedUserResponse(Provider provider, OAuthResponse oAuthResponse) {
-        User alreadyJoinedUser = createAndSave(provider, oAuthResponse.providerId());
-        String token = tokenProvider.createToken(alreadyJoinedUser.getId());
+    private LoginResponse joinedUserResponse(User joinedUser) {
+        String token = tokenProvider.createToken(joinedUser.getId());
 
         return new LoginResponse(token);
     }

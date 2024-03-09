@@ -27,6 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // lombok
@@ -47,9 +48,6 @@ dependencies {
     // spatial
     implementation 'org.hibernate.orm:hibernate-spatial'
 
-    // oauth2
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2'
-
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
@@ -69,6 +67,14 @@ dependencies {
 
     // RestTemplate(retry)
     implementation 'org.springframework.retry:spring-retry:1.2.5.RELEASE'
+
+    // aws
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.0.0'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.0'
+
+    // test container
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:localstack"
 }
 
 def querydslSrcDir = 'src/main/generated'
@@ -83,7 +89,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     reports {
         xml.required = true
         html.required = true

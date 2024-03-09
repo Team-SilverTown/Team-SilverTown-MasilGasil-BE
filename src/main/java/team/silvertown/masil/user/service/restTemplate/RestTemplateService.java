@@ -14,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateService {
 
     private static final String KAKAO_USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
-    private static final String AUTHORIZATION_PREFIX = "Bearer ";
 
     private final RestTemplate restTemplate;
 
@@ -22,7 +21,7 @@ public class RestTemplateService {
         String kakaoToken
     ) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", AUTHORIZATION_PREFIX + kakaoToken);
+        headers.add("Authorization", kakaoToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
         HttpEntity<MultiValueMap<String, String>> accountInfoRequest = new HttpEntity<>(headers);
 
