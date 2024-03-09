@@ -1,5 +1,6 @@
 package team.silvertown.masil.post.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,10 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.dto.request.CreateRequest;
+import team.silvertown.masil.post.dto.request.NormalListRequest;
+import team.silvertown.masil.post.dto.request.OrderType;
 import team.silvertown.masil.post.dto.response.CreateResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
+import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.service.PostService;
 
 @RestController
@@ -40,6 +46,38 @@ public class PostController {
         Long id
     ) {
         PostDetailResponse response = postService.getById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/v1/posts")
+    @Operation(summary = "산책로 목록 조회")
+    public ResponseEntity<ScrollResponse<SimplePostResponse>> getSliceByAddress(
+        @AuthenticationPrincipal
+        Long userId,
+        @RequestParam
+        String depth1,
+        @RequestParam
+        String depth2,
+        @RequestParam
+        String depth3,
+        @RequestParam(required = false, defaultValue = "LATEST")
+        OrderType order,
+        @RequestParam(required = false)
+        String cursor,
+        @RequestParam(required = false)
+        int size
+    ) {
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(depth1)
+            .depth2(depth2)
+            .depth3(depth3)
+            .order(order)
+            .cursor(cursor)
+            .size(size)
+            .build();
+        ScrollResponse<SimplePostResponse> response = postService.getSliceByAddress(userId,
+            request);
 
         return ResponseEntity.ok(response);
     }
