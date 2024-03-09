@@ -14,10 +14,10 @@ public record CreateRequest(
     String depth3,
     String depth4,
     List<KakaoPoint> path,
-    String title,
     String content,
     Integer distance,
     Integer totalTime,
+    Integer calories,
     OffsetDateTime startedAt,
     List<CreatePinRequest> pins,
     String thumbnailUrl,
@@ -31,10 +31,9 @@ public record CreateRequest(
         MasilValidator.notNull(depth2, MapErrorCode.NULL_DEPTH2);
         MasilValidator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);
         MasilValidator.notNull(depth4, MapErrorCode.NULL_DEPTH4);
-        MasilValidator.validateTitle(title);
         MasilValidator.validateUrl(thumbnailUrl);
-        MasilValidator.notNull(distance, MasilErrorCode.INVALID_DISTANCE);
-        MasilValidator.notNull(totalTime, MasilErrorCode.INVALID_TOTAL_TIME);
+        MasilValidator.notNull(distance, MasilErrorCode.NEGATIVE_DISTANCE);
+        MasilValidator.notNull(totalTime, MasilErrorCode.NEGATIVE_TIME);
         MasilValidator.notNull(path, MapErrorCode.NULL_PATH);
         MasilValidator.notUnder(path.size(), MIN_POINT_NUM, MapErrorCode.INSUFFICIENT_PATH_POINTS);
     }

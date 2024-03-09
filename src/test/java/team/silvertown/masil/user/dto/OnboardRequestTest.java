@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -94,7 +95,7 @@ class OnboardRequestTest {
 
         @ParameterizedTest
         @Transactional
-        @EmptySource
+        @NullAndEmptySource
         @ValueSource(strings = {" ", "a", "_sjf!", "ssssssssssssssssss"})
         public void 유효하지_않은_닉네임이_들어올_시_예외를_발생시킨다(String invalidNickname) throws Exception {
             //given, when, then

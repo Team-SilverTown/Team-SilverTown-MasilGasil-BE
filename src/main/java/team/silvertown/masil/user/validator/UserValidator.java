@@ -20,11 +20,9 @@ public class UserValidator extends Validator {
     }
 
     public static void validateNickname(String nickname, UserErrorCode userErrorCode) {
-        if (nickname != null) {
-            notBlank(nickname, userErrorCode);
-            range(nickname.length(), 2, 12, userErrorCode);
-            notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
-        }
+        notBlank(nickname, userErrorCode);
+        range(nickname.length(), 2, 12, userErrorCode);
+        notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
     }
 
     public static void validateSex(String sex, UserErrorCode userErrorCode) {

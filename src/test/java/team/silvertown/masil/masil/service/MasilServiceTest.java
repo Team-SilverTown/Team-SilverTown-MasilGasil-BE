@@ -69,9 +69,9 @@ class MasilServiceTest {
     String addressDepth2;
     String addressDepth3;
     List<KakaoPoint> path;
-    String title;
     int distance;
     int totalTime;
+    int calories;
 
     @BeforeEach
     void setUp() {
@@ -85,9 +85,9 @@ class MasilServiceTest {
         addressDepth2 = MasilTexture.createAddressDepth2();
         addressDepth3 = MasilTexture.createAddressDepth3();
         path = MapTexture.createPath(10000);
-        title = MasilTexture.getRandomSentenceWithMax(29);
         distance = MasilTexture.getRandomPositive();
         totalTime = MasilTexture.getRandomPositive();
+        calories = MasilTexture.getRandomPositive();
     }
 
     @ParameterizedTest
@@ -95,9 +95,9 @@ class MasilServiceTest {
     void 마실_생성을_성공한다(int expectedPinCount) {
         // given
         List<CreatePinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
-        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
-            "", path, title, null, distance, totalTime,
-            OffsetDateTime.now(), pinRequests, null, null);
+        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3, "",
+            path, null, distance, totalTime, calories, OffsetDateTime.now(), pinRequests,
+            null, null);
 
         // when
         CreateResponse expected = masilService.create(user.getId(), request);
@@ -117,7 +117,8 @@ class MasilServiceTest {
         // given
         long invalidId = MasilTexture.getRandomId();
         CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
-            "", path, title, null, distance, totalTime, OffsetDateTime.now(), null, null, null);
+            "", path, null, distance, totalTime, calories, OffsetDateTime.now(), null, null,
+            null);
 
         // when
         ThrowingCallable create = () -> masilService.create(invalidId, request);
@@ -143,10 +144,10 @@ class MasilServiceTest {
         MasilDetailResponse actual = masilService.getById(user.getId(), expected.getId());
 
         // then
-        assertThat(actual).extracting("id", "depth1", "depth2", "depth3", "depth4", "title",
-                "distance", "totalTime")
+        assertThat(actual).extracting("id", "depth1", "depth2", "depth3", "depth4", "distance",
+                "totalTime", "calories")
             .containsExactly(masil.getId(), masil.getDepth1(), masil.getDepth2(), masil.getDepth3(),
-                masil.getDepth4(), masil.getTitle(), masil.getDistance(), masil.getTotalTime());
+                masil.getDepth4(), masil.getDistance(), masil.getTotalTime(), masil.getCalories());
         assertThat(actual.pins()).hasSize(pinSize);
     }
 
@@ -263,6 +264,9 @@ class MasilServiceTest {
                 .toLocalDate()
                 .toString())
             .toList();
+        Integer expectedCalories = expected.stream()
+            .map(Masil::getCalories)
+            .reduce(0, Integer::sum);
 
         LocalDate feb1 = LocalDate.of(2024, 2, 1);
         LocalDate feb29 = LocalDate.of(2024, 2, 29);
@@ -274,6 +278,7 @@ class MasilServiceTest {
         // then
         assertThat(actual.totalCounts()).isEqualTo(expected.size());
         assertThat(actual.totalDistance()).isEqualTo(expectedDistance);
+        assertThat(actual.totalCalories()).isEqualTo(expectedCalories);
         assertThat(actual.masils())
             .allMatch(dailyMasil -> expectedDates.contains(dailyMasil.date()));
     }
@@ -291,6 +296,7 @@ class MasilServiceTest {
         // then
         assertThat(actual.totalDistance()).isZero();
         assertThat(actual.totalCounts()).isZero();
+        assertThat(actual.totalCalories()).isZero();
         assertThat(actual.masils()).isEmpty();
     }
 
@@ -336,6 +342,9 @@ class MasilServiceTest {
                 .toLocalDate()
                 .toString())
             .toList();
+        Integer expectedCalories = expected.stream()
+            .map(Masil::getCalories)
+            .reduce(0, Integer::sum);
 
         LocalDate feb13 = LocalDate.of(2024, 2, 13);
         PeriodRequest request = new PeriodRequest(feb13, null);
@@ -346,6 +355,7 @@ class MasilServiceTest {
         // then
         assertThat(actual.totalCounts()).isEqualTo(expected.size());
         assertThat(actual.totalDistance()).isEqualTo(expectedDistance);
+        assertThat(actual.totalCalories()).isEqualTo(expectedCalories);
         assertThat(actual.masils())
             .allMatch(dailyMasil -> expectedDates.contains(dailyMasil.date()));
     }
