@@ -156,7 +156,7 @@ public class UserService {
     public void changePublic(Long memberId) {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
-        user.updateIsPublic();
+        user.toggleIsPublic();
     }
 
 }

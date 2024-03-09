@@ -91,7 +91,7 @@ public class User extends BaseEntity {
         this.exerciseIntensity = ExerciseIntensity.valueOf(request.exerciseIntensity());
     }
 
-    public void updateIsPublic() {
+    public void toggleIsPublic() {
         this.isPublic = !this.isPublic;
     }
 
