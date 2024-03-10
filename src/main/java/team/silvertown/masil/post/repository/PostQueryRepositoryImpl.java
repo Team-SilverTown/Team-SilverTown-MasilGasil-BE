@@ -71,13 +71,13 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             return toScan.lt(cursor);
         }
 
-        int intCursor = Integer.parseInt(cursor);
+        long idCursor = Long.parseLong(cursor);
 
-        if (intCursor == 0) {
+        if (idCursor == 0) {
             return null;
         }
 
-        return post.id.lt(Integer.parseInt(cursor));
+        return post.id.lt(idCursor);
     }
 
     private OrderSpecifier<?> decideOrderTarget(OrderType order) {
