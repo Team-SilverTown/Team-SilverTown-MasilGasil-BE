@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.map.KakaoPoint;
+import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePinRequest;
 import team.silvertown.masil.post.dto.request.CreateRequest;
+import team.silvertown.masil.post.dto.request.NormalListRequest;
+import team.silvertown.masil.post.dto.request.OrderType;
 import team.silvertown.masil.post.dto.response.CreateResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
+import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
@@ -74,6 +80,8 @@ class PostServiceTest {
         title = PostTexture.getRandomSentenceWithMax(29);
         distance = PostTexture.getRandomPositive();
         totalTime = PostTexture.getRandomPositive();
+
+        entityManager.clear();
     }
 
     @ParameterizedTest
@@ -146,7 +154,7 @@ class PostServiceTest {
     }
 
     @Test
-    void 사용자가_존재하지_않으면_마실_단일_조회를_실패한다() {
+    void 사용자가_존재하지_않으면_산책로_포스트_단일_조회를_실패한다() {
         // given
         long invalidId = MasilTexture.getRandomId();
 
@@ -156,6 +164,233 @@ class PostServiceTest {
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getById)
             .withMessage(PostErrorCode.POST_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 산책로_포스트_최신순_조회를_성공한다() {
+        // given
+        createPostsAndGetLastId(30);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.LATEST)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(expectedSize - 1);
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @Test
+    void 다음_커서_기반으로_산책로_포스트_최신순_조회를_성공한다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(11, 99);
+        long lastId = createPostsAndGetLastId(totalSize);
+        int expectedSize = 10;
+        String idCursor = String.valueOf(lastId - expectedSize + 1);
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.LATEST)
+            .cursor(idCursor)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(
+            (int) (lastId - (Integer.parseInt(idCursor) - expectedSize)));
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @Test
+    void 산책로_포스트_인기순_조회를_성공한다() {
+        // given
+        createPostsAndGetLastId(30);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.MOST_POPULAR)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        Post actualLast = getLastMostPopularPost(expectedSize - 1);
+        String likeCount = String.valueOf(actualLast.getLikeCount());
+        String id = String.valueOf(actualLast.getId());
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(likeCount, id);
+    }
+
+    @Test
+    void 다음_커서_기반으로_산책로_포스트_인기순_조회를_성공한다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(11, 99);
+        long lastId = createPostsAndGetLastId(totalSize);
+        int expectedSize = 10;
+        String idCursor = String.valueOf(lastId - expectedSize + 1);
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.MOST_POPULAR)
+            .cursor("00000000000000" + idCursor)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        Post actualLast = getLastMostPopularPost(
+            (int) (lastId - (Integer.parseInt(idCursor) - expectedSize)));
+        String likeCount = String.valueOf(actualLast.getLikeCount());
+        String id = String.valueOf(actualLast.getId());
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(likeCount, id);
+    }
+
+    @Test
+    void 산책로_포스트가_없어도_목록_조회를_성공한다() {
+        // given
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.LATEST)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        assertThat(actual.isEmpty()).isTrue();
+        assertThat(actual.contents()).isEmpty();
+        assertThat(actual.nextCursor()).isNull();
+    }
+
+    @Test
+    void 조회_대상_산책로_포스트_수가_조회_사이즈보다_작으면_다음_커서가_없다() {
+        // given
+        int actualSize = 5;
+
+        createPostsAndGetLastId(actualSize);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.LATEST)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        List<Post> expected = postRepository.findAll();
+
+        Collections.reverse(expected);
+
+        assertThat(actual.contents()).hasSize(actualSize);
+        assertThat(actual.nextCursor()).isNull();
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void 커서가_빈_값이면_처음부터_목록_조회한다(String cursor) {
+        // given
+        createPostsAndGetLastId(30);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.LATEST)
+            .cursor(cursor)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(expectedSize - 1);
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @Test
+    void 정렬_순서가_없으면_산책로_포스트를_최신순으로_조회한다() {
+        // given
+        createPostsAndGetLastId(30);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+            request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(expectedSize - 1);
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    long createPostsAndGetLastId(int size) {
+        List<Post> posts = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            posts.add(PostTexture.createPostWithAddress(user, addressDepth1, addressDepth2,
+                addressDepth3));
+        }
+
+        List<Post> saved = postRepository.saveAll(posts);
+
+        return saved.get(saved.size() - 1)
+            .getId();
     }
 
     List<CreatePinRequest> createPinRequests(int size, int maxPathPoints) {
@@ -171,6 +406,39 @@ class PostServiceTest {
         }
 
         return pinRequests;
+    }
+
+    private String getLastLatestCursor(int skipSize) {
+        List<Post> posts = postRepository.findAll();
+
+        Collections.reverse(posts);
+
+        return posts.stream()
+            .skip(skipSize)
+            .findFirst()
+            .orElseThrow()
+            .getId()
+            .toString();
+    }
+
+    private Post getLastMostPopularPost(int skipSize) {
+        List<Post> posts = postRepository.findAll();
+
+        return posts.stream()
+            .sorted(this::sortByPopularity)
+            .skip(skipSize)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private int sortByPopularity(Post a, Post b) {
+        int likeDifference = b.getLikeCount() - a.getLikeCount();
+
+        if (likeDifference == 0) {
+            return Math.toIntExact(b.getId() - a.getId());
+        }
+
+        return likeDifference;
     }
 
 }

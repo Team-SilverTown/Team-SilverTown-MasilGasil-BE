@@ -9,13 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
+import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
+import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.request.CreatePinRequest;
 import team.silvertown.masil.post.dto.request.CreateRequest;
+import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.post.dto.response.CreateResponse;
 import team.silvertown.masil.post.dto.response.PinDetailResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
+import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
@@ -48,6 +52,17 @@ public class PostService {
         List<PinDetailResponse> pins = PinDetailResponse.listFrom(post);
 
         return PostDetailResponse.from(post, pins);
+    }
+
+    @Transactional(readOnly = true)
+    public ScrollResponse<SimplePostResponse> getSliceByAddress(
+        Long userId,
+        NormalListRequest request
+    ) {
+        User user = getUserIfLoggedIn(userId);
+        List<PostCursorDto> postsWithCursor = postRepository.findSliceBy(user, request);
+
+        return getScrollResponse(postsWithCursor, request.size());
     }
 
     private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
@@ -95,6 +110,42 @@ public class PostService {
             .thumbnailUrl(request.thumbnailUrl())
             .post(post)
             .build();
+    }
+
+    private User getUserIfLoggedIn(Long userId) {
+        if (Objects.isNull(userId)) {
+            return null;
+        }
+
+        return userRepository.findById(userId)
+            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
+    }
+
+    private ScrollResponse<SimplePostResponse> getScrollResponse(
+        List<PostCursorDto> postsWithCursor,
+        int size
+    ) {
+        boolean hasNext = postsWithCursor.size() > size;
+
+        if (hasNext) {
+            postsWithCursor.remove(size);
+        }
+
+        List<SimplePostResponse> posts = postsWithCursor.stream()
+            .map(PostCursorDto::post)
+            .toList();
+        String lastCursor = getLastCursor(postsWithCursor, hasNext);
+
+        return ScrollResponse.from(posts, lastCursor);
+    }
+
+    private String getLastCursor(List<PostCursorDto> postsWithCursor, boolean hasNext) {
+        if (hasNext) {
+            return postsWithCursor.get(postsWithCursor.size() - 1)
+                .cursor();
+        }
+
+        return null;
     }
 
 }
