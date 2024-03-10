@@ -91,4 +91,8 @@ public class User extends BaseEntity {
         this.exerciseIntensity = ExerciseIntensity.valueOf(request.exerciseIntensity());
     }
 
+    public void updateProfile(String profileImg) {
+        this.profileImg = profileImg;
+    }
+
 }
