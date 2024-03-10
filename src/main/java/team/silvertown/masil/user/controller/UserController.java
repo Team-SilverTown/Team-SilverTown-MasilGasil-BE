@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
@@ -42,7 +44,7 @@ public class UserController {
         @AuthenticationPrincipal
         Long userId
     ) {
-        userService.onboard(userId, request);
+        userService.onboard(request, userId);
         return ResponseEntity.noContent()
             .build();
     }
@@ -94,6 +96,21 @@ public class UserController {
         String accessToken
     ) {
         return ResponseEntity.ok(userService.login(accessToken));
+    }
+
+    @PutMapping("api/v1/users/profiles")
+    @SecurityRequirement(name = "토큰 받아오기")
+    @Operation(summary = "카카오 토큰으로 로그인")
+    public ResponseEntity<Void> profileUpdate(
+        @RequestPart
+        MultipartFile profileImg,
+        @AuthenticationPrincipal
+        Long userId
+    ) {
+        userService.updateProfile(profileImg, userId);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
 }
