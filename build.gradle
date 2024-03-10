@@ -27,6 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // lombok
@@ -47,9 +48,6 @@ dependencies {
     // spatial
     implementation 'org.hibernate.orm:hibernate-spatial'
 
-    // oauth2
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2'
-
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
@@ -57,6 +55,32 @@ dependencies {
 
     // faker
     implementation 'net.datafaker:datafaker:2.1.0'
+
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // query dsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    // RestTemplate(retry)
+    implementation 'org.springframework.retry:spring-retry:1.2.5.RELEASE'
+
+    // aws
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.0.0'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.0'
+
+    // test container
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:localstack"
+}
+
+def querydslSrcDir = 'src/main/generated'
+
+compileJava {
+    options.generatedSourceOutputDirectory = file(querydslSrcDir)
 }
 
 test {
@@ -65,7 +89,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     reports {
         xml.required = true
         html.required = true
@@ -108,8 +132,17 @@ jacocoTestCoverageVerification {
                     '*.domain.*',
                     '*.service.*'
             ]
+
+            excludes = [
+                    "*.Q*"
+            ]
         }
     }
 
     dependsOn jacocoTestReport
 }
+
+clean {
+    delete file(querydslSrcDir)
+}
+

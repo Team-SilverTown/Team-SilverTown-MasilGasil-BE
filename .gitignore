@@ -30,6 +30,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 .idea/**/codeStyleConfig.xml
+localstack/
 
 # AWS User-specific
 .idea/**/aws.xml
@@ -228,6 +229,9 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+# Query DSL
+src/main/generated
 
 # Eclipse Gradle plugin generated files
 # Eclipse Core
