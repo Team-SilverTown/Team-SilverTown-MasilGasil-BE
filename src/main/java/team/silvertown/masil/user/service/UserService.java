@@ -37,13 +37,6 @@ public class UserService {
     private final KakaoOAuthService kakaoOAuthService;
     private final JwtTokenProvider tokenProvider;
 
-    private static UserAuthority generateUserAuthority(User user, Authority authority) {
-        return UserAuthority.builder()
-            .authority(authority)
-            .user(user)
-            .build();
-    }
-
     public LoginResponse login(String kakaoToken) {
         OAuthResponse oAuthResponse;
         try {
@@ -119,7 +112,7 @@ public class UserService {
         OffsetDateTime marketingConsentedAt = request.isAllowingMarketing() ? OffsetDateTime.now()
             : null;
 
-        UserAgreement userAgreement = UserAgreement.builder()
+        return UserAgreement.builder()
             .user(user)
             .isAllowingMarketing(request.isAllowingMarketing())
             .isLocationInfoConsented(request.isLocationInfoConsented())
@@ -127,8 +120,6 @@ public class UserService {
             .isUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed())
             .marketingConsentedAt(marketingConsentedAt)
             .build();
-
-        return userAgreement;
     }
 
     private User createAndSave(Provider authenticatedProvider, String providerId) {
@@ -143,6 +134,13 @@ public class UserService {
         return User.builder()
             .socialId(providerId)
             .provider(authenticatedProvider)
+            .build();
+    }
+
+    private UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
             .build();
     }
 
