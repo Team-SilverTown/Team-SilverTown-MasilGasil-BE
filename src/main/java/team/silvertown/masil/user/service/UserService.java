@@ -1,5 +1,6 @@
 package team.silvertown.masil.user.service;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -7,10 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.image.service.ImageService;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
@@ -36,6 +39,7 @@ public class UserService {
     private final UserAuthorityRepository userAuthorityRepository;
     private final KakaoOAuthService kakaoOAuthService;
     private final JwtTokenProvider tokenProvider;
+    private final ImageService imageService;
 
     private static UserAuthority generateUserAuthority(User user, Authority authority) {
         return UserAuthority.builder()
@@ -74,7 +78,7 @@ public class UserService {
     }
 
     @Transactional
-    public void onboard(long userId, OnboardRequest request) {
+    public void onboard(OnboardRequest request, Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
@@ -97,11 +101,20 @@ public class UserService {
         }
     }
 
-    public MeInfoResponse getMe(Long memberId) {
-        User user = userRepository.findById(memberId)
+    public MeInfoResponse getMe(Long userId) {
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         return MeInfoResponse.from(user);
+    }
+
+    @Transactional
+    public void updateProfile(MultipartFile profileImg, Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        URI uploadedUri = imageService.upload(profileImg);
+        user.updateProfile(uploadedUri.toString());
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
