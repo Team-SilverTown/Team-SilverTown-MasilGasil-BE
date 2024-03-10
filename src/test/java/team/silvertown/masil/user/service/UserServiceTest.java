@@ -150,7 +150,7 @@ class UserServiceTest {
             "yyyy-MM-dd");
         private User unTypedUser;
 
-        private static OnboardRequest getNormalRequest() {
+        private OnboardRequest getNormalRequest() {
             return new OnboardRequest(
                 "nickname",
                 Sex.MALE.name(),
