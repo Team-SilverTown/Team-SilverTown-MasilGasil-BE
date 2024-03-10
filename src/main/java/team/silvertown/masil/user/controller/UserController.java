@@ -96,7 +96,7 @@ public class UserController {
     ) {
         userService.updateInfo(memberId, updateRequest);
 
-        return ResponseEntity.ok()
+        return ResponseEntity.noContent()
             .build();
     }
 
