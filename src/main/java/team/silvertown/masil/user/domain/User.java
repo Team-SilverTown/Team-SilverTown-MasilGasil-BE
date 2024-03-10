@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.validator.DateValidator;
-import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.validator.UserValidator;
@@ -92,7 +91,7 @@ public class User extends BaseEntity {
         this.exerciseIntensity = ExerciseIntensity.valueOf(request.getExerciseIntensity());
     }
 
-    public void updateIsPublic() {
+    public void toggleIsPublic() {
         this.isPublic = !this.isPublic;
     }
 
