@@ -19,12 +19,12 @@ public record MasilDetailResponse(
     int totalTime,
     int calories,
     OffsetDateTime startedAt,
-    List<PinDetailResponse> pins,
+    List<MasilPinDetailResponse> pins,
     Long postId,
     String thumbnailUrl
 ) {
 
-    public static MasilDetailResponse from(Masil masil, List<PinDetailResponse> pins) {
+    public static MasilDetailResponse from(Masil masil, List<MasilPinDetailResponse> pins) {
         return MasilDetailResponse.builder()
             .id(masil.getId())
             .depth1(masil.getDepth1())

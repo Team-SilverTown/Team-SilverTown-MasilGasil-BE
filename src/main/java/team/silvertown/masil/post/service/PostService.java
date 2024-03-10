@@ -13,12 +13,12 @@ import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.PostCursorDto;
-import team.silvertown.masil.post.dto.request.CreatePinRequest;
-import team.silvertown.masil.post.dto.request.CreateRequest;
+import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
+import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.response.CreateResponse;
-import team.silvertown.masil.post.dto.response.PinDetailResponse;
+import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
+import team.silvertown.masil.post.dto.response.PostPinDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
@@ -35,21 +35,21 @@ public class PostService {
     private final PostPinRepository postPinRepository;
 
     @Transactional
-    public CreateResponse create(Long userId, CreateRequest request) {
+    public CreatePostResponse create(Long userId, CreatePostRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
         Post post = createPost(request, user);
 
         savePins(request.pins(), post);
 
-        return new CreateResponse(post.getId());
+        return new CreatePostResponse(post.getId());
     }
 
     @Transactional(readOnly = true)
     public PostDetailResponse getById(Long id) {
         Post post = postRepository.findById(id)
             .orElseThrow(throwNotFound(PostErrorCode.POST_NOT_FOUND));
-        List<PinDetailResponse> pins = PinDetailResponse.listFrom(post);
+        List<PostPinDetailResponse> pins = PostPinDetailResponse.listFrom(post);
 
         return PostDetailResponse.from(post, pins);
     }
@@ -69,7 +69,7 @@ public class PostService {
         return () -> new DataNotFoundException(errorCode);
     }
 
-    private Post createPost(CreateRequest request, User user) {
+    private Post createPost(CreatePostRequest request, User user) {
         Post post = Post.builder()
             .user(user)
             .depth1(request.depth1())
@@ -88,19 +88,19 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    private void savePins(List<CreatePinRequest> pins, Post post) {
+    private void savePins(List<CreatePostPinRequest> pins, Post post) {
         if (Objects.nonNull(pins)) {
             pins.forEach(pin -> savePin(pin, post));
         }
     }
 
-    private void savePin(CreatePinRequest pin, Post post) {
+    private void savePin(CreatePostPinRequest pin, Post post) {
         PostPin postPin = createPin(pin, post);
 
         postPinRepository.save(postPin);
     }
 
-    private PostPin createPin(CreatePinRequest request, Post post) {
+    private PostPin createPin(CreatePostPinRequest request, Post post) {
         User owner = post.getUser();
 
         return PostPin.builder()

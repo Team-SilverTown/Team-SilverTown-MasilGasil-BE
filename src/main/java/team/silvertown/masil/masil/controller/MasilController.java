@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import team.silvertown.masil.masil.dto.request.CreateRequest;
+import team.silvertown.masil.masil.dto.request.CreateMasilRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
-import team.silvertown.masil.masil.dto.response.CreateResponse;
+import team.silvertown.masil.masil.dto.response.CreateMasilResponse;
 import team.silvertown.masil.masil.dto.response.MasilDetailResponse;
 import team.silvertown.masil.masil.dto.response.PeriodResponse;
 import team.silvertown.masil.masil.dto.response.RecentMasilResponse;
@@ -35,24 +35,22 @@ public class MasilController {
     @Operation(summary = "마실 생성")
     @ApiResponse(
         responseCode = "201",
-        headers = {
-            @Header(
-                name = "해당 마실 조회 API",
-                description = "/api/v1/masils/{id}"
-            )
-        },
+        headers = @Header(
+            name = "해당 마실 조회 API",
+            description = "/api/v1/masils/{id}"
+        ),
         content = @Content(
             mediaType = "application/json",
-            schema = @Schema(implementation = CreateResponse.class)
+            schema = @Schema(implementation = CreateMasilResponse.class)
         )
     )
-    public ResponseEntity<CreateResponse> create(
+    public ResponseEntity<CreateMasilResponse> create(
         @AuthenticationPrincipal
         Long userId,
         @RequestBody
-        CreateRequest request
+        CreateMasilRequest request
     ) {
-        CreateResponse createResponse = masilService.create(userId, request);
+        CreateMasilResponse createResponse = masilService.create(userId, request);
         URI uri = URI.create("/api/v1/masils/" + createResponse.id());
 
         return ResponseEntity.created(uri)

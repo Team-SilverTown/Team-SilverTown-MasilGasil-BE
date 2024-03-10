@@ -21,13 +21,13 @@ public record PostDetailResponse(
     boolean isPublic,
     int viewCount,
     int likeCount,
-    List<PinDetailResponse> pins,
+    List<PostPinDetailResponse> pins,
     long authorId,
     String authorName,
     String thumbnailUrl
 ) {
 
-    public static PostDetailResponse from(Post post, List<PinDetailResponse> pins) {
+    public static PostDetailResponse from(Post post, List<PostPinDetailResponse> pins) {
         User author = post.getUser();
 
         return PostDetailResponse.builder()

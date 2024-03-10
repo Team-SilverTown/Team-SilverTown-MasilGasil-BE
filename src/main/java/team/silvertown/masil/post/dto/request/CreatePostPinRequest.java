@@ -4,13 +4,13 @@ import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.map.MapErrorCode;
 import team.silvertown.masil.post.validator.PostValidator;
 
-public record CreatePinRequest(
+public record CreatePostPinRequest(
     KakaoPoint point,
     String content,
     String thumbnailUrl
 ) {
 
-    public CreatePinRequest {
+    public CreatePostPinRequest {
         PostValidator.notNull(point, MapErrorCode.NULL_KAKAO_POINT);
         PostValidator.validateUrl(thumbnailUrl);
     }

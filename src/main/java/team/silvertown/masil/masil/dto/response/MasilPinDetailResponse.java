@@ -7,15 +7,15 @@ import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
 
 @Builder
-public record PinDetailResponse(
+public record MasilPinDetailResponse(
     long id,
     KakaoPoint point,
     String content,
     String thumbnailUrl
 ) {
 
-    public static PinDetailResponse from(MasilPin pin) {
-        return PinDetailResponse.builder()
+    public static MasilPinDetailResponse from(MasilPin pin) {
+        return MasilPinDetailResponse.builder()
             .id(pin.getId())
             .point(pin.getSimplePoint())
             .content(pin.getContent())
@@ -23,10 +23,10 @@ public record PinDetailResponse(
             .build();
     }
 
-    public static List<PinDetailResponse> listFrom(Masil masil) {
+    public static List<MasilPinDetailResponse> listFrom(Masil masil) {
         return masil.getMasilPins()
             .stream()
-            .map(PinDetailResponse::from)
+            .map(MasilPinDetailResponse::from)
             .toList();
     }
 

@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.common.response.ScrollResponse;
-import team.silvertown.masil.post.dto.request.CreateRequest;
+import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.post.dto.request.OrderType;
-import team.silvertown.masil.post.dto.response.CreateResponse;
+import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.service.PostService;
@@ -46,16 +46,16 @@ public class PostController {
         },
         content = @Content(
             mediaType = "application/json",
-            schema = @Schema(implementation = CreateResponse.class)
+            schema = @Schema(implementation = CreatePostResponse.class)
         )
     )
-    public ResponseEntity<CreateResponse> create(
+    public ResponseEntity<CreatePostResponse> create(
         @AuthenticationPrincipal
         Long userId,
         @RequestBody
-        CreateRequest request
+        CreatePostRequest request
     ) {
-        CreateResponse response = postService.create(userId, request);
+        CreatePostResponse response = postService.create(userId, request);
         URI uri = URI.create("/api/v1/posts/" + response.id());
 
         return ResponseEntity.created(uri)

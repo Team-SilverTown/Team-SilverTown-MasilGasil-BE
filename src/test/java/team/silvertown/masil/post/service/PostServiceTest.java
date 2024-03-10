@@ -24,11 +24,11 @@ import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
-import team.silvertown.masil.post.dto.request.CreatePinRequest;
-import team.silvertown.masil.post.dto.request.CreateRequest;
+import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
+import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.post.dto.request.OrderType;
-import team.silvertown.masil.post.dto.response.CreateResponse;
+import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
@@ -88,12 +88,13 @@ class PostServiceTest {
     @ValueSource(ints = {10, 0})
     void 산책로_포스트_생성을_성공한다(int expectedPinCount) {
         // given
-        List<CreatePinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
-        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
+        List<CreatePostPinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
+        CreatePostRequest request = new CreatePostRequest(addressDepth1, addressDepth2,
+            addressDepth3,
             "", path, title, null, distance, totalTime, true, pinRequests, null);
 
         // when
-        CreateResponse expected = postService.create(user.getId(), request);
+        CreatePostResponse expected = postService.create(user.getId(), request);
 
         // then
         Post actual = postRepository.findById(expected.id())
@@ -108,7 +109,8 @@ class PostServiceTest {
     void 사용자가_존재하지_않으면_산책로_포스트_생성을_실패한다() {
         // given
         long invalidId = PostTexture.getRandomId();
-        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
+        CreatePostRequest request = new CreatePostRequest(addressDepth1, addressDepth2,
+            addressDepth3,
             "", path, title, null, distance, totalTime, true, null, null);
 
         // when
@@ -393,14 +395,14 @@ class PostServiceTest {
             .getId();
     }
 
-    List<CreatePinRequest> createPinRequests(int size, int maxPathPoints) {
-        List<CreatePinRequest> pinRequests = new ArrayList<>();
+    List<CreatePostPinRequest> createPinRequests(int size, int maxPathPoints) {
+        List<CreatePostPinRequest> pinRequests = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             Coordinate coordinate = MapTexture.createPoint()
                 .getCoordinate();
             KakaoPoint point = KakaoPoint.from(coordinate);
-            CreatePinRequest createPinRequest = new CreatePinRequest(point, null, null);
+            CreatePostPinRequest createPinRequest = new CreatePostPinRequest(point, null, null);
 
             pinRequests.add(createPinRequest);
         }
