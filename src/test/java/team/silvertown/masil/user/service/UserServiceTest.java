@@ -188,7 +188,7 @@ class UserServiceTest {
                     .getAuthority()).isEqualTo(Authority.RESTRICTED);
 
                 //when
-                userService.onboard(unTypedUser.getId(), request);
+                userService.onboard(request, unTypedUser.getId());
 
                 //then
                 User updatedUser = userRepository.findById(unTypedUser.getId())
@@ -265,7 +265,7 @@ class UserServiceTest {
                     .getAuthority()).isEqualTo(Authority.RESTRICTED);
 
                 //when
-                userService.onboard(unTypedUser.getId(), request);
+                userService.onboard(request, unTypedUser.getId());
 
                 //then
                 User updatedUser = userRepository.findById(unTypedUser.getId())
