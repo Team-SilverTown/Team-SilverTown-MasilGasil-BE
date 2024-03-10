@@ -38,12 +38,10 @@ public class PostController {
     @Operation(summary = "산책로 포스트 생성")
     @ApiResponse(
         responseCode = "201",
-        headers = {
-            @Header(
-                name = "해당 산책로 포스트 조회 API",
-                description = "/api/v1/posts/{id}"
-            )
-        },
+        headers = @Header(
+            name = "해당 산책로 포스트 조회 API",
+            description = "/api/v1/posts/{id}"
+        ),
         content = @Content(
             mediaType = "application/json",
             schema = @Schema(implementation = CreatePostResponse.class)
