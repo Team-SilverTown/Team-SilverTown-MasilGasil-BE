@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.user.dto.LoginResponse;
-import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.InfoResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.service.UserService;
 
@@ -68,10 +69,10 @@ public class UserController {
         responseCode = "200",
         content = @Content(
             mediaType = "application/json",
-            schema = @Schema(implementation = MeInfoResponse.class)
+            schema = @Schema(implementation = InfoResponse.class)
         )
     )
-    public ResponseEntity<MeInfoResponse> getMyInfo(
+    public ResponseEntity<InfoResponse> getMyInfo(
         @AuthenticationPrincipal
         Long memberId
     ) {
@@ -94,6 +95,14 @@ public class UserController {
         String accessToken
     ) {
         return ResponseEntity.ok(userService.login(accessToken));
+    }
+
+    @GetMapping("/api/v1/user/{userId}")
+    public ResponseEntity<InfoResponse> getOthersInfo(
+        @PathVariable
+        Long userId
+    ) {
+        return ResponseEntity.ok(userService.getOthers(userId));
     }
 
 }

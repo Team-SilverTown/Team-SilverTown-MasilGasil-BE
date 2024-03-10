@@ -2,30 +2,33 @@ package team.silvertown.masil.user.dto;
 
 import java.time.LocalDate;
 import lombok.Builder;
+import team.silvertown.masil.common.validator.DateValidator;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
+import team.silvertown.masil.user.exception.UserErrorCode;
 
 @Builder
-public record MeInfoResponse(
+public record InfoResponse(
     Long userId,
     String nickname,
     String profileImg,
     Integer height,
     Integer weight,
-    LocalDate birthDate,
+    String birthDate,
     Sex sex,
     ExerciseIntensity exerciseIntensity
 ) {
 
-    public static MeInfoResponse from(User user) {
-        return MeInfoResponse.builder()
+    public static InfoResponse from(User user) {
+        return InfoResponse.builder()
             .userId(user.getId())
             .nickname(user.getNickname())
             .profileImg(user.getProfileImg())
             .height(user.getHeight())
             .weight(user.getWeight())
-            .birthDate(user.getBirthDate())
+            .birthDate(
+                DateValidator.parseToString(user.getBirthDate(), UserErrorCode.INVALID_BIRTH_DATE))
             .sex(user.getSex())
             .exerciseIntensity(user.getExerciseIntensity())
             .build();

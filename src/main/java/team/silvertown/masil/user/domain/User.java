@@ -84,7 +84,7 @@ public class User extends BaseEntity {
 
         this.nickname = request.nickname();
         this.sex = Sex.valueOf(request.sex());
-        this.birthDate = DateValidator.parseDate(request.birthDate(),
+        this.birthDate = DateValidator.parseToDate(request.birthDate(),
             UserErrorCode.INVALID_BIRTH_DATE);
         this.height = request.height();
         this.weight = request.weight();

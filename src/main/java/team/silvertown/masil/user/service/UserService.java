@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
@@ -18,7 +19,7 @@ import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
-import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.InfoResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -97,11 +98,11 @@ public class UserService {
         }
     }
 
-    public MeInfoResponse getMe(Long memberId) {
+    public InfoResponse getMe(Long memberId) {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        return MeInfoResponse.from(user);
+        return InfoResponse.from(user);
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
@@ -149,6 +150,16 @@ public class UserService {
     private void assignDefaultAuthority(User user) {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
+    }
+
+    public InfoResponse getOthers(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        Validator.throwIf(!user.getIsPublic(),
+            () -> new ForbiddenException(UserErrorCode.INFO_BLOCKED_USER));
+
+        return InfoResponse.from(user);
     }
 
 }
