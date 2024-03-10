@@ -19,7 +19,7 @@ public record CreateMasilRequest(
     Integer totalTime,
     Integer calories,
     OffsetDateTime startedAt,
-    List<CreatePostPinRequest> pins,
+    List<CreateMasilPinRequest> pins,
     String thumbnailUrl,
     Long postId
 ) {
