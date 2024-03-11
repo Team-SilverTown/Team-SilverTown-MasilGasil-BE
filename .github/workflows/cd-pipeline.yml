@@ -1,0 +1,98 @@
+name: Deploy dev API to Amazon ECS
+
+on:
+  push:
+    branches: [ "feature-cd-pipeline" ]
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+  CONTAINER_NAME: masilgasil-api
+  ECR_REPOSITORY: masilgasil-ecr-private
+  ECS_CLUSTER: masilgasil-ecr-cluster
+  ECS_SERVICE: masilgasil-ecs-service
+  ECS_TASK_DEFINITION: aws/masilgasil-ecs-task-revision1
+  ACTIVE_PROFILE: prod
+  SERVER_PORT: 8080
+
+jobs:
+  job:
+    name: Deploy dev API
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure application.yaml
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ./src/main/resources/application.yaml
+        env:
+          server.port: ${{ env.SERVER_PORT }}
+
+          spring.datasource.username: ${{ secrets.MYSQL_USERNAME }}
+          spring.datasource.password: ${{ secrets.MYSQL_PASSWORD }}
+          spring.datasource.url: ${{ secrets.MYSQL_URL }}
+
+          spring.cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          spring.cloud.aws.credentials.secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          spring.cloud.aws.region.static: ${{ env.AWS_REGION }}
+          spring.cloud.aws.s3.bucket: ${{ secrets.AWS_S3_IMAGE_BUCKET }}
+          spring.cloud.aws.s3.endpoint: ${{ secrets.AWS_S3_IMAGE_ENDPOINT }}
+
+          jwt.issuer: ${{ secrets.TOKEN_ISSUER }}
+          jwt.base64-secret: ${{ secrets.TOKEN_SECRET }}
+          jwt.token-validity-in-seconds: ${{ secrets.TOKEN_EXPIRATION }}
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: clean build
+        env:
+          SPRING_PROFILES_ACTIVE: ${{ env.ACTIVE_PROFILE }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push docker image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
