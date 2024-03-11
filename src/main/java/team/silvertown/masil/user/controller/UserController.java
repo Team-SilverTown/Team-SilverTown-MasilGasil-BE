@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.service.UserService;
 
@@ -52,17 +53,14 @@ public class UserController {
     @GetMapping("api/v1/users/check-nickname")
     @Operation(summary = "닉네임 중복 검사")
     @ApiResponse(
-        responseCode = "204",
+        responseCode = "200",
         description = "중복되는 닉네임 없음"
     )
-    public ResponseEntity<Void> nicknameCheck(
+    public ResponseEntity<NicknameCheckResponse> nicknameCheck(
         @RequestParam
         String nickname
     ) {
-        userService.checkNickname(nickname);
-
-        return ResponseEntity.noContent()
-            .build();
+        return ResponseEntity.ok(userService.checkNickname(nickname));
     }
 
     @GetMapping("/api/v1/users/me")
