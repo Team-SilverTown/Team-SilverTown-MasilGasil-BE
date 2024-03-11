@@ -2,7 +2,7 @@ name: Deploy dev API to Amazon ECS
 
 on:
   push:
-    branches: [ "feature-cd-pipeline" ]
+    branches: [ "dev" ]
 
 permissions:
   contents: read
