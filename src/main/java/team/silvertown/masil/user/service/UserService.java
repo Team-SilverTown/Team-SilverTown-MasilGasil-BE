@@ -146,12 +146,20 @@ public class UserService {
         return User.builder()
             .socialId(providerId)
             .provider(authenticatedProvider)
+            .isPublic(true)
             .build();
     }
 
     private void assignDefaultAuthority(User user) {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
+    }
+
+    @Transactional
+    public void changePublic(Long memberId) {
+        User user = userRepository.findById(memberId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+        user.toggleIsPublic();
     }
 
 }
