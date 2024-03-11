@@ -32,7 +32,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     private final QPost post = QPost.post;
 
     @Override
-    public List<PostCursorDto> findSliceBy(User user, NormalListRequest request) {
+    public List<PostCursorDto> findScrollByAddress(User user, NormalListRequest request) {
         // TODO: 좋아요 구현 후 로그인한 사용자 본인이 좋아요한 포스트인지 쿼리 추가
         Predicate openness = getOpenness(user, null);
         BooleanBuilder condition = getBasicCondition(request.getScrollRequest(), openness);
@@ -46,7 +46,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public List<PostCursorDto> findScrollBy(
+    public List<PostCursorDto> findScrollByUser(
         User loginUser,
         User author,
         ScrollRequest request

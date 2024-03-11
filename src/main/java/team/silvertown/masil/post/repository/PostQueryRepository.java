@@ -8,8 +8,8 @@ import team.silvertown.masil.user.domain.User;
 
 public interface PostQueryRepository {
 
-    List<PostCursorDto> findSliceBy(User user, NormalListRequest request);
+    List<PostCursorDto> findScrollByAddress(User user, NormalListRequest request);
 
-    List<PostCursorDto> findScrollBy(User loginUser, User author, ScrollRequest request);
+    List<PostCursorDto> findScrollByUser(User loginUser, User author, ScrollRequest request);
 
 }
