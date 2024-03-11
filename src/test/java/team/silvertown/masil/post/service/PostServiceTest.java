@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.map.KakaoPoint;
+import team.silvertown.masil.common.response.ScrollRequest;
 import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
@@ -183,7 +184,7 @@ class PostServiceTest {
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -210,7 +211,7 @@ class PostServiceTest {
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -236,7 +237,7 @@ class PostServiceTest {
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -255,17 +256,18 @@ class PostServiceTest {
         long lastId = createPostsAndGetLastId(totalSize);
         int expectedSize = 10;
         String idCursor = String.valueOf(lastId - expectedSize + 1);
+        String idPrefix = idCursor.length() == 2 ? "00000000000000" : "0000000000000";
         NormalListRequest request = NormalListRequest.builder()
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
             .order(OrderType.MOST_POPULAR.name())
-            .cursor("00000000000000" + idCursor)
+            .cursor(idPrefix + idCursor)
             .size(expectedSize)
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -291,7 +293,7 @@ class PostServiceTest {
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -317,7 +319,7 @@ class PostServiceTest {
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -347,7 +349,7 @@ class PostServiceTest {
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -371,7 +373,7 @@ class PostServiceTest {
             .build();
 
         // when
-        ScrollResponse<SimplePostResponse> actual = postService.getSliceByAddress(null,
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(null,
             request);
 
         // then
@@ -379,6 +381,139 @@ class PostServiceTest {
 
         assertThat(actual.contents()).hasSize(expectedSize);
         assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @Test
+    void 특정_사용자의_산책로_포스트_최신순_조회를_성공한다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(11, 99);
+
+        createPostsAndGetLastId(totalSize);
+
+        int expectedSize = 10;
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null, expectedSize);
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
+            user.getId(), request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(expectedSize - 1);
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).isEqualTo(expectedLastCursor);
+    }
+
+    @Test
+    void 다음_커서_기반으로_특정_사용자의_산책로_포스트_최신순_조회를_성공한다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(11, 99);
+        long lastId = createPostsAndGetLastId(totalSize);
+        System.out.println(lastId);
+        int expectedSize = 10;
+        String idCursor = String.valueOf(lastId - expectedSize + 1);
+        System.out.println(idCursor);
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), idCursor, expectedSize);
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
+            user.getId(), request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(
+            (int) (lastId - (Integer.parseInt(idCursor) - expectedSize)));
+        System.out.println(expectedLastCursor);
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @Test
+    void 특정_사용자의_산책로_포스트_인기순_조회를_성공한다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(11, 99);
+
+        createPostsAndGetLastId(totalSize);
+
+        int expectedSize = 10;
+        ScrollRequest request = new ScrollRequest(OrderType.MOST_POPULAR.name(), null,
+            expectedSize);
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
+            user.getId(), request);
+
+        // then
+        Post actualLast = getLastMostPopularPost(expectedSize - 1);
+        String likeCount = String.valueOf(actualLast.getLikeCount());
+        String id = String.valueOf(actualLast.getId());
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(likeCount, id);
+    }
+
+    @Test
+    void 다음_커서_기반으로_특정_사용자의_산책로_포스트_인기순_조회를_성공한다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(11, 99);
+        long lastId = createPostsAndGetLastId(totalSize);
+        int expectedSize = 10;
+        String idCursor = String.valueOf(lastId - expectedSize + 1);
+        String idPrefix = idCursor.length() == 2 ? "00000000000000" : "0000000000000";
+        ScrollRequest request = new ScrollRequest(OrderType.MOST_POPULAR.name(),
+            idPrefix + idCursor, expectedSize);
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
+            user.getId(), request);
+
+        // then
+        Post actualLast = getLastMostPopularPost(
+            (int) (lastId - (Integer.parseInt(idCursor) - expectedSize)));
+        String likeCount = String.valueOf(actualLast.getLikeCount());
+        String id = String.valueOf(actualLast.getId());
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(likeCount, id);
+    }
+
+    @Test
+    void 로그인_사용자와_조회_대상_사용자가_같으면_공개_여부에_관계없이_조회한다() {
+        // given
+        int totalPublicPostSize = 6;
+
+        createPostsAndGetLastId(totalPublicPostSize);
+        postRepository.save(PostTexture.createPrivatePost(user));
+
+        int expectedSize = 10;
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null,
+            expectedSize);
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(user.getId(),
+            user.getId(), request);
+
+        // then
+        assertThat(actual.contents()).hasSize(totalPublicPostSize + 1);
+    }
+
+    @Test
+    void 사용자를_확인할_수_없으면_특정_사용자_포스트_목록_조회를_실패한다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(11, 99);
+
+        createPostsAndGetLastId(totalSize);
+
+        int expectedSize = 10;
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null, expectedSize);
+        long invalidId = PostTexture.getRandomId();
+
+        // when
+        ThrowingCallable getScroll = () -> postService.getScrollByAuthor(null, invalidId, request);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getScroll)
+            .withMessage(PostErrorCode.AUTHOR_NOT_FOUND.getMessage());
     }
 
     long createPostsAndGetLastId(int size) {
