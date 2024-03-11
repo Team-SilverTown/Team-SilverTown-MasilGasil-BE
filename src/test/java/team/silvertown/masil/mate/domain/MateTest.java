@@ -20,6 +20,7 @@ import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.texture.MapTexture;
 import team.silvertown.masil.texture.MasilTexture;
 import team.silvertown.masil.texture.MateTexture;
+import team.silvertown.masil.texture.PostTexture;
 import team.silvertown.masil.texture.UserTexture;
 import team.silvertown.masil.user.domain.User;
 
@@ -41,11 +42,7 @@ class MateTest {
     @BeforeEach
     void setUp() {
         user = UserTexture.createValidUser();
-        // TODO: post texture
-        post = Post.builder()
-            .id(1L)
-            .user(user)
-            .build();
+        post = PostTexture.createValidPost();
         addressDepth1 = MasilTexture.createAddressDepth1();
         addressDepth2 = MasilTexture.createAddressDepth2();
         addressDepth3 = MasilTexture.createAddressDepth3();

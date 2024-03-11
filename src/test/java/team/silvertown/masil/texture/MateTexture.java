@@ -35,9 +35,10 @@ public class MateTexture extends BaseDomainTexture {
     }
 
     public static Mate createDependentMate(User user, Post post) {
-        String addressDepth1 = MasilTexture.createAddressDepth1();
-        String addressDepth2 = MasilTexture.createAddressDepth2();
-        String addressDepth3 = MasilTexture.createAddressDepth3();
+        String addressDepth1 = post.getDepth1();
+        String addressDepth2 = post.getDepth2();
+        String addressDepth3 = post.getDepth3();
+        String addressDepth4 = post.getDepth4();
         String title = getRandomSentenceWithMax(30);
         String content = getRandomSentenceWithMax(10000);
         Point point = MapTexture.createPoint();
@@ -45,8 +46,8 @@ public class MateTexture extends BaseDomainTexture {
         OffsetDateTime gatherAt = getFutureDateTime();
         int capacity = getRandomInt(1, 10);
 
-        return createMate(user, post, addressDepth1, addressDepth2, addressDepth3, "", title,
-            content, point, detail, gatherAt, capacity);
+        return createMate(user, post, addressDepth1, addressDepth2, addressDepth3, addressDepth4,
+            title, content, point, detail, gatherAt, capacity);
     }
 
     public static Mate createMate(

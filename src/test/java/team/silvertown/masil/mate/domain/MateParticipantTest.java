@@ -16,6 +16,7 @@ import team.silvertown.masil.mate.domain.MateParticipant.MateParticipantBuilder;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.texture.MateTexture;
+import team.silvertown.masil.texture.PostTexture;
 import team.silvertown.masil.texture.UserTexture;
 import team.silvertown.masil.user.domain.User;
 
@@ -29,11 +30,7 @@ class MateParticipantTest {
     void setUp() {
         user = UserTexture.createValidUser();
         User author = UserTexture.createValidUser();
-        // TODO: post texture
-        Post post = Post.builder()
-            .user(user)
-            .id(1L)
-            .build();
+        Post post = PostTexture.createValidPost();
         mate = MateTexture.createDependentMate(author, post);
     }
 
