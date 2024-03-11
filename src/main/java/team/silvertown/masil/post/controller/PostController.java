@@ -2,6 +2,8 @@ package team.silvertown.masil.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
@@ -78,32 +79,47 @@ public class PostController {
     @GetMapping(value = "/api/v1/posts", produces = "application/json")
     @Operation(summary = "산책로 목록 조회")
     @ApiResponse(responseCode = "200")
+    @Parameters(
+        {
+            @Parameter(
+                name = "depth1",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "depth2",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "depth3",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "order",
+                in = ParameterIn.QUERY,
+                schema = @Schema(implementation = OrderType.class, defaultValue = "LATEST")
+            ),
+            @Parameter(
+                name = "cursor",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "size",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "integer", format = "int32", defaultValue = "10")
+            )
+        }
+    )
     @SecurityRequirements()
     public ResponseEntity<ScrollResponse<SimplePostResponse>> getSliceByAddress(
         @AuthenticationPrincipal
         Long userId,
-        @RequestParam
-        String depth1,
-        @RequestParam
-        String depth2,
-        @RequestParam
-        String depth3,
-        @RequestParam(required = false, defaultValue = "LATEST")
-        @Parameter(schema = @Schema(implementation = OrderType.class))
-        String order,
-        @RequestParam(required = false)
-        String cursor,
-        @RequestParam(required = false, defaultValue = "10")
-        Integer size
+        @Parameter(hidden = true)
+        NormalListRequest request
     ) {
-        NormalListRequest request = NormalListRequest.builder()
-            .depth1(depth1)
-            .depth2(depth2)
-            .depth3(depth3)
-            .order(OrderType.get(order))
-            .cursor(cursor)
-            .size(size)
-            .build();
         ScrollResponse<SimplePostResponse> response = postService.getSliceByAddress(userId,
             request);
 
