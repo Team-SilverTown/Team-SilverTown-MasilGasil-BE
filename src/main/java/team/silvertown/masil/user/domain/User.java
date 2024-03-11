@@ -75,20 +75,20 @@ public class User extends BaseEntity {
     private String socialId;
 
     public void update(UpdateRequest request) {
-        UserValidator.validateNickname(request.getNickname(), UserErrorCode.INVALID_NICKNAME);
-        UserValidator.validateSex(request.getSex(), UserErrorCode.INVALID_SEX);
-        UserValidator.validateBirthDate(request.getBirthDate(), UserErrorCode.INVALID_BIRTH_DATE);
-        UserValidator.validateHeight(request.getHeight(), UserErrorCode.INVALID_HEIGHT);
-        UserValidator.validateWeight(request.getWeight(), UserErrorCode.INVALID_WEIGHT);
-        UserValidator.validateExerciseIntensity(request.getExerciseIntensity());
+        UserValidator.validateNickname(request.nickname(), UserErrorCode.INVALID_NICKNAME);
+        UserValidator.validateSex(request.sex(), UserErrorCode.INVALID_SEX);
+        UserValidator.validateBirthDate(request.birthDate(), UserErrorCode.INVALID_BIRTH_DATE);
+        UserValidator.validateHeight(request.height(), UserErrorCode.INVALID_HEIGHT);
+        UserValidator.validateWeight(request.weight(), UserErrorCode.INVALID_WEIGHT);
+        UserValidator.validateExerciseIntensity(request.exerciseIntensity());
 
-        this.nickname = request.getNickname();
-        this.sex = Sex.valueOf(request.getSex());
-        this.birthDate = DateValidator.parseDate(request.getBirthDate(),
+        this.nickname = request.nickname();
+        this.sex = Sex.valueOf(request.sex());
+        this.birthDate = DateValidator.parseDate(request.birthDate(),
             UserErrorCode.INVALID_BIRTH_DATE);
-        this.height = request.getHeight();
-        this.weight = request.getWeight();
-        this.exerciseIntensity = ExerciseIntensity.valueOf(request.getExerciseIntensity());
+        this.height = request.height();
+        this.weight = request.weight();
+        this.exerciseIntensity = ExerciseIntensity.valueOf(request.exerciseIntensity());
     }
 
     public void toggleIsPublic() {
