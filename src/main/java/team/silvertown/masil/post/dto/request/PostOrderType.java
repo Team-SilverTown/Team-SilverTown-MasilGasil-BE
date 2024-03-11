@@ -22,6 +22,6 @@ public enum PostOrderType {
     }
 
     public static boolean isMostPopular(PostOrderType postOrderType) {
-        return Objects.equals(postOrderType, MOST_POPULAR);
+        return Objects.isNull(postOrderType) || postOrderType == MOST_POPULAR;
     }
 }
