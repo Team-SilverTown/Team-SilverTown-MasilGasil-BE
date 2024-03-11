@@ -38,6 +38,7 @@ jwt:
 server:
   port: ${SERVER_PORT}
 cors:
+  local-origin: http://localhost:3000
   service-origin: ${SERVICE_ORIGIN}
 springdoc:
   swagger-ui:
