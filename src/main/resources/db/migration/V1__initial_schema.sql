@@ -152,7 +152,7 @@ CREATE TABLE mate_participants
     user_id    BIGINT       NOT NULL,
     mate_id    BIGINT       NOT NULL,
     message    VARCHAR(255),
-    status     VARCHAR(12)  NOT NULL DEFAULT 'REQUESTED',
+    status     VARCHAR(12)  NOT NULL,
     created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
 
