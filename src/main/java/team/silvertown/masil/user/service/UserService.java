@@ -19,6 +19,7 @@ import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
@@ -92,10 +93,12 @@ public class UserService {
         updatingAuthority(authorities, user);
     }
 
-    public void checkNickname(String nickname) {
-        if (userRepository.existsByNickname(nickname)) {
-            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
-        }
+    public NicknameCheckResponse checkNickname(String nickname) {
+        boolean isDuplicated = userRepository.existsByNickname(nickname);
+        return NicknameCheckResponse.builder()
+            .nickname(nickname)
+            .isDuplicated(isDuplicated)
+            .build();
     }
 
     public MeInfoResponse getMe(Long memberId) {
