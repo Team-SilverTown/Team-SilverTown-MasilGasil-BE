@@ -8,13 +8,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.sql.Date;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.BaseEntity;
+import team.silvertown.masil.common.validator.DateValidator;
+import team.silvertown.masil.user.dto.UpdateRequest;
+import team.silvertown.masil.user.exception.UserErrorCode;
+import team.silvertown.masil.user.validator.UserValidator;
 
 @Entity
 @Table(name = "users")
@@ -36,7 +40,7 @@ public class User extends BaseEntity {
     private Sex sex;
 
     @Column(name = "birth_date")
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "height")
     private Integer height;
@@ -48,6 +52,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ExerciseIntensity exerciseIntensity;
 
+    @Column(name = "profileImg", columnDefinition = "VARCHAR(500)")
+    private String profileImg;
+
     @Column(name = "total_distance")
     private Integer totalDistance;
 
@@ -58,7 +65,7 @@ public class User extends BaseEntity {
     private Boolean isPublic;
 
     @Column(name = "is_allowing_notification")
-    private boolean isAllowingNotification;
+    private Boolean isAllowingNotification;
 
     @Column(name = "provider", columnDefinition = "VARCHAR(20)")
     @Enumerated(EnumType.STRING)
@@ -66,5 +73,40 @@ public class User extends BaseEntity {
 
     @Column(name = "social_id", length = 50)
     private String socialId;
+
+    public void updateNickname(String nickname){
+        UserValidator.validateNickname(nickname, UserErrorCode.INVALID_NICKNAME);
+        this.nickname = nickname;
+    }
+
+    public void updateSex(String sex){
+        UserValidator.validateSex(sex, UserErrorCode.INVALID_SEX);
+        this.sex = Sex.valueOf(sex);
+    }
+
+    public void updateBirthDate(String birthDate){
+        UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
+        this.birthDate = DateValidator.parseDate(birthDate,
+            UserErrorCode.INVALID_BIRTH_DATE);
+    }
+
+    public void updateHeight(Integer height){
+        UserValidator.validateHeight(height, UserErrorCode.INVALID_HEIGHT);
+        this.height = height;
+    }
+
+    public void updateWeight(Integer weight){
+        UserValidator.validateWeight(weight, UserErrorCode.INVALID_WEIGHT);
+        this.weight = weight;
+    }
+
+    public void updateExerciseIntensity(String exerciseIntensity){
+        UserValidator.validateExerciseIntensity(exerciseIntensity);
+        this.exerciseIntensity = ExerciseIntensity.valueOf(exerciseIntensity);
+    }
+
+    public void toggleIsPublic() {
+        this.isPublic = !this.isPublic;
+    }
 
 }

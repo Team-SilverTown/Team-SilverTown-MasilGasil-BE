@@ -13,9 +13,9 @@ import team.silvertown.masil.common.map.KakaoPointMapper;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapTexture {
 
-    private static double dongAnLat = 37.4004;
-    private static double dongAnLng = 126.9555;
-    private static double appender = 0.002;
+    private static final double dongAnLat = 37.4004;
+    private static final double dongAnLng = 126.9555;
+    private static final double appender = 0.002;
 
     public static List<KakaoPoint> createPath(int size) {
         List<KakaoPoint> path = new ArrayList<>();

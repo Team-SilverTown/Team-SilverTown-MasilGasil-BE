@@ -23,7 +23,7 @@ public class Gathering {
     @Column(name = "gathering_place_detail", length = 50, nullable = false)
     private String detail;
 
-    @Column(name = "gather_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
+    @Column(name = "gathering_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
     private OffsetDateTime gatheringAt;
 

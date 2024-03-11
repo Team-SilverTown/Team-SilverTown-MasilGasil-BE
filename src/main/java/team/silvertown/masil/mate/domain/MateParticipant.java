@@ -39,6 +39,9 @@ public class MateParticipant extends BaseEntity {
     @JoinColumn(name = "mate_id", referencedColumnName = "id")
     private Mate mate;
 
+    @Column(name = "message", length = 255)
+    private String message;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(12)")
     private ParticipantStatus status;
@@ -47,6 +50,7 @@ public class MateParticipant extends BaseEntity {
     private MateParticipant(
         User user,
         Mate mate,
+        String message,
         String status
     ) {
         MateValidator.notNull(user, MateErrorCode.NULL_USER);
@@ -54,6 +58,7 @@ public class MateParticipant extends BaseEntity {
 
         this.user = user;
         this.mate = mate;
+        this.message = message;
         this.status = StringUtils.isBlank(status) ? ParticipantStatus.REQUESTED
             : ParticipantStatus.get(status);
     }

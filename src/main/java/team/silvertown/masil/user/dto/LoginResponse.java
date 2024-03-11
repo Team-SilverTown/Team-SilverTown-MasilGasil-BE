@@ -1,6 +1,6 @@
 package team.silvertown.masil.user.dto;
 
-public record LoginResponseDto(
+public record LoginResponse(
     String token
 ) {
 
