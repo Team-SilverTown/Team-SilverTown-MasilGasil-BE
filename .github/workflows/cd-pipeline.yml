@@ -39,7 +39,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Configure application.yaml
+      - name: Configure application.yml
         uses: microsoft/variable-substitution@v1
         with:
           files: ./src/main/resources/application.yml
