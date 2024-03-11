@@ -7,8 +7,6 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.service.UserService;
@@ -26,9 +24,6 @@ class JwtTokenProviderTest {
 
     @Autowired
     UserService userService;
-
-    @MockBean
-    OAuth2User oAuth2User;
 
     @Test
     public void 권한이_없는_경우_토큰이_생성되지_않는다() throws Exception {

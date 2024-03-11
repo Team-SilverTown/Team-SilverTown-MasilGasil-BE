@@ -13,6 +13,24 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0B
+      location: ${java.io.tmpdir}
+      max-file-size: 100MB
+      max-request-size: 100MB
+  cloud:
+    aws:
+      credentials:
+        accessKey: ${AWS_ACCESS_KEY_ID}
+        secretKey: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: ${AWS_S3_IMAGE_BUCKET}
+        endpoint: ${AWS_S3_IMAGE_ENDPOINT}
+        path-style-access-enabled: true
 jwt:
   issuer: ${TOKEN_ISSUER}
   base64-secret: ${TOKEN_SECRET}
