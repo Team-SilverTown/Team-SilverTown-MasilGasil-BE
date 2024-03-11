@@ -42,7 +42,7 @@ jobs:
       - name: Configure application.yaml
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./src/main/resources/application.yaml
+          files: ./src/main/resources/application.yml
         env:
           server.port: ${{ env.SERVER_PORT }}
 
