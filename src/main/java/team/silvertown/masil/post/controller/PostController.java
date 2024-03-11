@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -81,15 +82,17 @@ public class PostController {
     @Operation(summary = "산책로 목록 조회")
     @ApiResponse(responseCode = "200")
     @SecurityRequirements()
-    public ResponseEntity<ScrollResponse<SimplePostResponse>> getSliceByAddress(
+    public ResponseEntity<ScrollResponse<SimplePostResponse>> getScrollBy(
         @AuthenticationPrincipal
-        Long userId,
+        Long loginId,
         @RequestParam
         String depth1,
         @RequestParam
         String depth2,
         @RequestParam
         String depth3,
+        @RequestParam(required = false)
+        Long authorId,
         @RequestParam(required = false, defaultValue = "LATEST")
         @Parameter(schema = @Schema(implementation = OrderType.class))
         String order,
@@ -102,14 +105,25 @@ public class PostController {
             .depth1(depth1)
             .depth2(depth2)
             .depth3(depth3)
-            .order(OrderType.get(order))
+            .order(order)
             .cursor(cursor)
             .size(size)
             .build();
-        ScrollResponse<SimplePostResponse> response = postService.getSliceByAddress(userId,
-            request);
+        ScrollResponse<SimplePostResponse> response = getScrollResponse(loginId, authorId, request);
 
         return ResponseEntity.ok(response);
+    }
+
+    private ScrollResponse<SimplePostResponse> getScrollResponse(
+        Long loginId,
+        Long authorId,
+        NormalListRequest request
+    ) {
+        if (Objects.isNull(authorId)) {
+            return postService.getScrollByAddress(loginId, request);
+        }
+
+        return postService.getScrollByAuthor(loginId, authorId, request.getScrollRequest());
     }
 
 }
