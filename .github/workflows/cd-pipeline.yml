@@ -9,7 +9,7 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-2
-  CONTAINER_NAME: masilgasil-api
+  CONTAINER_NAME: masilgasil-ecs-container
   ECR_REPOSITORY: masilgasil-ecr-private
   ECS_CLUSTER: masilgasil-ecs-cluster
   ECS_SERVICE: masilgasil-ecs-service-dev
