@@ -13,7 +13,7 @@ env:
   ECR_REPOSITORY: masilgasil-ecr-private
   ECS_CLUSTER: masilgasil-ecr-cluster
   ECS_SERVICE: masilgasil-ecs-service
-  ECS_TASK_DEFINITION: aws/masilgasil-ecs-task-revision1
+  ECS_TASK_DEFINITION: aws/masilgasil-ecs-task-revision1.json
   ACTIVE_PROFILE: prod
   SERVER_PORT: 8080
 
