@@ -25,6 +25,10 @@ import team.silvertown.masil.user.domain.User;
 @RequiredArgsConstructor
 public class PostQueryRepositoryImpl implements PostQueryRepository {
 
+    private static final int LIKE_COUNT_CURSOR_LENGTH = 5;
+    private static final int ID_CURSOR_LENGTH = 11;
+    private static final char PADDING = '0';
+
     private final JPAQueryFactory jpaQueryFactory;
     private final QPost post = QPost.post;
 
@@ -91,8 +95,9 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private StringExpression getCursor(PostOrderType order) {
         if (PostOrderType.isMostPopular(order)) {
-            return StringExpressions.lpad(post.likeCount.stringValue(), 5, '0')
-                .concat(StringExpressions.lpad(post.id.stringValue(), 11, '0'));
+            return StringExpressions.lpad(post.likeCount.stringValue(), LIKE_COUNT_CURSOR_LENGTH,
+                    PADDING)
+                .concat(StringExpressions.lpad(post.id.stringValue(), ID_CURSOR_LENGTH, PADDING));
         }
 
         return post.id.stringValue();
