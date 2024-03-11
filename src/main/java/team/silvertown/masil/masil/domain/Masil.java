@@ -73,7 +73,7 @@ public class Masil extends BaseEntity {
     private OffsetDateTime startedAt;
 
     @OneToMany(mappedBy = "masil")
-    private List<MasilPin> masilPins = new ArrayList<>();
+    private final List<MasilPin> masilPins = new ArrayList<>();
 
     @Builder
     private Masil(
