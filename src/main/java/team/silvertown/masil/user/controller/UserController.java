@@ -51,7 +51,7 @@ public class UserController {
     @GetMapping("api/v1/users/check-nickname")
     @Operation(summary = "닉네임 중복 검사")
     @ApiResponse(
-        responseCode = "204",
+        responseCode = "200",
         description = "중복되는 닉네임 없음"
     )
     public ResponseEntity<NicknameCheckResponse> nicknameCheck(
