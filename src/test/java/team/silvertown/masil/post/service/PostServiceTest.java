@@ -118,7 +118,7 @@ class PostServiceTest {
 
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(create)
-            .withMessage(PostErrorCode.USER_NOT_FOUND.getMessage());
+            .withMessage(PostErrorCode.LOGIN_USER_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -178,7 +178,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(OrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -204,7 +204,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(OrderType.LATEST.name())
             .cursor(idCursor)
             .size(expectedSize)
             .build();
@@ -231,7 +231,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.MOST_POPULAR)
+            .order(OrderType.MOST_POPULAR.name())
             .size(expectedSize)
             .build();
 
@@ -259,7 +259,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.MOST_POPULAR)
+            .order(OrderType.MOST_POPULAR.name())
             .cursor("00000000000000" + idCursor)
             .size(expectedSize)
             .build();
@@ -286,7 +286,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(OrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -312,7 +312,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(OrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -341,7 +341,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(OrderType.LATEST.name())
             .cursor(cursor)
             .size(expectedSize)
             .build();
