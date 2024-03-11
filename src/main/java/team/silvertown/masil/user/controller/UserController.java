@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +46,7 @@ public class UserController {
         Long userId
     ) {
         userService.onboard(request, userId);
+
         return ResponseEntity.noContent()
             .build();
     }
@@ -60,6 +62,7 @@ public class UserController {
         String nickname
     ) {
         userService.checkNickname(nickname);
+
         return ResponseEntity.noContent()
             .build();
     }
@@ -108,6 +111,22 @@ public class UserController {
         Long userId
     ) {
         userService.updateProfile(profileImg, userId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @PatchMapping("/api/v1/users/is-public")
+    @Operation(summary = "계정 공개여부 변경")
+    @ApiResponse(
+        responseCode = "204",
+        description = "계정 공개/비공개 여부 변경 완료"
+    )
+    public ResponseEntity<Void> changePublic(
+        @AuthenticationPrincipal
+        Long memberId
+    ) {
+        userService.changePublic(memberId);
 
         return ResponseEntity.noContent()
             .build();

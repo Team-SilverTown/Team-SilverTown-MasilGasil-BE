@@ -41,7 +41,8 @@ public class ImageService {
         String name = StringUtils.getFilename(filename);
         String ext = StringUtils.getFilenameExtension(filename);
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID()
+            .toString();
         String newName = uuid + name;
         String encode = encoder.encodeToString(newName.getBytes());
 

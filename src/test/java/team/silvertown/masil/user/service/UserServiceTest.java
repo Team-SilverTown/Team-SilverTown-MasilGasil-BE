@@ -10,6 +10,7 @@ import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
@@ -67,7 +69,6 @@ class UserServiceTest {
 
     @MockBean
     KakaoOAuthService kakaoOAuthService;
-
 
     @Nested
     class 닉네임_중복_조회_로직_테스트 {
@@ -139,156 +140,206 @@ class UserServiceTest {
                 .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
         }
 
-        @Nested
-        class 유저_추가정보를_입력하는_서비스로직_테스트 {
+    }
 
-            private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
-                "yyyy-MM-dd");
-            private User unTypedUser;
+    @Nested
+    class 유저_추가정보를_입력하는_서비스로직_테스트 {
 
-            private static OnboardRequest getNormalRequest() {
-                return new OnboardRequest(
-                    "nickname",
-                    Sex.MALE.name(),
-                    format.format(faker.date()
-                        .birthdayLocalDate(20, 40)),
-                    getRandomInt(170, 190),
-                    getRandomInt(70, 90),
-                    ExerciseIntensity.MIDDLE.name(),
-                    true,
-                    true,
-                    true,
-                    true
-                );
-            }
+        private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd");
+        private User unTypedUser;
 
-            @BeforeEach
-            void setup() {
-                String socialId = String.valueOf(faker.barcode());
-                User user = User.builder()
-                    .provider(Provider.KAKAO)
-                    .socialId(socialId)
-                    .build();
-                UserAuthority newAuthority = UserAuthority.builder()
-                    .authority(Authority.RESTRICTED)
-                    .user(user)
-                    .build();
-                userAuthorityRepository.save(newAuthority);
-                unTypedUser = userRepository.save(user);
-            }
-
-            @Test
-            public void 정상적으로_추가정보를_작성한_경우_회원정보가_제대로_업데이트_되고_모든_서비스를_이용할_수_있다() throws Exception {
-                //given
-                OnboardRequest request = getNormalRequest();
-                List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
-                    unTypedUser);
-                assertThat(beforeUpdatedAuthority).hasSize(1);
-                assertThat(beforeUpdatedAuthority.get(0)
-                    .getAuthority()).isEqualTo(Authority.RESTRICTED);
-
-                //when
-                userService.onboard(request, unTypedUser.getId());
-
-                //then
-                User updatedUser = userRepository.findById(unTypedUser.getId())
-                    .get();
-                assertAll(
-                    () -> assertThat(updatedUser.getNickname()).isEqualTo(request.nickname()),
-                    () -> assertThat(updatedUser.getBirthDate()
-                        .toString()).isEqualTo(
-                        request.birthDate()),
-                    () -> assertThat(updatedUser.getHeight()).isEqualTo(request.height()),
-                    () -> assertThat(updatedUser.getWeight()).isEqualTo(request.weight()),
-                    () -> assertThat(updatedUser.getSex()
-                        .name()).isEqualTo(request.sex()),
-                    () -> assertThat(updatedUser.getExerciseIntensity()
-                        .name()).isEqualTo(request.exerciseIntensity())
-                );
-                List<UserAuthority> updatedAuthority = userAuthorityRepository.findByUser(
-                    unTypedUser);
-                assertThat(updatedAuthority).hasSize(2);
-                assertThat(updatedAuthority.get(1)
-                    .getAuthority()).isEqualTo(Authority.NORMAL);
-
-            }
-
+        private static OnboardRequest getNormalRequest() {
+            return new OnboardRequest(
+                "nickname",
+                Sex.MALE.name(),
+                format.format(faker.date()
+                    .birthdayLocalDate(20, 40)),
+                getRandomInt(170, 190),
+                getRandomInt(70, 90),
+                ExerciseIntensity.MIDDLE.name(),
+                true,
+                true,
+                true,
+                true
+            );
         }
 
-        @Nested
-        class 유저정보를_내려받는_테스트 {
+        @BeforeEach
+        void setup() {
+            String socialId = String.valueOf(faker.barcode());
+            User user = User.builder()
+                .provider(Provider.KAKAO)
+                .socialId(socialId)
+                .build();
+            UserAuthority newAuthority = UserAuthority.builder()
+                .authority(Authority.RESTRICTED)
+                .user(user)
+                .build();
+            userAuthorityRepository.save(newAuthority);
+            unTypedUser = userRepository.save(user);
+        }
 
-            private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
-                "yyyy-MM-dd");
-            private User unTypedUser;
+        @Test
+        public void 정상적으로_추가정보를_작성한_경우_회원정보가_제대로_업데이트_되고_모든_서비스를_이용할_수_있다() throws Exception {
+            //given
+            OnboardRequest request = getNormalRequest();
+            List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
+                unTypedUser);
+            assertThat(beforeUpdatedAuthority).hasSize(1);
+            assertThat(beforeUpdatedAuthority.get(0)
+                .getAuthority()).isEqualTo(Authority.RESTRICTED);
 
-            private static OnboardRequest getNormalRequest() {
-                return new OnboardRequest(
-                    "nickname",
-                    Sex.MALE.name(),
-                    format.format(faker.date()
-                        .birthdayLocalDate(20, 40)),
-                    getRandomInt(170, 190),
-                    getRandomInt(70, 90),
-                    ExerciseIntensity.MIDDLE.name(),
-                    true,
-                    true,
-                    true,
-                    true
-                );
-            }
+            //when
+            userService.onboard(request, unTypedUser.getId());
 
-            @BeforeEach
-            void setup() {
-                String socialId = String.valueOf(faker.barcode());
-                User user = User.builder()
-                    .provider(Provider.KAKAO)
-                    .socialId(socialId)
-                    .build();
-                UserAuthority newAuthority = UserAuthority.builder()
-                    .authority(Authority.RESTRICTED)
-                    .user(user)
-                    .build();
-                userAuthorityRepository.save(newAuthority);
-                unTypedUser = userRepository.save(user);
-            }
+            //then
+            User updatedUser = userRepository.findById(unTypedUser.getId())
+                .get();
+            assertAll(
+                () -> assertThat(updatedUser.getNickname()).isEqualTo(request.nickname()),
+                () -> assertThat(updatedUser.getBirthDate()
+                    .toString()).isEqualTo(
+                    request.birthDate()),
+                () -> assertThat(updatedUser.getHeight()).isEqualTo(request.height()),
+                () -> assertThat(updatedUser.getWeight()).isEqualTo(request.weight()),
+                () -> assertThat(updatedUser.getSex()
+                    .name()).isEqualTo(request.sex()),
+                () -> assertThat(updatedUser.getExerciseIntensity()
+                    .name()).isEqualTo(request.exerciseIntensity())
+            );
+            List<UserAuthority> updatedAuthority = userAuthorityRepository.findByUser(
+                unTypedUser);
+            assertThat(updatedAuthority).hasSize(2);
+            assertThat(updatedAuthority.stream()
+                .map(UserAuthority::getAuthority)
+                .collect(Collectors.toList()))
+                .contains(Authority.NORMAL);
+        }
 
+    }
 
-            @Test
-            public void 정상적으로_유저정보를_내려받을_수_있다() throws Exception {
-                //given
-                OnboardRequest request = getNormalRequest();
-                List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
-                    unTypedUser);
-                assertThat(beforeUpdatedAuthority).hasSize(1);
-                assertThat(beforeUpdatedAuthority.get(0)
-                    .getAuthority()).isEqualTo(Authority.RESTRICTED);
+    @Nested
+    class 유저정보를_내려받는_테스트 {
 
-                //when
-                userService.onboard(request, unTypedUser.getId());
+        private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd");
+        private User unTypedUser;
 
-                //then
-                User updatedUser = userRepository.findById(unTypedUser.getId())
-                    .get();
-                assertDoesNotThrow(() -> userService.getMe(updatedUser.getId()));
-                MeInfoResponse me = userService.getMe(updatedUser.getId());
-                assertAll(
-                    () -> assertThat(updatedUser.getNickname()).isEqualTo(me.nickname()),
-                    () -> assertThat(updatedUser.getBirthDate()
-                        .toString()).isEqualTo(
-                        me.birthDate()
-                            .toString()),
-                    () -> assertThat(updatedUser.getHeight()).isEqualTo(me.height()),
-                    () -> assertThat(updatedUser.getWeight()).isEqualTo(me.weight()),
-                    () -> assertThat(updatedUser.getSex()
-                        .name()).isEqualTo(me.sex()
-                        .name()),
-                    () -> assertThat(updatedUser.getExerciseIntensity()
-                        .name()).isEqualTo(me.exerciseIntensity()
-                        .name())
-                );
-            }
+        private static OnboardRequest getNormalRequest() {
+            return new OnboardRequest(
+                "nickname",
+                Sex.MALE.name(),
+                format.format(faker.date()
+                    .birthdayLocalDate(20, 40)),
+                getRandomInt(170, 190),
+                getRandomInt(70, 90),
+                ExerciseIntensity.MIDDLE.name(),
+                true,
+                true,
+                true,
+                true
+            );
+        }
 
+        @BeforeEach
+        void setup() {
+            String socialId = String.valueOf(faker.barcode());
+            User user = User.builder()
+                .provider(Provider.KAKAO)
+                .socialId(socialId)
+                .build();
+            UserAuthority newAuthority = UserAuthority.builder()
+                .authority(Authority.RESTRICTED)
+                .user(user)
+                .build();
+            userAuthorityRepository.save(newAuthority);
+            unTypedUser = userRepository.save(user);
+        }
+
+        @Test
+        public void 정상적으로_유저정보를_내려받을_수_있다() throws Exception {
+            //given
+            OnboardRequest request = getNormalRequest();
+            List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
+                unTypedUser);
+            assertThat(beforeUpdatedAuthority).hasSize(1);
+            assertThat(beforeUpdatedAuthority.get(0)
+                .getAuthority()).isEqualTo(Authority.RESTRICTED);
+
+            //when
+            userService.onboard(request, unTypedUser.getId());
+
+            //then
+            User updatedUser = userRepository.findById(unTypedUser.getId())
+                .get();
+            assertDoesNotThrow(() -> userService.getMe(updatedUser.getId()));
+            MeInfoResponse me = userService.getMe(updatedUser.getId());
+            assertAll(
+                () -> assertThat(updatedUser.getNickname()).isEqualTo(me.nickname()),
+                () -> assertThat(updatedUser.getBirthDate()
+                    .toString()).isEqualTo(
+                    me.birthDate()
+                        .toString()),
+                () -> assertThat(updatedUser.getHeight()).isEqualTo(me.height()),
+                () -> assertThat(updatedUser.getWeight()).isEqualTo(me.weight()),
+                () -> assertThat(updatedUser.getSex()
+                    .name()).isEqualTo(me.sex()
+                    .name()),
+                () -> assertThat(updatedUser.getExerciseIntensity()
+                    .name()).isEqualTo(me.exerciseIntensity()
+                    .name()),
+                () -> assertThat(updatedUser.getIsPublic()).isEqualTo(me.isPublic())
+            );
+        }
+
+    }
+
+    @Nested
+    class 공개_비공개_여부_확인하는_테스트 {
+
+        private User unTypedUser;
+
+        @BeforeEach
+        void setup() {
+            String socialId = String.valueOf(faker.barcode());
+            User user = User.builder()
+                .provider(Provider.KAKAO)
+                .socialId(socialId)
+                .isPublic(true)
+                .build();
+            UserAuthority newAuthority = UserAuthority.builder()
+                .authority(Authority.RESTRICTED)
+                .user(user)
+                .build();
+            userAuthorityRepository.save(newAuthority);
+            unTypedUser = userRepository.save(user);
+        }
+
+        @Test
+        public void 정상적으로_공개_비공개_여부를_바꿀_수_있다() throws Exception {
+            //given
+            boolean beforeChangedIsPublic = unTypedUser.getIsPublic();
+
+            //when
+            userService.changePublic(unTypedUser.getId());
+            User changedUser = userRepository.findById(unTypedUser.getId())
+                .get();
+            boolean changedIsPublic = changedUser.getIsPublic();
+
+            //then
+            assertThat(changedIsPublic).isNotEqualTo(beforeChangedIsPublic);
+        }
+
+        @Test
+        public void 존재하지_않는_유저의_공개여부를_변경하려는_경우_예외가_발생한다() throws Exception {
+            //given
+            Long undefinedUserId = unTypedUser.getId() + 1L;
+
+            //when, then
+            assertThatThrownBy(() -> userService.changePublic(undefinedUserId))
+                .isInstanceOf(DataNotFoundException.class)
+                .hasMessage(UserErrorCode.USER_NOT_FOUND.getMessage());
         }
 
     }

@@ -95,4 +95,8 @@ public class User extends BaseEntity {
         this.profileImg = profileImg;
     }
 
+    public void toggleIsPublic() {
+        this.isPublic = !this.isPublic;
+    }
+
 }
