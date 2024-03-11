@@ -15,7 +15,8 @@ public record MeInfoResponse(
     Integer weight,
     LocalDate birthDate,
     Sex sex,
-    ExerciseIntensity exerciseIntensity
+    ExerciseIntensity exerciseIntensity,
+    Boolean isPublic
 ) {
 
     public static MeInfoResponse from(User user) {
@@ -28,6 +29,7 @@ public record MeInfoResponse(
             .birthDate(user.getBirthDate())
             .sex(user.getSex())
             .exerciseIntensity(user.getExerciseIntensity())
+            .isPublic(user.getIsPublic())
             .build();
     }
 

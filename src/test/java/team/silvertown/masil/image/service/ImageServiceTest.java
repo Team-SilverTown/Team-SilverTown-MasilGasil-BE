@@ -28,8 +28,10 @@ class ImageServiceTest extends LocalstackTest {
     @Test
     void 이미지를_업로드_할_수_있다() {
         // given
-        String filename = faker.file().fileName("", null, "jpg", "");
-        String content = faker.book().title();
+        String filename = faker.file()
+            .fileName("", null, "jpg", "");
+        String content = faker.book()
+            .title();
         MultipartFile file = new MockMultipartFile(filename, content.getBytes());
 
         // when
