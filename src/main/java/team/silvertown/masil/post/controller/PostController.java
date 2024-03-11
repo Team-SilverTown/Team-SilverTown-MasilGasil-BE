@@ -65,7 +65,10 @@ public class PostController {
     @Operation(summary = "산책로 포스트 상세조회")
     @ApiResponse(
         responseCode = "200",
-        useReturnTypeSchema = true
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = PostDetailResponse.class)
+        )
     )
     public ResponseEntity<PostDetailResponse> getById(
         @PathVariable
