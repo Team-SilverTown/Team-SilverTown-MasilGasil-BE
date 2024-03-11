@@ -9,7 +9,7 @@ public record NormalListRequest(
     String depth1,
     String depth2,
     String depth3,
-    OrderType order,
+    PostOrderType order,
     String cursor,
     int size
 ) {

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.post.domain.Post;
-import team.silvertown.masil.post.dto.request.OrderType;
+import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.user.domain.User;
 
@@ -36,12 +36,12 @@ public final class PostValidator extends Validator {
             () -> new ForbiddenException(PostErrorCode.PIN_OWNER_NOT_MATCHING));
     }
 
-    public static void validateCursorFormat(String cursor, OrderType order) {
+    public static void validateCursorFormat(String cursor, PostOrderType order) {
         if (StringUtils.isBlank(cursor)) {
             return;
         }
 
-        if (OrderType.isMostPopular(order)) {
+        if (PostOrderType.isMostPopular(order)) {
             notUnder(cursor.length(), ID_CURSOR_LENGTH, PostErrorCode.INVALID_CURSOR_FORMAT);
             return;
         }

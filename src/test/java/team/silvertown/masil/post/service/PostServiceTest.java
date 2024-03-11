@@ -27,7 +27,7 @@ import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.OrderType;
+import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
@@ -178,7 +178,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(PostOrderType.LATEST)
             .size(expectedSize)
             .build();
 
@@ -204,7 +204,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(PostOrderType.LATEST)
             .cursor(idCursor)
             .size(expectedSize)
             .build();
@@ -231,7 +231,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.MOST_POPULAR)
+            .order(PostOrderType.MOST_POPULAR)
             .size(expectedSize)
             .build();
 
@@ -259,7 +259,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.MOST_POPULAR)
+            .order(PostOrderType.MOST_POPULAR)
             .cursor("00000000000000" + idCursor)
             .size(expectedSize)
             .build();
@@ -286,7 +286,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(PostOrderType.LATEST)
             .size(expectedSize)
             .build();
 
@@ -312,7 +312,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(PostOrderType.LATEST)
             .size(expectedSize)
             .build();
 
@@ -341,7 +341,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST)
+            .order(PostOrderType.LATEST)
             .cursor(cursor)
             .size(expectedSize)
             .build();

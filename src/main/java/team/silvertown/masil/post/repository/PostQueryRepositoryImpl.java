@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 import team.silvertown.masil.post.domain.QPost;
 import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.OrderType;
+import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.user.domain.User;
 
@@ -60,12 +60,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .fetch();
     }
 
-    private BooleanExpression getCursorFilter(OrderType order, String cursor) {
+    private BooleanExpression getCursorFilter(PostOrderType order, String cursor) {
         if (StringUtils.isBlank(cursor)) {
             return null;
         }
 
-        if (OrderType.isMostPopular(order)) {
+        if (PostOrderType.isMostPopular(order)) {
             StringExpression toScan = getCursor(order);
 
             return toScan.lt(cursor);
@@ -80,8 +80,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return post.id.lt(idCursor);
     }
 
-    private OrderSpecifier<?> decideOrderTarget(OrderType order) {
-        if (OrderType.isMostPopular(order)) {
+    private OrderSpecifier<?> decideOrderTarget(PostOrderType order) {
+        if (PostOrderType.isMostPopular(order)) {
             return post.likeCount.desc();
         }
 
@@ -89,8 +89,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     }
 
-    private StringExpression getCursor(OrderType order) {
-        if (OrderType.isMostPopular(order)) {
+    private StringExpression getCursor(PostOrderType order) {
+        if (PostOrderType.isMostPopular(order)) {
             return StringExpressions.lpad(post.likeCount.stringValue(), 5, '0')
                 .concat(StringExpressions.lpad(post.id.stringValue(), 11, '0'));
         }
