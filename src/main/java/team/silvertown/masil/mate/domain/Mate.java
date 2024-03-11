@@ -3,6 +3,8 @@ package team.silvertown.masil.mate.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -59,6 +61,10 @@ public class Mate extends BaseEntity {
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(15)")
+    private MateStatus status;
+
     @Builder
     private Mate(
         User author,
@@ -87,6 +93,7 @@ public class Mate extends BaseEntity {
         this.content = content;
         this.gathering = new Gathering(gatheringPlacePoint, gatheringPlaceDetail, gatheringAt);
         this.capacity = capacity;
+        this.status = MateStatus.OPEN;
     }
 
     public String getDepth1() {
