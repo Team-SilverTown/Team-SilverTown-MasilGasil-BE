@@ -369,6 +369,7 @@ class UserServiceTest {
             String socialId = String.valueOf(faker.barcode());
             User user = User.builder()
                 .provider(Provider.KAKAO)
+                .isPublic(true)
                 .socialId(socialId)
                 .build();
             UserAuthority newAuthority = UserAuthority.builder()
