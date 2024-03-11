@@ -17,7 +17,7 @@ services:
       TZ: Asia/Seoul
   localstack:
     container_name: localstack
-    build: aws
+    build: .aws
     network_mode: bridge
     ports:
       - "4566:4566"
