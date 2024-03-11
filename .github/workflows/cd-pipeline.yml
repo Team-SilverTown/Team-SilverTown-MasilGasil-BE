@@ -11,7 +11,7 @@ env:
   AWS_REGION: ap-northeast-2
   CONTAINER_NAME: masilgasil-api
   ECR_REPOSITORY: masilgasil-ecr-private
-  ECS_CLUSTER: masilgasil-ecr-cluster
+  ECS_CLUSTER: masilgasil-ecs-cluster
   ECS_SERVICE: masilgasil-ecs-service
   ECS_TASK_DEFINITION: aws/masilgasil-ecs-task-revision1.json
   ACTIVE_PROFILE: prod
