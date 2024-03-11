@@ -32,6 +32,7 @@ import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -79,11 +80,13 @@ class UserServiceTest {
                 .fullName();
 
             //when, then
-            assertDoesNotThrow(() -> userService.checkNickname(nickname));
+            NicknameCheckResponse nicknameCheckResponse = userService.checkNickname(nickname);
+            assertThat(nicknameCheckResponse.isDuplicated()).isFalse();
+            assertThat(nicknameCheckResponse.nickname()).isEqualTo(nickname);
         }
 
         @Test
-        public void 중복닉네임_조회시_이미_존재하는_닉네임을_조회할_경우_예외가_발생한다() throws Exception {
+        public void 중복닉네임_조회시_이미_존재하는_닉네임을_조회할_경우_이미_존재하고_있음을_반환한다() throws Exception {
             //given
             String nickname = faker.name()
                 .fullName();
@@ -92,10 +95,12 @@ class UserServiceTest {
                 .build();
             userRepository.save(user);
 
-            //when, then
-            assertThatThrownBy(() -> userService.checkNickname(nickname))
-                .isInstanceOf(DuplicateResourceException.class)
-                .hasMessage(UserErrorCode.DUPLICATED_NICKNAME.getMessage());
+            //when
+            NicknameCheckResponse nicknameCheckResponse = userService.checkNickname(nickname);
+
+            //then
+            assertThat(nicknameCheckResponse.isDuplicated()).isTrue();
+            assertThat(nicknameCheckResponse.nickname()).isEqualTo(nickname);
         }
 
     }
