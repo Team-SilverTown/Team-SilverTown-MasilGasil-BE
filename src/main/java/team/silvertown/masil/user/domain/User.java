@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -81,6 +82,7 @@ public class User extends BaseEntity {
         UserValidator.validateHeight(request.height(), UserErrorCode.INVALID_HEIGHT);
         UserValidator.validateWeight(request.weight(), UserErrorCode.INVALID_WEIGHT);
         UserValidator.validateExerciseIntensity(request.exerciseIntensity());
+        initializeStats();
 
         this.nickname = request.nickname();
         this.sex = Sex.valueOf(request.sex());
@@ -89,6 +91,23 @@ public class User extends BaseEntity {
         this.height = request.height();
         this.weight = request.weight();
         this.exerciseIntensity = ExerciseIntensity.valueOf(request.exerciseIntensity());
+    }
+
+    public void updateStats(int distance) {
+        initializeStats();
+        
+        this.totalDistance += distance;
+        this.totalCount++;
+    }
+
+    private void initializeStats() {
+        if (Objects.isNull(this.totalDistance)) {
+            this.totalDistance = 0;
+        }
+
+        if (Objects.isNull(this.totalCount)) {
+            this.totalCount = 0;
+        }
     }
 
 }
