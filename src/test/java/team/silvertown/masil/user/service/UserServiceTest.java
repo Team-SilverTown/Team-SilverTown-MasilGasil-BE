@@ -34,8 +34,10 @@ import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
@@ -80,11 +82,13 @@ class UserServiceTest {
                 .fullName();
 
             //when, then
-            assertDoesNotThrow(() -> userService.checkNickname(nickname));
+            NicknameCheckResponse nicknameCheckResponse = userService.checkNickname(nickname);
+            assertThat(nicknameCheckResponse.isDuplicated()).isFalse();
+            assertThat(nicknameCheckResponse.nickname()).isEqualTo(nickname);
         }
 
         @Test
-        public void 중복닉네임_조회시_이미_존재하는_닉네임을_조회할_경우_예외가_발생한다() throws Exception {
+        public void 중복닉네임_조회시_이미_존재하는_닉네임을_조회할_경우_이미_존재하고_있음을_반환한다() throws Exception {
             //given
             String nickname = faker.name()
                 .fullName();
@@ -93,10 +97,12 @@ class UserServiceTest {
                 .build();
             userRepository.save(user);
 
-            //when, then
-            assertThatThrownBy(() -> userService.checkNickname(nickname))
-                .isInstanceOf(DuplicateResourceException.class)
-                .hasMessage(UserErrorCode.DUPLICATED_NICKNAME.getMessage());
+            //when
+            NicknameCheckResponse nicknameCheckResponse = userService.checkNickname(nickname);
+
+            //then
+            assertThat(nicknameCheckResponse.isDuplicated()).isTrue();
+            assertThat(nicknameCheckResponse.nickname()).isEqualTo(nickname);
         }
 
     }
@@ -149,7 +155,7 @@ class UserServiceTest {
             "yyyy-MM-dd");
         private User unTypedUser;
 
-        private static OnboardRequest getNormalRequest() {
+        private OnboardRequest getNormalRequest() {
             return new OnboardRequest(
                 "nickname",
                 Sex.MALE.name(),
@@ -340,6 +346,79 @@ class UserServiceTest {
             assertThatThrownBy(() -> userService.changePublic(undefinedUserId))
                 .isInstanceOf(DataNotFoundException.class)
                 .hasMessage(UserErrorCode.USER_NOT_FOUND.getMessage());
+        }
+
+    }
+
+    @Nested
+    class 유저_정보를_수정하는_테스트 {
+
+        private static final DateTimeFormatter format = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd");
+        private User unTypedUser;
+
+        private static UpdateRequest getNormalRequest() {
+            return new UpdateRequest(
+                "nickname",
+                Sex.MALE.name(),
+                format.format(faker.date()
+                    .birthdayLocalDate(20, 40)),
+                getRandomInt(170, 190),
+                getRandomInt(70, 90),
+                ExerciseIntensity.MIDDLE.name()
+            );
+        }
+
+        @BeforeEach
+        void setup() {
+            String socialId = String.valueOf(faker.barcode());
+            User user = User.builder()
+                .provider(Provider.KAKAO)
+                .isPublic(true)
+                .socialId(socialId)
+                .build();
+            UserAuthority newAuthority = UserAuthority.builder()
+                .authority(Authority.RESTRICTED)
+                .user(user)
+                .build();
+            userAuthorityRepository.save(newAuthority);
+            unTypedUser = userRepository.save(user);
+        }
+
+        @Test
+        public void 정상적으로_유저정보를_내려받을_수_있다() throws Exception {
+            //given
+            UpdateRequest request = getNormalRequest();
+            List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
+                unTypedUser);
+            assertThat(beforeUpdatedAuthority).hasSize(1);
+            assertThat(beforeUpdatedAuthority.get(0)
+                .getAuthority()).isEqualTo(Authority.RESTRICTED);
+
+            //when
+            userService.updateInfo(unTypedUser.getId(), request);
+
+            //then
+            User updatedUser = userRepository.findById(unTypedUser.getId())
+                .get();
+            assertDoesNotThrow(() -> userService.getMe(updatedUser.getId()));
+            MeInfoResponse me = userService.getMe(updatedUser.getId());
+            assertAll(
+                () -> assertThat(updatedUser.getNickname()).isEqualTo(me.nickname()),
+                () -> assertThat(updatedUser.getBirthDate()
+                    .toString()).isEqualTo(
+                    me.birthDate()
+                        .toString()),
+                () -> assertThat(updatedUser.getHeight()).isEqualTo(me.height()),
+                () -> assertThat(updatedUser.getWeight()).isEqualTo(me.weight()),
+                () -> assertThat(updatedUser.getSex()
+                    .name()).isEqualTo(me.sex()
+                    .name()),
+                () -> assertThat(updatedUser.getExerciseIntensity()
+                    .name()).isEqualTo(me.exerciseIntensity()
+                    .name()),
+                () -> assertThat(updatedUser.getIsPublic()).isEqualTo(me.isPublic())
+            );
         }
 
     }
