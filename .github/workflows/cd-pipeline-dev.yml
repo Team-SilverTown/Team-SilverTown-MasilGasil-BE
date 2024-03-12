@@ -65,8 +65,6 @@ jobs:
         uses: gradle/gradle-build-action@v3.1.0
         with:
           arguments: clean build
-        env:
-          SPRING_PROFILES_ACTIVE: ${{ env.ACTIVE_PROFILE }}
 
       - name: Amazon ECR 로그인
         id: login-ecr
