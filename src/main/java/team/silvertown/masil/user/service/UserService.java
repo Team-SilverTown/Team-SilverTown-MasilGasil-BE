@@ -29,7 +29,6 @@ import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
-import team.silvertown.masil.user.util.SecurityUtils;
 
 @Slf4j
 @Service
