@@ -21,11 +21,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
+import team.silvertown.masil.texture.UserAuthorityTexture;
+import team.silvertown.masil.texture.UserTexture;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
 import team.silvertown.masil.user.domain.Provider;
@@ -34,6 +38,7 @@ import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
@@ -419,6 +424,92 @@ class UserServiceTest {
                     .name()),
                 () -> assertThat(updatedUser.getIsPublic()).isEqualTo(me.isPublic())
             );
+        }
+
+    }
+
+    @Nested
+    class 유저의_my_page_정보를_정상적으로_가져온다 {
+
+        private User user;
+        private User privateUser;
+
+        @BeforeEach
+        public void setUp() {
+            user = UserTexture.createWalkedUser();
+            userRepository.save(user);
+            UserAuthority userAuthority = UserAuthorityTexture.generateRestrictAuthority(user);
+            userAuthorityRepository.save(userAuthority);
+            privateUser = UserTexture.privateUser();
+            userRepository.save(privateUser);
+            UserAuthority priavteUserAuthority = UserAuthorityTexture.generateRestrictAuthority(privateUser);
+            userAuthorityRepository.save(priavteUserAuthority);
+        }
+
+        @Test
+        public void 해당_userId를_가진_user의_정보를_정확히_가져온다() throws Exception {
+            //given
+            User walkedUser = userRepository.findById(user.getId())
+                .get();
+
+            //when
+            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(walkedUser.getId());
+
+            //then
+            assertThat(myPageInfo)
+                .hasFieldOrPropertyWithValue("nickname", myPageInfo.nickname())
+                .hasFieldOrPropertyWithValue("profileImg", myPageInfo.profileImg())
+                .hasFieldOrPropertyWithValue("totalDistance", myPageInfo.totalDistance())
+                .hasFieldOrPropertyWithValue("totalCount", myPageInfo.totalCount())
+                .hasFieldOrPropertyWithValue("totalCalories", myPageInfo.totalCalories());
+        }
+
+        @Test
+        public void 존재하지_않는_유저의_마이페이지를_호출할_경우_예외가_발생한다() throws Exception {
+            //given, when, then
+            assertThatThrownBy(() -> userService.getMyPageInfo(user.getId() + 2))
+                .isInstanceOf(DataNotFoundException.class)
+                .hasMessage(UserErrorCode.USER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        public void 다른_사람이_계정_비공개를_한_경우_마실_기록은_볼_수_없다() throws Exception {
+            //given
+            User walkedUser = userRepository.findById(privateUser.getId())
+                .get();
+
+            //when
+            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(walkedUser.getId());
+
+            //then
+            assertThat(myPageInfo)
+                .hasFieldOrPropertyWithValue("nickname", myPageInfo.nickname())
+                .hasFieldOrPropertyWithValue("profileImg", myPageInfo.profileImg())
+                .hasFieldOrPropertyWithValue("totalDistance", null)
+                .hasFieldOrPropertyWithValue("totalCount", null)
+                .hasFieldOrPropertyWithValue("totalCalories", null);
+        }
+
+        @Test
+        public void 내가_로그인_하고_내_정보를_받아보려고_할때는_계정이_비공계더라도_정보를_볼_수_있다() throws Exception {
+            //given
+            String token = tokenProvider.createToken(privateUser.getId());
+            Authentication authentication = tokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            User selfUser = userRepository.findById(user.getId())
+                .get();
+
+            //when
+            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(selfUser.getId());
+
+            //then
+            assertThat(myPageInfo)
+                .hasFieldOrPropertyWithValue("nickname", myPageInfo.nickname())
+                .hasFieldOrPropertyWithValue("profileImg", myPageInfo.profileImg())
+                .hasFieldOrPropertyWithValue("totalDistance", myPageInfo.totalDistance())
+                .hasFieldOrPropertyWithValue("totalCount", myPageInfo.totalCount())
+                .hasFieldOrPropertyWithValue("totalCalories", myPageInfo.totalCalories());
         }
 
     }
