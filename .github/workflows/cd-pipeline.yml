@@ -45,6 +45,7 @@ jobs:
           files: ./src/main/resources/application.yml
         env:
           server.port: ${{ env.SERVER_PORT }}
+          cors.service-origin: ${{ secrets.SERVICE_ORIGIN }}
 
           spring.datasource.username: ${{ secrets.MYSQL_USERNAME }}
           spring.datasource.password: ${{ secrets.MYSQL_PASSWORD }}
