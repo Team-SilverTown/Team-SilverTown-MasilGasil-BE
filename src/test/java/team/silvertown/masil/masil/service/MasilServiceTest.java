@@ -27,11 +27,11 @@ import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
-import team.silvertown.masil.masil.dto.request.CreatePinRequest;
-import team.silvertown.masil.masil.dto.request.CreateRequest;
+import team.silvertown.masil.masil.dto.request.CreateMasilPinRequest;
+import team.silvertown.masil.masil.dto.request.CreateMasilRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
-import team.silvertown.masil.masil.dto.response.CreateResponse;
-import team.silvertown.masil.masil.dto.response.MasilResponse;
+import team.silvertown.masil.masil.dto.response.CreateMasilResponse;
+import team.silvertown.masil.masil.dto.response.MasilDetailResponse;
 import team.silvertown.masil.masil.dto.response.PeriodResponse;
 import team.silvertown.masil.masil.dto.response.RecentMasilResponse;
 import team.silvertown.masil.masil.dto.response.SimpleMasilResponse;
@@ -94,13 +94,14 @@ class MasilServiceTest {
     @ValueSource(ints = {10, 0})
     void 마실_생성을_성공한다(int expectedPinCount) {
         // given
-        List<CreatePinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
-        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3, "",
+        List<CreateMasilPinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
+        CreateMasilRequest request = new CreateMasilRequest(addressDepth1, addressDepth2,
+            addressDepth3, "",
             path, null, distance, totalTime, calories, OffsetDateTime.now(), pinRequests,
             null, null);
 
         // when
-        CreateResponse expected = masilService.create(user.getId(), request);
+        CreateMasilResponse expected = masilService.create(user.getId(), request);
 
         // then
         Masil actual = masilRepository
@@ -116,7 +117,8 @@ class MasilServiceTest {
     void 사용자가_존재하지_않으면_마실_생성을_실패한다() {
         // given
         long invalidId = MasilTexture.getRandomId();
-        CreateRequest request = new CreateRequest(addressDepth1, addressDepth2, addressDepth3,
+        CreateMasilRequest request = new CreateMasilRequest(addressDepth1, addressDepth2,
+            addressDepth3,
             "", path, null, distance, totalTime, calories, OffsetDateTime.now(), null, null,
             null);
 
@@ -141,7 +143,7 @@ class MasilServiceTest {
         entityManager.clear();
 
         // when
-        MasilResponse actual = masilService.getById(user.getId(), expected.getId());
+        MasilDetailResponse actual = masilService.getById(user.getId(), expected.getId());
 
         // then
         assertThat(actual).extracting("id", "depth1", "depth2", "depth3", "depth4", "distance",
@@ -392,14 +394,14 @@ class MasilServiceTest {
         return masils;
     }
 
-    List<CreatePinRequest> createPinRequests(int size, int maxPathPoints) {
-        List<CreatePinRequest> pinRequests = new ArrayList<>();
+    List<CreateMasilPinRequest> createPinRequests(int size, int maxPathPoints) {
+        List<CreateMasilPinRequest> pinRequests = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             Coordinate coordinate = MapTexture.createPoint()
                 .getCoordinate();
             KakaoPoint point = KakaoPoint.from(coordinate);
-            CreatePinRequest createPinRequest = new CreatePinRequest(point, null, null);
+            CreateMasilPinRequest createPinRequest = new CreateMasilPinRequest(point, null, null);
 
             pinRequests.add(createPinRequest);
         }

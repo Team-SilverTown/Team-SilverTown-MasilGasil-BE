@@ -9,13 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
+import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
-import team.silvertown.masil.post.dto.request.CreatePinRequest;
-import team.silvertown.masil.post.dto.request.CreateRequest;
-import team.silvertown.masil.post.dto.response.CreateResponse;
-import team.silvertown.masil.post.dto.response.PinResponse;
-import team.silvertown.masil.post.dto.response.PostResponse;
+import team.silvertown.masil.post.dto.PostCursorDto;
+import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
+import team.silvertown.masil.post.dto.request.CreatePostRequest;
+import team.silvertown.masil.post.dto.request.NormalListRequest;
+import team.silvertown.masil.post.dto.response.CreatePostResponse;
+import team.silvertown.masil.post.dto.response.PostDetailResponse;
+import team.silvertown.masil.post.dto.response.PostPinDetailResponse;
+import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
@@ -31,30 +35,41 @@ public class PostService {
     private final PostPinRepository postPinRepository;
 
     @Transactional
-    public CreateResponse create(Long userId, CreateRequest request) {
+    public CreatePostResponse create(Long userId, CreatePostRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
         Post post = createPost(request, user);
 
         savePins(request.pins(), post);
 
-        return new CreateResponse(post.getId());
+        return new CreatePostResponse(post.getId());
     }
 
     @Transactional(readOnly = true)
-    public PostResponse getById(Long id) {
+    public PostDetailResponse getById(Long id) {
         Post post = postRepository.findById(id)
             .orElseThrow(throwNotFound(PostErrorCode.POST_NOT_FOUND));
-        List<PinResponse> pins = PinResponse.listFrom(post);
+        List<PostPinDetailResponse> pins = PostPinDetailResponse.listFrom(post);
 
-        return PostResponse.from(post, pins);
+        return PostDetailResponse.from(post, pins);
+    }
+
+    @Transactional(readOnly = true)
+    public ScrollResponse<SimplePostResponse> getSliceByAddress(
+        Long userId,
+        NormalListRequest request
+    ) {
+        User user = getUserIfLoggedIn(userId);
+        List<PostCursorDto> postsWithCursor = postRepository.findSliceBy(user, request);
+
+        return getScrollResponse(postsWithCursor, request.size());
     }
 
     private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
 
-    private Post createPost(CreateRequest request, User user) {
+    private Post createPost(CreatePostRequest request, User user) {
         Post post = Post.builder()
             .user(user)
             .depth1(request.depth1())
@@ -73,19 +88,19 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    private void savePins(List<CreatePinRequest> pins, Post post) {
+    private void savePins(List<CreatePostPinRequest> pins, Post post) {
         if (Objects.nonNull(pins)) {
             pins.forEach(pin -> savePin(pin, post));
         }
     }
 
-    private void savePin(CreatePinRequest pin, Post post) {
+    private void savePin(CreatePostPinRequest pin, Post post) {
         PostPin postPin = createPin(pin, post);
 
         postPinRepository.save(postPin);
     }
 
-    private PostPin createPin(CreatePinRequest request, Post post) {
+    private PostPin createPin(CreatePostPinRequest request, Post post) {
         User owner = post.getUser();
 
         return PostPin.builder()
@@ -95,6 +110,37 @@ public class PostService {
             .thumbnailUrl(request.thumbnailUrl())
             .post(post)
             .build();
+    }
+
+    private User getUserIfLoggedIn(Long userId) {
+        if (Objects.isNull(userId)) {
+            return null;
+        }
+
+        return userRepository.findById(userId)
+            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
+    }
+
+    private ScrollResponse<SimplePostResponse> getScrollResponse(
+        List<PostCursorDto> postsWithCursor,
+        int size
+    ) {
+        List<SimplePostResponse> posts = postsWithCursor.stream()
+            .limit(size)
+            .map(PostCursorDto::post)
+            .toList();
+        String lastCursor = getLastCursor(postsWithCursor, size);
+
+        return ScrollResponse.from(posts, lastCursor);
+    }
+
+    private String getLastCursor(List<PostCursorDto> postsWithCursor, int size) {
+        if (postsWithCursor.size() > size) {
+            return postsWithCursor.get(size - 1)
+                .cursor();
+        }
+
+        return null;
     }
 
 }

@@ -21,6 +21,20 @@ public final class PostTexture extends BaseDomainTexture {
         return createPostWithOptional(content, thumbnailUrl);
     }
 
+    public static Post createPostWithAddress(
+        User user,
+        String depth1,
+        String depth2,
+        String depth3
+    ) {
+        LineString path = MapTexture.createLineString(100);
+        String title = getRandomSentenceWithMax(29);
+        int totalTime = getRandomInt(600, 4200);
+
+        return createPost(user, depth1, depth2, depth3, "", path, title, null, null,
+            (int) path.getLength(), totalTime);
+    }
+
     public static Post createDependentPost(User user, int pathSize) {
         String addressDepth1 = MasilTexture.createAddressDepth1();
         String addressDepth2 = MasilTexture.createAddressDepth2();
