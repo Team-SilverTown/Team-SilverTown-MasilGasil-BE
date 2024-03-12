@@ -15,6 +15,7 @@ import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.image.service.ImageService;
+import team.silvertown.masil.image.validator.ImageFileServiceValidator;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
@@ -128,19 +129,13 @@ public class UserService {
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         String profileUrl = null;
-        if(Objects.nonNull(profileImg)) {
+        if (Objects.nonNull(profileImg)) {
+            ImageFileServiceValidator.validateImgFile(profileImg);
             URI uploadedUri = imageService.upload(profileImg);
             profileUrl = uploadedUri.toString();
         }
 
         user.updateProfile(profileUrl);
-    }
-
-    private static UserAuthority generateUserAuthority(User user, Authority authority) {
-        return UserAuthority.builder()
-            .authority(authority)
-            .user(user)
-            .build();
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
@@ -208,5 +203,13 @@ public class UserService {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
     }
+
+    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
+            .build();
+    }
+
 
 }
