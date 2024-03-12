@@ -129,7 +129,8 @@ public class User extends BaseEntity {
     }
 
     private boolean hasNullStats() {
-        return Objects.isNull(this.totalDistance) || Objects.isNull(this.totalCount)
+        return Objects.isNull(this.totalDistance)
+            || Objects.isNull(this.totalCount)
             || Objects.isNull(this.totalCalories);
     }
 
