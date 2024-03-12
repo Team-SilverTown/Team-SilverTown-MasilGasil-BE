@@ -35,8 +35,8 @@ public class MateService {
     public CreateResponse create(Long userId, CreateRequest request) {
         User author = userRepository.findById(userId)
             .orElseThrow(getNotFoundException(MateErrorCode.USER_NOT_FOUND));
-        boolean isParticipating = mateParticipantRepository.existsInSimilarTime(
-            author, request.gatheringAt());
+        boolean isParticipating = mateParticipantRepository.existsInSimilarTime(author,
+            request.gatheringAt());
 
         if (isParticipating) {
             throw new BadRequestException(MateErrorCode.OVERGENERATION_IN_SIMILAR_TIME);

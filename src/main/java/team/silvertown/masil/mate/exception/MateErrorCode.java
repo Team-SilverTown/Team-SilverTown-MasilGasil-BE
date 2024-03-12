@@ -27,7 +27,7 @@ public enum MateErrorCode implements ErrorCode {
 
     NULL_AUTHOR(90000, "메이트 모집의 작성자를 확인할 수 없습니다"),
     NULL_USER(90001, "해당 메이트 참여자를 확인할 수 없습니다"),
-    AUTHOR_NOT_FOUND(90400, "메이트 작성자가 존재하지 않습니다");
+    USER_NOT_FOUND(90400, "사용자가 존재하지 않습니다");
 
     private static final int MATE_ERROR_CODE_PREFIX = 300_00000;
 

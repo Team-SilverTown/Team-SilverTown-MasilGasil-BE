@@ -16,7 +16,7 @@ public record CreateRequest(
     String content,
     KakaoPoint gatheringPlacePoint,
     String gatheringPlaceDetail,
-    // TODO: apply date parser
+    // TODO: apply datetime parser
     OffsetDateTime gatheringAt,
     Integer capacity
 ) {
