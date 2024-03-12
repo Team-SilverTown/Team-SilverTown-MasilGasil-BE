@@ -78,34 +78,40 @@ public class User extends BaseEntity {
     private String socialId;
 
     public void updateNickname(String nickname) {
-        UserValidator.validateNickname(nickname, UserErrorCode.INVALID_NICKNAME);
-        this.nickname = nickname;
+        if (UserValidator.validateNickname(nickname, UserErrorCode.INVALID_NICKNAME)) {
+            this.nickname = nickname;
+        }
     }
 
     public void updateSex(String sex) {
-        UserValidator.validateSex(sex, UserErrorCode.INVALID_SEX);
-        this.sex = Sex.valueOf(sex);
+        if (UserValidator.validateSex(sex, UserErrorCode.INVALID_SEX)) {
+            this.sex = Sex.valueOf(sex);
+        }
     }
 
     public void updateBirthDate(String birthDate) {
-        UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
-        this.birthDate = DateValidator.parseDate(birthDate,
-            UserErrorCode.INVALID_BIRTH_DATE);
+        if (UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE)) {
+            this.birthDate = DateValidator.parseDate(birthDate,
+                UserErrorCode.INVALID_BIRTH_DATE);
+        }
     }
 
     public void updateHeight(Integer height) {
-        UserValidator.validateHeight(height, UserErrorCode.INVALID_HEIGHT);
-        this.height = height;
+        if (UserValidator.validateHeight(height, UserErrorCode.INVALID_HEIGHT)) {
+            this.height = height;
+        }
     }
 
     public void updateWeight(Integer weight) {
-        UserValidator.validateWeight(weight, UserErrorCode.INVALID_WEIGHT);
-        this.weight = weight;
+        if (UserValidator.validateWeight(weight, UserErrorCode.INVALID_WEIGHT)) {
+            this.weight = weight;
+        }
     }
 
     public void updateExerciseIntensity(String exerciseIntensity) {
-        UserValidator.validateExerciseIntensity(exerciseIntensity);
-        this.exerciseIntensity = ExerciseIntensity.valueOf(exerciseIntensity);
+        if (UserValidator.validateExerciseIntensity(exerciseIntensity)) {
+            this.exerciseIntensity = ExerciseIntensity.get(exerciseIntensity);
+        }
     }
 
     public void toggleIsPublic() {

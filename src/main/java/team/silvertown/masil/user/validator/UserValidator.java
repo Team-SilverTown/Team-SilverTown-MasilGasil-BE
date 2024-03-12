@@ -19,44 +19,63 @@ public class UserValidator extends Validator {
             () -> new DataNotFoundException(UserErrorCode.AUTHORITY_NOT_FOUND));
     }
 
-    public static void validateNickname(String nickname, UserErrorCode userErrorCode) {
+    public static boolean validateNickname(String nickname, UserErrorCode userErrorCode) {
         notBlank(nickname, userErrorCode);
         range(nickname.length(), 2, 12, userErrorCode);
         notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
+        return true;
     }
 
-    public static void validateSex(String sex, UserErrorCode userErrorCode) {
+    public static boolean validateSex(String sex, UserErrorCode userErrorCode) {
         if (sex != null) {
             notBlank(sex, userErrorCode);
             Sex.get(sex);
+            return true;
         }
+
+        return false;
     }
 
-    public static void validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
+    public static boolean validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
         if (birthDate != null) {
             notBlank(birthDate, userErrorCode);
             DateValidator.parseDate(birthDate, userErrorCode);
+
+            return true;
         }
+
+        return false;
     }
 
-    public static void validateHeight(Integer height, UserErrorCode userErrorCode) {
+    public static boolean validateHeight(Integer height, UserErrorCode userErrorCode) {
         if (height != null) {
             notUnder(height, 1, userErrorCode);
+
+            return true;
         }
+
+        return false;
     }
 
-    public static void validateWeight(Integer weight, UserErrorCode userErrorCode) {
+    public static boolean validateWeight(Integer weight, UserErrorCode userErrorCode) {
         if (weight != null) {
             notUnder(weight, 1, userErrorCode);
+
+            return true;
         }
+
+        return false;
     }
 
-    public static void validateExerciseIntensity(
+    public static boolean validateExerciseIntensity(
         String exerciseIntensity
     ) {
         if (exerciseIntensity != null) {
             ExerciseIntensity.get(exerciseIntensity);
+            return true;
         }
+
+        return false;
     }
 
     public static void validateIsAllowingMarketing(
