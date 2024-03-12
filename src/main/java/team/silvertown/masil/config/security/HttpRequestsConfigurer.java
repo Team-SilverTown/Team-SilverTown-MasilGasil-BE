@@ -16,8 +16,6 @@ public class HttpRequestsConfigurer
         "/swagger-ui/**",
         "/swagger-resources/**"
     };
-    private static final String USER_INFO_REQUEST = "/api/v1/users/me";
-    private static final String NORMAL_USER_ROLE = "NORMAL";
     private static final String AUTH_RESOURCE = "/api/v1/users/login";
 
     @Override
