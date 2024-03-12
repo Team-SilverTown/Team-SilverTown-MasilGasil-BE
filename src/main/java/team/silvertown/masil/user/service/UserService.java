@@ -23,6 +23,7 @@ import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
+import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
@@ -95,11 +96,12 @@ public class UserService {
     }
 
     @Transactional
-    public void updateInfo(Long memberId, UpdateRequest updateRequest) {
+    public UpdateResponse updateInfo(Long memberId, UpdateRequest updateRequest) {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
         update(user, updateRequest);
-        user.toggleIsPublic();
+
+        return UpdateResponse.from(user);
     }
 
     public NicknameCheckResponse checkNickname(String nickname) {

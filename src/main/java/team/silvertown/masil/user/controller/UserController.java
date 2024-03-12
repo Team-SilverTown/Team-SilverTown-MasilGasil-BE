@@ -24,6 +24,7 @@ import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
+import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.service.UserService;
 
 @RestController
@@ -115,16 +116,23 @@ public class UserController {
     }
 
     @PutMapping("/api/v1/users")
-    public ResponseEntity<Void> updateInfo(
+    @SecurityRequirement(name = "토큰 받아오기")
+    @Operation(summary = "카카오 토큰으로 로그인")
+    @ApiResponse(
+        responseCode = "200",
+        description = "유저 정보 업데이트 요청",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = UpdateResponse.class)
+        )
+    )
+    public ResponseEntity<UpdateResponse> updateInfo(
         @RequestBody
         UpdateRequest updateRequest,
         @AuthenticationPrincipal
         Long memberId
     ) {
-        userService.updateInfo(memberId, updateRequest);
-
-        return ResponseEntity.noContent()
-            .build();
+        return ResponseEntity.ok(userService.updateInfo(memberId, updateRequest));
     }
 
 }
