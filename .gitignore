@@ -31,6 +31,7 @@
 .idea/**/shelf
 .idea/**/codeStyleConfig.xml
 localstack/
+snapadmin_*
 
 # AWS User-specific
 .idea/**/aws.xml

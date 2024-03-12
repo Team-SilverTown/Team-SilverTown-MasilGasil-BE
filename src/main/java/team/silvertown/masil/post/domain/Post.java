@@ -29,7 +29,7 @@ import team.silvertown.masil.user.domain.User;
 
 @Entity
 @Table(name = "posts")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter
 public class Post extends BaseEntity {
 

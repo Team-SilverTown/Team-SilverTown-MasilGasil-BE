@@ -28,7 +28,7 @@ import team.silvertown.masil.user.domain.User;
 
 @Entity
 @Table(name = "mates")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter
 public class Mate extends BaseEntity {
 
