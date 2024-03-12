@@ -84,7 +84,6 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/users/login")
-    @SecurityRequirement(name = "토큰 받아오기")
     @Operation(summary = "카카오 토큰으로 로그인")
     @ApiResponse(
         responseCode = "200",
