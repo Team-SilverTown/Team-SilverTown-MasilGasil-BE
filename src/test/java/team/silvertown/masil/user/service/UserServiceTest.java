@@ -10,6 +10,7 @@ import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,7 @@ import team.silvertown.masil.user.domain.ExerciseIntensity;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
+import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
@@ -45,6 +47,7 @@ import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
+import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
 
@@ -74,6 +77,9 @@ class UserServiceTest extends LocalstackTest {
 
     @Autowired
     UserAuthorityRepository userAuthorityRepository;
+
+    @Autowired
+    UserAgreementRepository userAgreementRepository;
 
     @MockBean
     KakaoOAuthService kakaoOAuthService;
@@ -227,6 +233,11 @@ class UserServiceTest extends LocalstackTest {
                 .map(UserAuthority::getAuthority)
                 .collect(Collectors.toList()))
                 .contains(Authority.NORMAL);
+
+            UserAgreement byUser = userAgreementRepository.findByUser(updatedUser).get();
+            assertThat(byUser.getIsLocationInfoConsented()).isTrue();
+            assertThat(byUser.getIsPersonalInfoConsented()).isTrue();
+            assertThat(byUser.getIsUnderAgeConsentConfirmed()).isTrue();
         }
 
     }
