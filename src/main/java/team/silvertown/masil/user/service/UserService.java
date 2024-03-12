@@ -130,12 +130,18 @@ public class UserService {
 
         String profileUrl = null;
         if (Objects.nonNull(profileImg)) {
-            ImageFileServiceValidator.validateImgFile(profileImg);
-            URI uploadedUri = imageService.upload(profileImg);
-            profileUrl = uploadedUri.toString();
+            profileUrl = getProfileUrl(profileImg);
         }
 
         user.updateProfile(profileUrl);
+    }
+
+    private String getProfileUrl(MultipartFile profileImg) {
+        String profileUrl;
+        ImageFileServiceValidator.validateImgFile(profileImg);
+        URI uploadedUri = imageService.upload(profileImg);
+        profileUrl = uploadedUri.toString();
+        return profileUrl;
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
