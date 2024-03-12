@@ -20,13 +20,17 @@ import team.silvertown.masil.common.response.ScrollRequest;
 import team.silvertown.masil.post.domain.QPost;
 import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.OrderType;
+import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.user.domain.User;
 
 @Repository
 @RequiredArgsConstructor
 public class PostQueryRepositoryImpl implements PostQueryRepository {
+
+    private static final int LIKE_COUNT_CURSOR_LENGTH = 5;
+    private static final int ID_CURSOR_LENGTH = 11;
+    private static final char PADDING = '0';
 
     private final JPAQueryFactory jpaQueryFactory;
     private final QPost post = QPost.post;
@@ -91,28 +95,28 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .fetch();
     }
 
-    private BooleanExpression getCursorFilter(OrderType order, String cursor) {
+    private BooleanExpression getCursorFilter(PostOrderType order, String cursor) {
         if (StringUtils.isBlank(cursor)) {
             return null;
         }
 
-        if (OrderType.isMostPopular(order)) {
+        if (PostOrderType.isMostPopular(order)) {
             StringExpression toScan = getCursor(order);
 
             return toScan.lt(cursor);
         }
 
-        int intCursor = Integer.parseInt(cursor);
+        long idCursor = Long.parseLong(cursor);
 
-        if (intCursor == 0) {
+        if (idCursor == 0) {
             return null;
         }
 
-        return post.id.lt(Integer.parseInt(cursor));
+        return post.id.lt(idCursor);
     }
 
-    private OrderSpecifier<?> decideOrderTarget(OrderType order) {
-        if (OrderType.isMostPopular(order)) {
+    private OrderSpecifier<?> decideOrderTarget(PostOrderType order) {
+        if (PostOrderType.isMostPopular(order)) {
             return post.likeCount.desc();
         }
 
@@ -120,10 +124,11 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     }
 
-    private StringExpression getCursor(OrderType order) {
-        if (OrderType.isMostPopular(order)) {
-            return StringExpressions.lpad(post.likeCount.stringValue(), 5, '0')
-                .concat(StringExpressions.lpad(post.id.stringValue(), 11, '0'));
+    private StringExpression getCursor(PostOrderType order) {
+        if (PostOrderType.isMostPopular(order)) {
+            return StringExpressions.lpad(post.likeCount.stringValue(), LIKE_COUNT_CURSOR_LENGTH,
+                    PADDING)
+                .concat(StringExpressions.lpad(post.id.stringValue(), ID_CURSOR_LENGTH, PADDING));
         }
 
         return post.id.stringValue();

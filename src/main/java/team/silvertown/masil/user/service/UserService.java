@@ -19,8 +19,10 @@ import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
@@ -37,6 +39,7 @@ public class UserService {
     private final KakaoOAuthService kakaoOAuthService;
     private final JwtTokenProvider tokenProvider;
 
+    @Transactional
     public LoginResponse login(String kakaoToken) {
         OAuthResponse oAuthResponse;
         try {
@@ -72,7 +75,7 @@ public class UserService {
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         checkNickname(request.nickname());
-        user.update(request);
+        update(user, request);
         UserAgreement userAgreement = getUserAgreement(request, user);
         Validator.throwIf(agreementRepository.existsByUser(user),
             () -> new DuplicateResourceException(UserErrorCode.ALREADY_ONBOARDED));
@@ -84,10 +87,27 @@ public class UserService {
         updatingAuthority(authorities, user);
     }
 
-    public void checkNickname(String nickname) {
-        if (userRepository.existsByNickname(nickname)) {
-            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
-        }
+    @Transactional
+    public void changePublic(Long memberId) {
+        User user = userRepository.findById(memberId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+        user.toggleIsPublic();
+    }
+
+    @Transactional
+    public void updateInfo(Long memberId, UpdateRequest updateRequest) {
+        User user = userRepository.findById(memberId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+        update(user, updateRequest);
+        user.toggleIsPublic();
+    }
+
+    public NicknameCheckResponse checkNickname(String nickname) {
+        boolean isDuplicated = userRepository.existsByNickname(nickname);
+        return NicknameCheckResponse.builder()
+            .nickname(nickname)
+            .isDuplicated(isDuplicated)
+            .build();
     }
 
     public MeInfoResponse getMe(Long memberId) {
@@ -95,6 +115,13 @@ public class UserService {
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         return MeInfoResponse.from(user);
+    }
+
+    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
+            .build();
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
@@ -106,6 +133,24 @@ public class UserService {
             UserAuthority normalAuthority = generateUserAuthority(user, Authority.NORMAL);
             userAuthorityRepository.save(normalAuthority);
         }
+    }
+
+    private void update(User user, OnboardRequest updateRequest) {
+        user.updateNickname(updateRequest.nickname());
+        user.updateSex(updateRequest.sex());
+        user.updateBirthDate(updateRequest.birthDate());
+        user.updateHeight(updateRequest.height());
+        user.updateWeight(updateRequest.weight());
+        user.updateExerciseIntensity(updateRequest.exerciseIntensity());
+    }
+
+    private void update(User user, UpdateRequest updateRequest) {
+        user.updateNickname(updateRequest.nickname());
+        user.updateSex(updateRequest.sex());
+        user.updateBirthDate(updateRequest.birthDate());
+        user.updateHeight(updateRequest.height());
+        user.updateWeight(updateRequest.weight());
+        user.updateExerciseIntensity(updateRequest.exerciseIntensity());
     }
 
     private UserAgreement getUserAgreement(OnboardRequest request, User user) {
@@ -134,13 +179,7 @@ public class UserService {
         return User.builder()
             .socialId(providerId)
             .provider(authenticatedProvider)
-            .build();
-    }
-
-    private UserAuthority generateUserAuthority(User user, Authority authority) {
-        return UserAuthority.builder()
-            .authority(authority)
-            .user(user)
+            .isPublic(true)
             .build();
     }
 

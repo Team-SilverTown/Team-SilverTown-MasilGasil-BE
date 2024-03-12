@@ -73,7 +73,7 @@ public class Masil extends BaseEntity {
     private OffsetDateTime startedAt;
 
     @OneToMany(mappedBy = "masil")
-    private List<MasilPin> masilPins = new ArrayList<>();
+    private final List<MasilPin> masilPins = new ArrayList<>();
 
     @Builder
     private Masil(
@@ -107,6 +107,8 @@ public class Masil extends BaseEntity {
         this.totalTime = totalTime;
         this.calories = calories;
         this.startedAt = startedAt;
+
+        this.user.updateStats(this.distance, calories);
     }
 
     public List<KakaoPoint> getKakaoPath() {

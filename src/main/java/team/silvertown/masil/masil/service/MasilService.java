@@ -19,8 +19,8 @@ import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
 import team.silvertown.masil.masil.dto.MasilDailyDetailDto;
 import team.silvertown.masil.masil.dto.MasilDailyDto;
+import team.silvertown.masil.masil.dto.request.CreateMasilPinRequest;
 import team.silvertown.masil.masil.dto.request.CreateMasilRequest;
-import team.silvertown.masil.masil.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
 import team.silvertown.masil.masil.dto.response.CreateMasilResponse;
 import team.silvertown.masil.masil.dto.response.MasilDetailResponse;
@@ -119,19 +119,19 @@ public class MasilService {
         return masilRepository.save(masil);
     }
 
-    private void savePins(List<CreatePostPinRequest> pins, Masil masil) {
+    private void savePins(List<CreateMasilPinRequest> pins, Masil masil) {
         if (Objects.nonNull(pins)) {
             pins.forEach(pin -> savePin(pin, masil));
         }
     }
 
-    private void savePin(CreatePostPinRequest pin, Masil masil) {
+    private void savePin(CreateMasilPinRequest pin, Masil masil) {
         MasilPin masilPin = createPin(pin, masil);
 
         masilPinRepository.save(masilPin);
     }
 
-    private MasilPin createPin(CreatePostPinRequest request, Masil masil) {
+    private MasilPin createPin(CreateMasilPinRequest request, Masil masil) {
         User owner = masil.getUser();
 
         return MasilPin.builder()

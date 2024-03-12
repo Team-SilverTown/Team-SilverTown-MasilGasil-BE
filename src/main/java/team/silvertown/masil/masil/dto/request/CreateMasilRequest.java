@@ -19,7 +19,7 @@ public record CreateMasilRequest(
     Integer totalTime,
     Integer calories,
     OffsetDateTime startedAt,
-    List<CreatePostPinRequest> pins,
+    List<CreateMasilPinRequest> pins,
     String thumbnailUrl,
     Long postId
 ) {
@@ -32,8 +32,9 @@ public record CreateMasilRequest(
         MasilValidator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);
         MasilValidator.notNull(depth4, MapErrorCode.NULL_DEPTH4);
         MasilValidator.validateUrl(thumbnailUrl);
-        MasilValidator.notNull(distance, MasilErrorCode.NEGATIVE_DISTANCE);
-        MasilValidator.notNull(totalTime, MasilErrorCode.NEGATIVE_TIME);
+        MasilValidator.notUnder(distance, 0, MasilErrorCode.NEGATIVE_DISTANCE);
+        MasilValidator.notUnder(totalTime, 0, MasilErrorCode.NEGATIVE_TIME);
+        MasilValidator.notUnder(calories, 0, MasilErrorCode.NEGATIVE_CALORIES);
         MasilValidator.notNull(path, MapErrorCode.NULL_PATH);
         MasilValidator.notUnder(path.size(), MIN_POINT_NUM, MapErrorCode.INSUFFICIENT_PATH_POINTS);
     }

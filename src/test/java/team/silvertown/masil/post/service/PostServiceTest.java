@@ -28,7 +28,7 @@ import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.OrderType;
+import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
@@ -172,14 +172,15 @@ class PostServiceTest {
     @Test
     void 산책로_포스트_최신순_조회를_성공한다() {
         // given
-        createPostsAndGetLastId(30);
+        int totalSize = PostTexture.getRandomInt(21, 99);
+        createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
         NormalListRequest request = NormalListRequest.builder()
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST.name())
+            .order(PostOrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -197,7 +198,7 @@ class PostServiceTest {
     @Test
     void 다음_커서_기반으로_산책로_포스트_최신순_조회를_성공한다() {
         // given
-        int totalSize = PostTexture.getRandomInt(11, 99);
+        int totalSize = PostTexture.getRandomInt(21, 99);
         long lastId = createPostsAndGetLastId(totalSize);
         int expectedSize = 10;
         String idCursor = String.valueOf(lastId - expectedSize + 1);
@@ -205,7 +206,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST.name())
+            .order(PostOrderType.LATEST.name())
             .cursor(idCursor)
             .size(expectedSize)
             .build();
@@ -225,14 +226,15 @@ class PostServiceTest {
     @Test
     void 산책로_포스트_인기순_조회를_성공한다() {
         // given
-        createPostsAndGetLastId(30);
+        int totalSize = PostTexture.getRandomInt(21, 99);
+        createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
         NormalListRequest request = NormalListRequest.builder()
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.MOST_POPULAR.name())
+            .order(PostOrderType.MOST_POPULAR.name())
             .size(expectedSize)
             .build();
 
@@ -252,17 +254,17 @@ class PostServiceTest {
     @Test
     void 다음_커서_기반으로_산책로_포스트_인기순_조회를_성공한다() {
         // given
-        int totalSize = PostTexture.getRandomInt(11, 99);
+        int totalSize = PostTexture.getRandomInt(21, 99);
         long lastId = createPostsAndGetLastId(totalSize);
         int expectedSize = 10;
         String idCursor = String.valueOf(lastId - expectedSize + 1);
-        String idPrefix = idCursor.length() == 2 ? "00000000000000" : "0000000000000";
+        String cursor = "0000000000000000".substring(0, 16 - idCursor.length()) + idCursor;
         NormalListRequest request = NormalListRequest.builder()
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.MOST_POPULAR.name())
-            .cursor(idPrefix + idCursor)
+            .order(PostOrderType.MOST_POPULAR.name())
+            .cursor(cursor)
             .size(expectedSize)
             .build();
 
@@ -288,7 +290,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST.name())
+            .order(PostOrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -305,7 +307,7 @@ class PostServiceTest {
     @Test
     void 조회_대상_산책로_포스트_수가_조회_사이즈보다_작으면_다음_커서가_없다() {
         // given
-        int actualSize = 5;
+        int actualSize = PostTexture.getRandomInt(1, 9);
 
         createPostsAndGetLastId(actualSize);
 
@@ -314,7 +316,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST.name())
+            .order(PostOrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -336,14 +338,16 @@ class PostServiceTest {
     @ValueSource(strings = " ")
     void 커서가_빈_값이면_처음부터_목록_조회한다(String cursor) {
         // given
-        createPostsAndGetLastId(30);
+        int totalSize = PostTexture.getRandomInt(21, 99);
+
+        createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
         NormalListRequest request = NormalListRequest.builder()
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(OrderType.LATEST.name())
+            .order(PostOrderType.LATEST.name())
             .cursor(cursor)
             .size(expectedSize)
             .build();
@@ -362,7 +366,9 @@ class PostServiceTest {
     @Test
     void 정렬_순서가_없으면_산책로_포스트를_최신순으로_조회한다() {
         // given
-        createPostsAndGetLastId(30);
+        int totalSize = PostTexture.getRandomInt(21, 99);
+
+        createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
         NormalListRequest request = NormalListRequest.builder()
@@ -386,12 +392,12 @@ class PostServiceTest {
     @Test
     void 특정_사용자의_산책로_포스트_최신순_조회를_성공한다() {
         // given
-        int totalSize = PostTexture.getRandomInt(11, 99);
+        int totalSize = PostTexture.getRandomInt(21, 99);
 
         createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null, expectedSize);
+        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), null, expectedSize);
 
         // when
         ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
@@ -407,13 +413,12 @@ class PostServiceTest {
     @Test
     void 다음_커서_기반으로_특정_사용자의_산책로_포스트_최신순_조회를_성공한다() {
         // given
-        int totalSize = PostTexture.getRandomInt(11, 99);
+        int totalSize = PostTexture.getRandomInt(21, 99);
         long lastId = createPostsAndGetLastId(totalSize);
-        System.out.println(lastId);
         int expectedSize = 10;
         String idCursor = String.valueOf(lastId - expectedSize + 1);
-        System.out.println(idCursor);
-        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), idCursor, expectedSize);
+        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), idCursor,
+            expectedSize);
 
         // when
         ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
@@ -431,12 +436,12 @@ class PostServiceTest {
     @Test
     void 특정_사용자의_산책로_포스트_인기순_조회를_성공한다() {
         // given
-        int totalSize = PostTexture.getRandomInt(11, 99);
+        int totalSize = PostTexture.getRandomInt(21, 99);
 
         createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(OrderType.MOST_POPULAR.name(), null,
+        ScrollRequest request = new ScrollRequest(PostOrderType.MOST_POPULAR.name(), null,
             expectedSize);
 
         // when
@@ -455,13 +460,13 @@ class PostServiceTest {
     @Test
     void 다음_커서_기반으로_특정_사용자의_산책로_포스트_인기순_조회를_성공한다() {
         // given
-        int totalSize = PostTexture.getRandomInt(11, 99);
+        int totalSize = PostTexture.getRandomInt(21, 99);
         long lastId = createPostsAndGetLastId(totalSize);
         int expectedSize = 10;
         String idCursor = String.valueOf(lastId - expectedSize + 1);
-        String idPrefix = idCursor.length() == 2 ? "00000000000000" : "0000000000000";
-        ScrollRequest request = new ScrollRequest(OrderType.MOST_POPULAR.name(),
-            idPrefix + idCursor, expectedSize);
+        String cursor = "0000000000000000".substring(0, 16 - idCursor.length()) + idCursor;
+        ScrollRequest request = new ScrollRequest(PostOrderType.MOST_POPULAR.name(), cursor,
+            expectedSize);
 
         // when
         ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
@@ -480,13 +485,13 @@ class PostServiceTest {
     @Test
     void 로그인_사용자와_조회_대상_사용자가_같으면_공개_여부에_관계없이_조회한다() {
         // given
-        int totalPublicPostSize = 6;
+        int totalPublicPostSize = PostTexture.getRandomInt(1, 7);
 
         createPostsAndGetLastId(totalPublicPostSize);
         postRepository.save(PostTexture.createPrivatePost(user));
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null,
+        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), null,
             expectedSize);
 
         // when
@@ -500,12 +505,12 @@ class PostServiceTest {
     @Test
     void 사용자를_확인할_수_없으면_특정_사용자_포스트_목록_조회를_실패한다() {
         // given
-        int totalSize = PostTexture.getRandomInt(11, 99);
+        int totalSize = PostTexture.getRandomInt(21, 99);
 
         createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null, expectedSize);
+        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), null, expectedSize);
         long invalidId = PostTexture.getRandomId();
 
         // when

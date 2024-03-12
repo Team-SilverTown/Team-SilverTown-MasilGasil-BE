@@ -27,8 +27,8 @@ import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
+import team.silvertown.masil.masil.dto.request.CreateMasilPinRequest;
 import team.silvertown.masil.masil.dto.request.CreateMasilRequest;
-import team.silvertown.masil.masil.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
 import team.silvertown.masil.masil.dto.response.CreateMasilResponse;
 import team.silvertown.masil.masil.dto.response.MasilDetailResponse;
@@ -94,7 +94,7 @@ class MasilServiceTest {
     @ValueSource(ints = {10, 0})
     void 마실_생성을_성공한다(int expectedPinCount) {
         // given
-        List<CreatePostPinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
+        List<CreateMasilPinRequest> pinRequests = createPinRequests(expectedPinCount, 10000);
         CreateMasilRequest request = new CreateMasilRequest(addressDepth1, addressDepth2,
             addressDepth3, "",
             path, null, distance, totalTime, calories, OffsetDateTime.now(), pinRequests,
@@ -394,14 +394,14 @@ class MasilServiceTest {
         return masils;
     }
 
-    List<CreatePostPinRequest> createPinRequests(int size, int maxPathPoints) {
-        List<CreatePostPinRequest> pinRequests = new ArrayList<>();
+    List<CreateMasilPinRequest> createPinRequests(int size, int maxPathPoints) {
+        List<CreateMasilPinRequest> pinRequests = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             Coordinate coordinate = MapTexture.createPoint()
                 .getCoordinate();
             KakaoPoint point = KakaoPoint.from(coordinate);
-            CreatePostPinRequest createPinRequest = new CreatePostPinRequest(point, null, null);
+            CreateMasilPinRequest createPinRequest = new CreateMasilPinRequest(point, null, null);
 
             pinRequests.add(createPinRequest);
         }

@@ -20,7 +20,7 @@ public final class UserTexture extends BaseDomainTexture {
         int weight = getRandomInt(70, 90);
 
         return createUser(nickname, Sex.MALE, birthDate, height, weight,
-            ExerciseIntensity.MIDDLE, 0, 0, true, true, Provider.KAKAO,
+            ExerciseIntensity.MIDDLE, 0, 0, 0, true, true, Provider.KAKAO,
             String.valueOf(getRandomId()));
     }
 
@@ -33,6 +33,7 @@ public final class UserTexture extends BaseDomainTexture {
         ExerciseIntensity exerciseIntensity,
         Integer totalDistance,
         Integer totalCount,
+        Integer totalCalories,
         boolean isPublic,
         boolean isAllowingNotification,
         Provider provider,
@@ -47,6 +48,7 @@ public final class UserTexture extends BaseDomainTexture {
             .exerciseIntensity(exerciseIntensity)
             .totalDistance(totalDistance)
             .totalCount(totalCount)
+            .totalCalories(totalCalories)
             .isAllowingNotification(isAllowingNotification)
             .isPublic(isPublic)
             .provider(provider)

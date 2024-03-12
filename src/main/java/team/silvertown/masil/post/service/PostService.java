@@ -141,23 +141,18 @@ public class PostService {
         List<PostCursorDto> postsWithCursor,
         int size
     ) {
-        boolean hasNext = postsWithCursor.size() > size;
-
-        if (hasNext) {
-            postsWithCursor.remove(size);
-        }
-
         List<SimplePostResponse> posts = postsWithCursor.stream()
+            .limit(size)
             .map(PostCursorDto::post)
             .toList();
-        String lastCursor = getLastCursor(postsWithCursor, hasNext);
+        String lastCursor = getLastCursor(postsWithCursor, size);
 
         return ScrollResponse.from(posts, lastCursor);
     }
 
-    private String getLastCursor(List<PostCursorDto> postsWithCursor, boolean hasNext) {
-        if (hasNext) {
-            return postsWithCursor.get(postsWithCursor.size() - 1)
+    private String getLastCursor(List<PostCursorDto> postsWithCursor, int size) {
+        if (postsWithCursor.size() > size) {
+            return postsWithCursor.get(size - 1)
                 .cursor();
         }
 

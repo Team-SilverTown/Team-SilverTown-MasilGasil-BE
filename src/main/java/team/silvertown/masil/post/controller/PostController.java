@@ -2,6 +2,8 @@ package team.silvertown.masil.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.OrderType;
+import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
@@ -39,12 +41,10 @@ public class PostController {
     @Operation(summary = "산책로 포스트 생성")
     @ApiResponse(
         responseCode = "201",
-        headers = {
-            @Header(
-                name = "해당 산책로 포스트 조회 API",
-                description = "/api/v1/posts/{id}"
-            )
-        },
+        headers = @Header(
+            name = "해당 산책로 포스트 조회 API",
+            description = "/api/v1/posts/{id}"
+        ),
         content = @Content(
             mediaType = "application/json",
             schema = @Schema(implementation = CreatePostResponse.class)
@@ -67,7 +67,10 @@ public class PostController {
     @Operation(summary = "산책로 포스트 상세조회")
     @ApiResponse(
         responseCode = "200",
-        useReturnTypeSchema = true
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = PostDetailResponse.class)
+        )
     )
     public ResponseEntity<PostDetailResponse> getById(
         @PathVariable
@@ -81,34 +84,49 @@ public class PostController {
     @GetMapping(value = "/api/v1/posts", produces = "application/json")
     @Operation(summary = "산책로 목록 조회")
     @ApiResponse(responseCode = "200")
+    @Parameters(
+        {
+            @Parameter(
+                name = "depth1",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "depth2",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "depth3",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "order",
+                in = ParameterIn.QUERY,
+                schema = @Schema(implementation = PostOrderType.class, defaultValue = "LATEST")
+            ),
+            @Parameter(
+                name = "cursor",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "string")
+            ),
+            @Parameter(
+                name = "size",
+                in = ParameterIn.QUERY,
+                schema = @Schema(type = "integer", format = "int32", defaultValue = "10")
+            )
+        }
+    )
     @SecurityRequirements()
     public ResponseEntity<ScrollResponse<SimplePostResponse>> getScrollBy(
         @AuthenticationPrincipal
         Long loginId,
-        @RequestParam
-        String depth1,
-        @RequestParam
-        String depth2,
-        @RequestParam
-        String depth3,
         @RequestParam(required = false)
         Long authorId,
-        @RequestParam(required = false, defaultValue = "LATEST")
-        @Parameter(schema = @Schema(implementation = OrderType.class))
-        String order,
-        @RequestParam(required = false)
-        String cursor,
-        @RequestParam(required = false, defaultValue = "10")
-        Integer size
+        @Parameter(hidden = true)
+        NormalListRequest request
     ) {
-        NormalListRequest request = NormalListRequest.builder()
-            .depth1(depth1)
-            .depth2(depth2)
-            .depth3(depth3)
-            .order(order)
-            .cursor(cursor)
-            .size(size)
-            .build();
         ScrollResponse<SimplePostResponse> response = getScrollResponse(loginId, authorId, request);
 
         return ResponseEntity.ok(response);
