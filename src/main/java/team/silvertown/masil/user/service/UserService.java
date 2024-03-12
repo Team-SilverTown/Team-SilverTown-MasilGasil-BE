@@ -3,6 +3,7 @@ package team.silvertown.masil.user.service;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -126,8 +127,13 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        URI uploadedUri = imageService.upload(profileImg);
-        user.updateProfile(uploadedUri.toString());
+        String profileUrl = null;
+        if(Objects.nonNull(profileImg)) {
+            URI uploadedUri = imageService.upload(profileImg);
+            profileUrl = uploadedUri.toString();
+        }
+
+        user.updateProfile(profileUrl);
     }
 
     private static UserAuthority generateUserAuthority(User user, Authority authority) {
