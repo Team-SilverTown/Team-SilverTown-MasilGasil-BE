@@ -2,15 +2,17 @@ package team.silvertown.masil.config.security;
 
 import java.text.MessageFormat;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import team.silvertown.masil.config.SnapAdminProperties;
+import tech.ailef.snapadmin.external.SnapAdminProperties;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties(SnapAdminProperties.class)
 public class HttpRequestsConfigurer
     implements
     Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> {
@@ -40,7 +42,7 @@ public class HttpRequestsConfigurer
             .permitAll()
             .requestMatchers(HttpMethod.GET, POST_GET_RESOURCES)
             .permitAll()
-            .requestMatchers(MessageFormat.format(ADMIN_PANEL, snapAdminProperties.baseUrl()))
+            .requestMatchers(MessageFormat.format(ADMIN_PANEL, snapAdminProperties.getBaseUrl()))
             .permitAll()
             .anyRequest()
             .authenticated();

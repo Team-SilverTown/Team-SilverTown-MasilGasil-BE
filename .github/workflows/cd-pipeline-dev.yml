@@ -62,11 +62,9 @@ jobs:
           jwt.token-validity-in-seconds: ${{ secrets.TOKEN_EXPIRATION }}
 
       - name: 프로젝트 빌드
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        uses: gradle/gradle-build-action@v3.1.0
         with:
           arguments: clean build
-        env:
-          SPRING_PROFILES_ACTIVE: ${{ env.ACTIVE_PROFILE }}
 
       - name: Amazon ECR 로그인
         id: login-ecr
