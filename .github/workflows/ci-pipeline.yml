@@ -1,0 +1,48 @@
+name: Java CI with Gradle
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    environment: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 체크 아웃
+        uses: actions/checkout@v4
+
+      - name: AWS credentials 설정
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: JDK 17 설치
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Gradle 권한 부여
+        run: chmod +x gradlew
+
+      - name: 프로젝트 빌드
+        run: ./gradlew clean build
+
+      - name: Jacoco 테스트 결과 출력
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          title: 📑 Jacoco 테스트 결과
+          paths: ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 50
+          min-coverage-changed-files: 50
+          update-comment: true
