@@ -6,7 +6,7 @@ import team.silvertown.masil.common.map.MapErrorCode;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.validator.PostValidator;
 
-public record CreateRequest(
+public record CreatePostRequest(
     String depth1,
     String depth2,
     String depth3,
@@ -17,13 +17,13 @@ public record CreateRequest(
     Integer distance,
     Integer totalTime,
     Boolean isPublic,
-    List<CreatePinRequest> pins,
+    List<CreatePostPinRequest> pins,
     String thumbnailUrl
 ) {
 
     private static final int MIN_POINT_NUM = 3;
 
-    public CreateRequest {
+    public CreatePostRequest {
         PostValidator.notBlank(depth1, MapErrorCode.BLANK_DEPTH1);
         PostValidator.notNull(depth2, MapErrorCode.NULL_DEPTH2);
         PostValidator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);

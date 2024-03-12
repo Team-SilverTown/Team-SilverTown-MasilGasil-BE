@@ -1,5 +1,6 @@
 package team.silvertown.masil.masil.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
@@ -187,6 +188,24 @@ class MasilTest {
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
             .withMessage(MasilErrorCode.NEGATIVE_CALORIES.getMessage());
+    }
+
+    @Test
+    void 마실_생성_시_사용자의_통계를_갱신한다() {
+        // given
+        Integer distanceBefore = user.getTotalDistance();
+        Integer totalCountBefore = user.getTotalCount();
+
+        // when
+        Masil masil = MasilTexture.createDependentMasil(user, 100);
+        Integer distance = masil.getDistance();
+
+        // then
+        Integer expectedDistance = distanceBefore + distance;
+        Integer expectedCount = totalCountBefore + 1;
+
+        assertThat(user.getTotalDistance()).isEqualTo(expectedDistance);
+        assertThat(user.getTotalCount()).isEqualTo(expectedCount);
     }
 
 }
