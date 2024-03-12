@@ -19,6 +19,7 @@ import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
@@ -27,6 +28,7 @@ import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
+import team.silvertown.masil.user.util.SecurityUtils;
 
 @Slf4j
 @Service
@@ -110,6 +112,22 @@ public class UserService {
             .build();
     }
 
+    public MyPageInfoResponse getMyPageInfo(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        if (SecurityUtils.isLogin() && SecurityUtils.getUserId()
+            .equals(userId)) {
+            return MyPageInfoResponse.from(user);
+        }
+
+        if (!user.getIsPublic()) {
+            return MyPageInfoResponse.fromPrivateUser(user);
+        }
+
+        return MyPageInfoResponse.from(user);
+    }
+
     public MeInfoResponse getMe(Long memberId) {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
@@ -117,7 +135,7 @@ public class UserService {
         return MeInfoResponse.from(user);
     }
 
-    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+    private UserAuthority generateUserAuthority(User user, Authority authority) {
         return UserAuthority.builder()
             .authority(authority)
             .user(user)

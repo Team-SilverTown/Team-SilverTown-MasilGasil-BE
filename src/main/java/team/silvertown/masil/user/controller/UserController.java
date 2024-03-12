@@ -133,7 +133,7 @@ public class UserController {
     @Operation(summary = "계정 공개여부 변경")
     @ApiResponse(
         responseCode = "200",
-        description = "계정 공개/비공개 여부 변경 완료",
+        description = "유저의 마이페이지 정보 조회",
         content = @Content(
             mediaType = "application/json",
             schema = @Schema(implementation = MyPageInfoResponse.class)
