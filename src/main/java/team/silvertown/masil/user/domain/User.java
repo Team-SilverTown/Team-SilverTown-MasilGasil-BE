@@ -121,17 +121,16 @@ public class User extends BaseEntity {
     }
 
     private void initializeStats() {
-        if (Objects.isNull(this.totalDistance)) {
-            this.totalDistance = 0;
-        }
-
-        if (Objects.isNull(this.totalCount)) {
+        if (hasNullStats()) {
             this.totalCount = 0;
-        }
-
-        if (Objects.isNull(this.totalCalories)) {
+            this.totalDistance = 0;
             this.totalCalories = 0;
         }
+    }
+
+    private boolean hasNullStats() {
+        return Objects.isNull(this.totalDistance) || Objects.isNull(this.totalCount)
+            || Objects.isNull(this.totalCalories);
     }
 
 }
