@@ -204,7 +204,7 @@ public class UserService {
         userAuthorityRepository.save(newAuthority);
     }
 
-    private static UserAuthority generateUserAuthority(User user, Authority authority) {
+    private UserAuthority generateUserAuthority(User user, Authority authority) {
         return UserAuthority.builder()
             .authority(authority)
             .user(user)
