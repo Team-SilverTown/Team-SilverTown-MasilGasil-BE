@@ -9,7 +9,6 @@ import static org.mockito.BDDMockito.given;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.datafaker.Faker;
@@ -23,16 +22,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
-import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
-import team.silvertown.masil.image.config.S3Properties;
-import team.silvertown.masil.image.validator.ImageFileType;
+import team.silvertown.masil.image.exception.ImageErrorCode;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.test.LocalstackTest;
 import team.silvertown.masil.texture.UserTexture;
@@ -56,7 +52,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 @SpringBootTest
 @Transactional
-class UserServiceTest extends LocalstackTest{
+class UserServiceTest extends LocalstackTest {
 
     private static final Faker faker = new Faker();
     private static final String VALID_PROVIDER = "kakao";
@@ -445,14 +441,20 @@ class UserServiceTest extends LocalstackTest{
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"image/apng", "image/avif", "image/gif", "image/jpeg", "image/png", "image/svg+xml", "image/webp"})
+        @ValueSource(
+            strings = {
+                "image/apng", "image/avif", "image/gif", "image/jpeg", "image/png", "image/svg+xml",
+                "image/webp"
+            }
+        )
         public void 정상적으로_프로필을_업데이트한다(String validImageType) throws Exception {
             //given
             String filename = "valid file";
             String originalFilename = filename + ".jpeg";
             byte[] content = "content".getBytes();
 
-            MockMultipartFile file = new MockMultipartFile(filename, originalFilename, validImageType,
+            MockMultipartFile file = new MockMultipartFile(filename, originalFilename,
+                validImageType,
                 content);
             User savedUser = userRepository.findById(user.getId())
                 .get();
@@ -478,6 +480,31 @@ class UserServiceTest extends LocalstackTest{
             //then
             String profileImg = user.getProfileImg();
             assertThat(profileImg).isNull();
+        }
+
+        @ParameterizedTest
+        @ValueSource(
+            strings = {
+                "text/html; charset=utf-8", "application/javascript", "text/javascript",
+                "application/ecmascript", "text/ecmascript", " ", ""
+            }
+        )
+        public void 비정상적인_확장자인_경우_예외가_발생한다(String invalidImageType) throws Exception {
+            //given
+            String filename = "valid file";
+            String originalFilename = filename + ".jpeg";
+            byte[] content = "content".getBytes();
+
+            MockMultipartFile file = new MockMultipartFile(filename, originalFilename,
+                invalidImageType,
+                content);
+            User savedUser = userRepository.findById(user.getId())
+                .get();
+
+            //when, then
+            assertThatThrownBy(() -> userService.updateProfile(file, savedUser.getId()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ImageErrorCode.NOT_SUPPORTED_CONTENT.getMessage());
         }
 
     }
