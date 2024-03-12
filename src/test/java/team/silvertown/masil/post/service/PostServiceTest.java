@@ -14,13 +14,16 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.map.KakaoPoint;
+import team.silvertown.masil.common.map.MapErrorCode;
 import team.silvertown.masil.common.response.ScrollRequest;
 import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
@@ -387,6 +390,65 @@ class PostServiceTest {
 
         assertThat(actual.contents()).hasSize(expectedSize);
         assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void 지역_Depth_1이_빈_값이면_산책로_포스트_목록_조회를_실패한다(String blankDepth1) {
+        // given
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(blankDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .size(10)
+            .build();
+
+        // when
+        ThrowingCallable getByAddress = () -> postService.getScrollByAddress(null, request);
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(getByAddress)
+            .withMessage(MapErrorCode.BLANK_DEPTH1.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    void 지역_Depth_2가_빈_값이면_산책로_포스트_목록_조회를_실패한다(String nullDepth2) {
+        // given
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(nullDepth2)
+            .depth3(addressDepth3)
+            .size(10)
+            .build();
+
+        // when
+        ThrowingCallable getByAddress = () -> postService.getScrollByAddress(null, request);
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(getByAddress)
+            .withMessage(MapErrorCode.NULL_DEPTH2.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void 지역_Depth_3이_빈_값이면_산책로_포스트_목록_조회를_실패한다(String blankDepth3) {
+        // given
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(blankDepth3)
+            .size(10)
+            .build();
+
+        // when
+        ThrowingCallable getByAddress = () -> postService.getScrollByAddress(null, request);
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(getByAddress)
+            .withMessage(MapErrorCode.BLANK_DEPTH3.getMessage());
     }
 
     @Test
