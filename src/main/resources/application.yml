@@ -37,6 +37,8 @@ jwt:
   token-validity-in-seconds: ${TOKEN_EXPIRATION}
 server:
   port: ${SERVER_PORT}
+cors:
+  service-origin: ${SERVICE_ORIGIN}
 springdoc:
   swagger-ui:
     path: /docs
