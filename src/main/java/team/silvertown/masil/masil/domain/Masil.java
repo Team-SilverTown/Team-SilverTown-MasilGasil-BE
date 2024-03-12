@@ -31,7 +31,7 @@ import team.silvertown.masil.user.domain.User;
 
 @Entity
 @Table(name = "masils")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter
 public class Masil extends BaseEntity {
 

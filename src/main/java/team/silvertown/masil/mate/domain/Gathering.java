@@ -3,7 +3,6 @@ package team.silvertown.masil.mate.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.OffsetDateTime;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.TimeZoneStorage;
@@ -13,7 +12,7 @@ import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.mate.validator.MateValidator;
 
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter
 public class Gathering {
 
