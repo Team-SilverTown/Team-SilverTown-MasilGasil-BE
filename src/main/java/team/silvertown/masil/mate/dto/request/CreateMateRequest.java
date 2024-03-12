@@ -6,7 +6,7 @@ import team.silvertown.masil.common.map.MapErrorCode;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.mate.validator.MateValidator;
 
-public record CreateRequest(
+public record CreateMateRequest(
     Long postId,
     String depth1,
     String depth2,
@@ -21,7 +21,7 @@ public record CreateRequest(
     Integer capacity
 ) {
 
-    public CreateRequest {
+    public CreateMateRequest {
         MateValidator.notNull(postId, MateErrorCode.NULL_POST);
         MateValidator.notBlank(depth1, MapErrorCode.BLANK_DEPTH1);
         MateValidator.notNull(depth2, MapErrorCode.NULL_DEPTH2);

@@ -1,5 +1,5 @@
 package team.silvertown.masil.mate.dto.response;
 
-public record CreateResponse(Long id) {
+public record CreateMateResponse(Long id) {
 
 }

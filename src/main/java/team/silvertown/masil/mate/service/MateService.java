@@ -12,8 +12,8 @@ import team.silvertown.masil.common.map.KakaoPointMapper;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
-import team.silvertown.masil.mate.dto.request.CreateRequest;
-import team.silvertown.masil.mate.dto.response.CreateResponse;
+import team.silvertown.masil.mate.dto.request.CreateMateRequest;
+import team.silvertown.masil.mate.dto.response.CreateMateResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.mate.repository.MateParticipantRepository;
 import team.silvertown.masil.mate.repository.MateRepository;
@@ -32,7 +32,7 @@ public class MateService {
     private final PostRepository postRepository;
 
     @Transactional
-    public CreateResponse create(Long userId, CreateRequest request) {
+    public CreateMateResponse create(Long userId, CreateMateRequest request) {
         User author = userRepository.findById(userId)
             .orElseThrow(getNotFoundException(MateErrorCode.USER_NOT_FOUND));
         boolean isParticipating = mateParticipantRepository.existsInSimilarTime(author,
@@ -48,14 +48,14 @@ public class MateService {
 
         createMateParticipant(author, mate, ParticipantStatus.ACCEPTED.name());
 
-        return new CreateResponse(mate.getId());
+        return new CreateMateResponse(mate.getId());
     }
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
 
-    private Mate createMate(User author, Post post, CreateRequest request) {
+    private Mate createMate(User author, Post post, CreateMateRequest request) {
         Point point = KakaoPointMapper.mapToPoint(request.gatheringPlacePoint());
         Mate mate = Mate.builder()
             .author(author)

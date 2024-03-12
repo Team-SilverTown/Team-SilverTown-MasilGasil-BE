@@ -18,8 +18,8 @@ import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
-import team.silvertown.masil.mate.dto.request.CreateRequest;
-import team.silvertown.masil.mate.dto.response.CreateResponse;
+import team.silvertown.masil.mate.dto.request.CreateMateRequest;
+import team.silvertown.masil.mate.dto.response.CreateMateResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.mate.repository.MateParticipantRepository;
 import team.silvertown.masil.mate.repository.MateRepository;
@@ -77,12 +77,13 @@ class MateServiceTest {
     @Test
     void 메이트_모집_생성을_성공한다() {
         // given
-        CreateRequest request = new CreateRequest(post.getId(), post.getDepth1(), post.getDepth2(),
+        CreateMateRequest request = new CreateMateRequest(post.getId(), post.getDepth1(),
+            post.getDepth2(),
             post.getDepth3(), "", title, content, gatheringPlacePoint, gatheringPlaceDetail,
             gatherAt, capacity);
 
         // when
-        CreateResponse expected = mateService.create(author.getId(), request);
+        CreateMateResponse expected = mateService.create(author.getId(), request);
 
         // then
         Mate actual = mateRepository.findAll()
@@ -104,7 +105,8 @@ class MateServiceTest {
     void 로그인한_사용자를_확인할_수_없으면_메이트_생성을_실패한다() {
         // given
         long invalidId = MateTexture.getRandomId();
-        CreateRequest request = new CreateRequest(post.getId(), post.getDepth1(), post.getDepth2(),
+        CreateMateRequest request = new CreateMateRequest(post.getId(), post.getDepth1(),
+            post.getDepth2(),
             post.getDepth3(), "", title, content, gatheringPlacePoint, gatheringPlaceDetail,
             gatherAt, capacity);
 
@@ -128,7 +130,8 @@ class MateServiceTest {
 
         mateParticipantRepository.save(mateParticipant);
 
-        CreateRequest request = new CreateRequest(post.getId(), post.getDepth1(), post.getDepth2(),
+        CreateMateRequest request = new CreateMateRequest(post.getId(), post.getDepth1(),
+            post.getDepth2(),
             post.getDepth3(), "", title, content, gatheringPlacePoint, gatheringPlaceDetail,
             gatherAt, capacity);
 
@@ -144,7 +147,8 @@ class MateServiceTest {
     void 메이트의_산책로_포스트가_존재하지_않으면_메이트_생성을_실패한다() {
         // given
         long invalidId = MateTexture.getRandomId();
-        CreateRequest request = new CreateRequest(invalidId, post.getDepth1(), post.getDepth2(),
+        CreateMateRequest request = new CreateMateRequest(invalidId, post.getDepth1(),
+            post.getDepth2(),
             post.getDepth3(), "", title, content, gatheringPlacePoint, gatheringPlaceDetail,
             gatherAt, capacity);
 
