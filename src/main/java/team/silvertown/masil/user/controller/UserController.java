@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
@@ -125,6 +127,23 @@ public class UserController {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @GetMapping("api/v1/users/{userId}")
+    @Operation(summary = "계정 공개여부 변경")
+    @ApiResponse(
+        responseCode = "200",
+        description = "계정 공개/비공개 여부 변경 완료",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = MyPageInfoResponse.class)
+        )
+    )
+    public ResponseEntity<MyPageInfoResponse> getMyPage(
+        @PathVariable
+        Long userId
+    ) {
+        return ResponseEntity.ok(userService.getMyPageInfo(userId));
     }
 
 }
