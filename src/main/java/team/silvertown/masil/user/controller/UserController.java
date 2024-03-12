@@ -103,6 +103,10 @@ public class UserController {
     @PutMapping("api/v1/users/profiles")
     @SecurityRequirement(name = "토큰 받아오기")
     @Operation(summary = "카카오 토큰으로 로그인")
+    @ApiResponse(
+        responseCode = "204",
+        description = "유저 프로필 사진 업데이트"
+    )
     public ResponseEntity<Void> profileUpdate(
         @RequestPart
         MultipartFile profileImg,
@@ -116,6 +120,7 @@ public class UserController {
     }
 
     @PatchMapping("/api/v1/users/is-public")
+    @SecurityRequirement(name = "토큰 받아오기")
     @Operation(summary = "계정 공개여부 변경")
     @ApiResponse(
         responseCode = "204",
