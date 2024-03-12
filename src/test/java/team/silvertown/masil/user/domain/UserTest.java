@@ -29,16 +29,19 @@ class UserTest {
     void 사용자의_산책_통계_갱신을_성공한다() {
         // given
         User user = UserTexture.createValidUser();
-        int distanceBefore = user.getTotalDistance();
-        int totalCountBefore = user.getTotalCount();
+        Integer distanceBefore = user.getTotalDistance();
+        Integer totalCountBefore = user.getTotalCount();
+        Integer caloriesBefore = user.getTotalCalories();
         int expectedDistance = UserTexture.getRandomPositive();
+        int expectedCalories = UserTexture.getRandomPositive();
 
         // when
-        user.updateStats(expectedDistance);
+        user.updateStats(expectedDistance, expectedCalories);
 
         // then
         assertThat(user.getTotalDistance()).isEqualTo(distanceBefore + expectedDistance);
         assertThat(user.getTotalCount()).isEqualTo(totalCountBefore + 1);
+        assertThat(user.getTotalCalories()).isEqualTo(caloriesBefore + expectedCalories);
     }
 
     @Test
@@ -63,14 +66,16 @@ class UserTest {
             .build();
 
         // when
-        user.updateStats(0);
+        user.updateStats(0, 0);
 
         // then
         Integer totalDistance = user.getTotalDistance();
         Integer totalCount = user.getTotalCount();
+        Integer totalCalories = user.getTotalCalories();
 
         assertThat(totalDistance).isNotNull();
         assertThat(totalCount).isNotNull();
+        assertThat(totalCalories).isNotNull();
     }
 
 }

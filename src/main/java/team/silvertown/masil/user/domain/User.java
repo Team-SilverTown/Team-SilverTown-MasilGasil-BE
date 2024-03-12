@@ -61,6 +61,9 @@ public class User extends BaseEntity {
     @Column(name = "total_count")
     private Integer totalCount;
 
+    @Column(name = "total_calories")
+    private Integer totalCalories;
+
     @Column(name = "is_public")
     private Boolean isPublic;
 
@@ -109,10 +112,11 @@ public class User extends BaseEntity {
         this.isPublic = !this.isPublic;
     }
 
-    public void updateStats(int distance) {
+    public void updateStats(int distance, int calories) {
         initializeStats();
 
         this.totalDistance += distance;
+        this.totalCalories += calories;
         this.totalCount++;
     }
 
@@ -123,6 +127,10 @@ public class User extends BaseEntity {
 
         if (Objects.isNull(this.totalCount)) {
             this.totalCount = 0;
+        }
+
+        if (Objects.isNull(this.totalCalories)) {
+            this.totalCalories = 0;
         }
     }
 

@@ -108,7 +108,7 @@ public class Masil extends BaseEntity {
         this.calories = calories;
         this.startedAt = startedAt;
 
-        this.user.updateStats(this.distance);
+        this.user.updateStats(this.distance, calories);
     }
 
     public List<KakaoPoint> getKakaoPath() {
