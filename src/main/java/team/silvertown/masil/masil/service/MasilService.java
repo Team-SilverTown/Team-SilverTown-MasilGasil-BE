@@ -19,13 +19,13 @@ import team.silvertown.masil.masil.domain.Masil;
 import team.silvertown.masil.masil.domain.MasilPin;
 import team.silvertown.masil.masil.dto.MasilDailyDetailDto;
 import team.silvertown.masil.masil.dto.MasilDailyDto;
-import team.silvertown.masil.masil.dto.request.CreatePinRequest;
-import team.silvertown.masil.masil.dto.request.CreateRequest;
+import team.silvertown.masil.masil.dto.request.CreateMasilPinRequest;
+import team.silvertown.masil.masil.dto.request.CreateMasilRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
-import team.silvertown.masil.masil.dto.response.CreateResponse;
-import team.silvertown.masil.masil.dto.response.MasilResponse;
+import team.silvertown.masil.masil.dto.response.CreateMasilResponse;
+import team.silvertown.masil.masil.dto.response.MasilDetailResponse;
+import team.silvertown.masil.masil.dto.response.MasilPinDetailResponse;
 import team.silvertown.masil.masil.dto.response.PeriodResponse;
-import team.silvertown.masil.masil.dto.response.PinResponse;
 import team.silvertown.masil.masil.dto.response.RecentMasilResponse;
 import team.silvertown.masil.masil.dto.response.SimpleMasilResponse;
 import team.silvertown.masil.masil.exception.MasilErrorCode;
@@ -44,18 +44,18 @@ public class MasilService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CreateResponse create(Long userId, CreateRequest request) {
+    public CreateMasilResponse create(Long userId, CreateMasilRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = createMasil(request, user);
 
         savePins(request.pins(), masil);
 
-        return new CreateResponse(masil.getId());
+        return new CreateMasilResponse(masil.getId());
     }
 
     @Transactional(readOnly = true)
-    public MasilResponse getById(Long userId, Long id) {
+    public MasilDetailResponse getById(Long userId, Long id) {
         User user = userRepository.findById(userId)
             .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
         Masil masil = masilRepository.findById(id)
@@ -63,9 +63,9 @@ public class MasilService {
 
         MasilValidator.validateMasilOwner(masil, user);
 
-        List<PinResponse> pins = PinResponse.listFrom(masil);
+        List<MasilPinDetailResponse> pins = MasilPinDetailResponse.listFrom(masil);
 
-        return MasilResponse.from(masil, pins);
+        return MasilDetailResponse.from(masil, pins);
     }
 
     @Transactional(readOnly = true)
@@ -99,7 +99,7 @@ public class MasilService {
         return () -> new DataNotFoundException(errorCode);
     }
 
-    private Masil createMasil(CreateRequest request, User user) {
+    private Masil createMasil(CreateMasilRequest request, User user) {
         Masil masil = Masil.builder()
             .depth1(request.depth1())
             .depth2(request.depth2())
@@ -119,19 +119,19 @@ public class MasilService {
         return masilRepository.save(masil);
     }
 
-    private void savePins(List<CreatePinRequest> pins, Masil masil) {
+    private void savePins(List<CreateMasilPinRequest> pins, Masil masil) {
         if (Objects.nonNull(pins)) {
             pins.forEach(pin -> savePin(pin, masil));
         }
     }
 
-    private void savePin(CreatePinRequest pin, Masil masil) {
+    private void savePin(CreateMasilPinRequest pin, Masil masil) {
         MasilPin masilPin = createPin(pin, masil);
 
         masilPinRepository.save(masilPin);
     }
 
-    private MasilPin createPin(CreatePinRequest request, Masil masil) {
+    private MasilPin createPin(CreateMasilPinRequest request, Masil masil) {
         User owner = masil.getUser();
 
         return MasilPin.builder()
