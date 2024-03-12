@@ -25,7 +25,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
-import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.texture.UserAuthorityTexture;
@@ -453,7 +452,7 @@ class UserServiceTest {
                 .get();
 
             //when
-            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(walkedUser.getId());
+            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(walkedUser.getId(), null);
 
             //then
             assertThat(myPageInfo)
@@ -467,7 +466,7 @@ class UserServiceTest {
         @Test
         public void 존재하지_않는_유저의_마이페이지를_호출할_경우_예외가_발생한다() throws Exception {
             //given, when, then
-            assertThatThrownBy(() -> userService.getMyPageInfo(user.getId() + 2))
+            assertThatThrownBy(() -> userService.getMyPageInfo(user.getId() + 2, null))
                 .isInstanceOf(DataNotFoundException.class)
                 .hasMessage(UserErrorCode.USER_NOT_FOUND.getMessage());
         }
@@ -479,7 +478,7 @@ class UserServiceTest {
                 .get();
 
             //when
-            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(walkedUser.getId());
+            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(walkedUser.getId(), null);
 
             //then
             assertThat(myPageInfo)
@@ -492,16 +491,8 @@ class UserServiceTest {
 
         @Test
         public void 내가_로그인_하고_내_정보를_받아보려고_할때는_계정이_비공계더라도_정보를_볼_수_있다() throws Exception {
-            //given
-            String token = tokenProvider.createToken(privateUser.getId());
-            Authentication authentication = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            User selfUser = userRepository.findById(user.getId())
-                .get();
-
-            //when
-            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(selfUser.getId());
+            //given, when
+            MyPageInfoResponse myPageInfo = userService.getMyPageInfo(user.getId(), user.getId());
 
             //then
             assertThat(myPageInfo)
