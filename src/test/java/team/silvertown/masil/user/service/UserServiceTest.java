@@ -223,6 +223,24 @@ class UserServiceTest {
                 .contains(Authority.NORMAL);
         }
 
+        @Test
+        public void 이미_사용중인_닉네임이_라면_예외가_발생한다() throws Exception {
+            //given
+            User user = User.builder().nickname("nickname").build();
+            userRepository.save(user);
+            OnboardRequest request = getNormalRequest();
+            List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
+                unTypedUser);
+            assertThat(beforeUpdatedAuthority).hasSize(1);
+            assertThat(beforeUpdatedAuthority.get(0)
+                .getAuthority()).isEqualTo(Authority.RESTRICTED);
+
+            //when, then
+            assertThatThrownBy(() -> userService.onboard(unTypedUser.getId(), request))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage(UserErrorCode.DUPLICATED_NICKNAME.getMessage());
+        }
+
     }
 
     @Nested
