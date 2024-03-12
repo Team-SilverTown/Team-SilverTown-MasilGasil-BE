@@ -22,23 +22,21 @@ public class MateParticipantQueryRepositoryImpl implements MateParticipantQueryR
     @Override
     public boolean existsInSimilarTime(User user, OffsetDateTime gatheringAt) {
         QMate mate = QMate.mate;
-        BooleanBuilder condition = new BooleanBuilder();
         OffsetDateTime beforeHour = gatheringAt.minusHours(1);
         OffsetDateTime afterHour = gatheringAt.plusHours(1);
-
-        condition
+        BooleanBuilder condition = new BooleanBuilder()
             .and(mateParticipant.user.eq(user))
             .and(mateParticipant.status.eq(ParticipantStatus.ACCEPTED))
             .and(mate.gathering.gatheringAt.between(beforeHour, afterHour));
 
         List<MateParticipant> participants = jpaQueryFactory
             .selectFrom(mateParticipant)
-            .join(mate)
+            .join(mateParticipant.mate, mate)
             .where(condition)
-            .limit(1L)
+            .limit(1)
             .fetch();
 
-        return participants.isEmpty();
+        return !participants.isEmpty();
     }
 
 }
