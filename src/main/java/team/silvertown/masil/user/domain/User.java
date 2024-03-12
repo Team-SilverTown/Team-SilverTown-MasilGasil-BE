@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,6 +61,9 @@ public class User extends BaseEntity {
     @Column(name = "total_count")
     private Integer totalCount;
 
+    @Column(name = "total_calories")
+    private Integer totalCalories;
+
     @Column(name = "is_public")
     private Boolean isPublic;
 
@@ -110,6 +114,28 @@ public class User extends BaseEntity {
 
     public void toggleIsPublic() {
         this.isPublic = !this.isPublic;
+    }
+
+    public void updateStats(int distance, int calories) {
+        initializeStats();
+
+        this.totalDistance += distance;
+        this.totalCalories += calories;
+        this.totalCount++;
+    }
+
+    private void initializeStats() {
+        if (hasNullStats()) {
+            this.totalCount = 0;
+            this.totalDistance = 0;
+            this.totalCalories = 0;
+        }
+    }
+
+    private boolean hasNullStats() {
+        return Objects.isNull(this.totalDistance)
+            || Objects.isNull(this.totalCount)
+            || Objects.isNull(this.totalCalories);
     }
 
 }

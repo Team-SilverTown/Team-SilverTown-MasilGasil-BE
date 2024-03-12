@@ -10,6 +10,7 @@ CREATE TABLE users
     profile_img              varchar(500),
     total_distance           INTEGER,
     total_count              INTEGER,
+    total_calories           INTEGER,
     is_public                TINYINT(1)            DEFAULT 1,
     is_allowing_notification TINYINT(1)            DEFAULT 1,
     provider                 VARCHAR(20),
