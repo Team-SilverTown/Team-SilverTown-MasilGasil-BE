@@ -23,7 +23,7 @@ public enum MateErrorCode implements ErrorCode {
     OVERGENERATION_IN_SIMILAR_TIME(20002, "비슷한 시간대에 참여하는 메이트가 있습니다"),
 
     NULL_POST(30000, "메이트 모집의 산책로 포스트를 확인할 수 없습니다"),
-    POST_NOT_FOUND(304000, "기존의 산책로 포스트를 찾을 수 없습니다"),
+    POST_NOT_FOUND(30400, "기존의 산책로 포스트를 찾을 수 없습니다"),
 
     NULL_AUTHOR(90000, "메이트 모집의 작성자를 확인할 수 없습니다"),
     NULL_USER(90001, "해당 메이트 참여자를 확인할 수 없습니다"),
