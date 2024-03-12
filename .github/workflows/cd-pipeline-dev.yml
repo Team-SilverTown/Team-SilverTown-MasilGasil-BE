@@ -14,7 +14,7 @@ env:
   ECS_CLUSTER: masilgasil-ecs-cluster
   ECS_SERVICE: masilgasil-ecs-service-dev
   ECS_TASK_DEFINITION: .aws/masilgasil-ecs-task-revision1.json
-  ACTIVE_PROFILE: prod
+  ACTIVE_PROFILE: dev
   SERVER_PORT: 8080
 
 jobs:
@@ -62,11 +62,9 @@ jobs:
           jwt.token-validity-in-seconds: ${{ secrets.TOKEN_EXPIRATION }}
 
       - name: 프로젝트 빌드
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        uses: gradle/gradle-build-action@v3.1.0
         with:
           arguments: clean build
-        env:
-          SPRING_PROFILES_ACTIVE: ${{ env.ACTIVE_PROFILE }}
 
       - name: Amazon ECR 로그인
         id: login-ecr
