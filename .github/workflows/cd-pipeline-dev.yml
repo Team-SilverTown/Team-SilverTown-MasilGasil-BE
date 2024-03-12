@@ -14,7 +14,7 @@ env:
   ECS_CLUSTER: masilgasil-ecs-cluster
   ECS_SERVICE: masilgasil-ecs-service-dev
   ECS_TASK_DEFINITION: .aws/masilgasil-ecs-task-revision1.json
-  ACTIVE_PROFILE: prod
+  ACTIVE_PROFILE: dev
   SERVER_PORT: 8080
 
 jobs:
