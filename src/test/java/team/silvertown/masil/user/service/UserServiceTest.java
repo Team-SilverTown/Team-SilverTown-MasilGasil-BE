@@ -479,7 +479,7 @@ class UserServiceTest extends LocalstackTest {
         }
 
         @Test
-        public void 프로필_사진을_보내지_않는_경우_빈_문자열로_프로필을_업데이트한다() throws Exception {
+        public void 프로필_사진을_보내지_않는_경우_null로_프로필을_업데이트한다() throws Exception {
             //given
             MockMultipartFile file = null;
             User savedUser = userRepository.findById(user.getId())
