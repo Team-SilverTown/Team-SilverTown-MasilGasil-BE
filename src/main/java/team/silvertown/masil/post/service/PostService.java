@@ -60,6 +60,7 @@ public class PostService {
         Long loginId,
         NormalListRequest request
     ) {
+        request.validateAddress();
         User user = getUserIfLoggedIn(loginId);
         List<PostCursorDto> postsWithCursor = postRepository.findScrollByAddress(user, request);
 

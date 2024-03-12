@@ -23,10 +23,6 @@ public final class NormalListRequest {
         String cursor,
         int size
     ) {
-        PostValidator.notBlank(depth1, MapErrorCode.BLANK_DEPTH1);
-        PostValidator.notNull(depth2, MapErrorCode.NULL_DEPTH2);
-        PostValidator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);
-
         this.depth1 = depth1;
         this.depth2 = depth2;
         this.depth3 = depth3;
@@ -35,6 +31,12 @@ public final class NormalListRequest {
 
     public int getSize() {
         return this.scrollRequest.getSize();
+    }
+
+    public void validateAddress() {
+        PostValidator.notBlank(depth1, MapErrorCode.BLANK_DEPTH1);
+        PostValidator.notNull(depth2, MapErrorCode.NULL_DEPTH2);
+        PostValidator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);
     }
 
 }
