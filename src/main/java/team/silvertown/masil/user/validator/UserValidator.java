@@ -19,11 +19,10 @@ public class UserValidator extends Validator {
             () -> new DataNotFoundException(UserErrorCode.AUTHORITY_NOT_FOUND));
     }
 
-    public static boolean validateNickname(String nickname, UserErrorCode userErrorCode) {
+    public static void validateNickname(String nickname, UserErrorCode userErrorCode) {
         notBlank(nickname, userErrorCode);
         range(nickname.length(), 2, 12, userErrorCode);
         notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
-        return true;
     }
 
     public static boolean validateSex(String sex, UserErrorCode userErrorCode) {

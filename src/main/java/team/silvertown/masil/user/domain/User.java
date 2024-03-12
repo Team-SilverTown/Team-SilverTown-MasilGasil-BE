@@ -78,9 +78,8 @@ public class User extends BaseEntity {
     private String socialId;
 
     public void updateNickname(String nickname) {
-        if (UserValidator.validateNickname(nickname, UserErrorCode.INVALID_NICKNAME)) {
-            this.nickname = nickname;
-        }
+        UserValidator.validateNickname(nickname, UserErrorCode.INVALID_NICKNAME);
+        this.nickname = nickname;
     }
 
     public void updateSex(String sex) {
