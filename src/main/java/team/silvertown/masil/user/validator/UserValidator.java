@@ -29,41 +29,30 @@ public class UserValidator extends Validator {
         if (sex != null) {
             notBlank(sex, userErrorCode);
             Sex.get(sex);
+
             return true;
         }
 
         return false;
     }
 
-    public static boolean validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
+    public static void validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
         if (birthDate != null) {
             notBlank(birthDate, userErrorCode);
             DateValidator.parseDate(birthDate, userErrorCode);
-
-            return true;
         }
-
-        return false;
     }
 
-    public static boolean validateHeight(Integer height, UserErrorCode userErrorCode) {
+    public static void validateHeight(Integer height, UserErrorCode userErrorCode) {
         if (height != null) {
             notUnder(height, 1, userErrorCode);
-
-            return true;
         }
-
-        return false;
     }
 
-    public static boolean validateWeight(Integer weight, UserErrorCode userErrorCode) {
+    public static void validateWeight(Integer weight, UserErrorCode userErrorCode) {
         if (weight != null) {
             notUnder(weight, 1, userErrorCode);
-
-            return true;
         }
-
-        return false;
     }
 
     public static boolean validateExerciseIntensity(

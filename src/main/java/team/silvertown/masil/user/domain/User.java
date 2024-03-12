@@ -89,22 +89,19 @@ public class User extends BaseEntity {
     }
 
     public void updateBirthDate(String birthDate) {
-        if (UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE)) {
-            this.birthDate = DateValidator.parseDate(birthDate,
-                UserErrorCode.INVALID_BIRTH_DATE);
-        }
+        UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
+        this.birthDate = DateValidator.parseDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
+
     }
 
     public void updateHeight(Integer height) {
-        if (UserValidator.validateHeight(height, UserErrorCode.INVALID_HEIGHT)) {
-            this.height = height;
-        }
+        UserValidator.validateHeight(height, UserErrorCode.INVALID_HEIGHT);
+        this.height = height;
     }
 
     public void updateWeight(Integer weight) {
-        if (UserValidator.validateWeight(weight, UserErrorCode.INVALID_WEIGHT)) {
-            this.weight = weight;
-        }
+        UserValidator.validateWeight(weight, UserErrorCode.INVALID_WEIGHT);
+        this.weight = weight;
     }
 
     public void updateExerciseIntensity(String exerciseIntensity) {
