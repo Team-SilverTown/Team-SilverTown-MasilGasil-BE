@@ -1,4 +1,4 @@
-package team.silvertown.masil.testConfig;
+package team.silvertown.masil.config;
 
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

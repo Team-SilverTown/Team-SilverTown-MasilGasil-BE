@@ -14,8 +14,10 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 public abstract class LocalstackTest {
 
-    protected static final String BUCKET_NAME = UUID.randomUUID().toString();
-    private static final DockerImageName DOCKER_IMAGE_NAME = DockerImageName.parse("localstack/localstack:3.0");
+    protected static final String BUCKET_NAME = UUID.randomUUID()
+        .toString();
+    private static final DockerImageName DOCKER_IMAGE_NAME = DockerImageName.parse(
+        "localstack/localstack:3.0");
 
     @Container
     static LocalStackContainer localStack = new LocalStackContainer(DOCKER_IMAGE_NAME);
@@ -35,7 +37,8 @@ public abstract class LocalstackTest {
     }
 
     protected static String getS3Endpoint() {
-        return localStack.getEndpointOverride(Service.S3).toString();
+        return localStack.getEndpointOverride(Service.S3)
+            .toString();
     }
 
 }
