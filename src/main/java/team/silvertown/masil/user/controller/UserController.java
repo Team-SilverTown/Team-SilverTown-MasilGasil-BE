@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,8 +101,11 @@ public class UserController {
         return ResponseEntity.ok(userService.login(accessToken));
     }
 
-    @PutMapping("api/v1/users/profiles")
-    @SecurityRequirement(name = "토큰 받아오기")
+    @PutMapping(
+        value = "api/v1/users/profiles",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @Operation(summary = "카카오 토큰으로 로그인")
     @ApiResponse(
         responseCode = "204",
@@ -120,7 +124,6 @@ public class UserController {
     }
 
     @PatchMapping("/api/v1/users/is-public")
-    @SecurityRequirement(name = "토큰 받아오기")
     @Operation(summary = "계정 공개여부 변경")
     @ApiResponse(
         responseCode = "204",
