@@ -141,9 +141,11 @@ public class UserController {
     )
     public ResponseEntity<MyPageInfoResponse> getMyPage(
         @PathVariable
-        Long userId
+        Long userId,
+        @AuthenticationPrincipal
+        Long loginId
     ) {
-        return ResponseEntity.ok(userService.getMyPageInfo(userId));
+        return ResponseEntity.ok(userService.getMyPageInfo(userId, loginId));
     }
 
 }

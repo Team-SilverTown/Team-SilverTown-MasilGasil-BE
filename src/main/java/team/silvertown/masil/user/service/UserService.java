@@ -2,6 +2,7 @@ package team.silvertown.masil.user.service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,6 @@ public class UserService {
         }
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
-        assignDefaultAuthority(justSavedUser);
         String newUserToken = tokenProvider.createToken(justSavedUser.getId());
 
         return new LoginResponse(newUserToken);
@@ -112,12 +112,11 @@ public class UserService {
             .build();
     }
 
-    public MyPageInfoResponse getMyPageInfo(Long userId) {
+    public MyPageInfoResponse getMyPageInfo(Long userId, Long loginId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        if (SecurityUtils.isLogin() && SecurityUtils.getUserId()
-            .equals(userId)) {
+        if (Objects.nonNull(loginId) && loginId.equals(userId)) {
             return MyPageInfoResponse.from(user);
         }
 
