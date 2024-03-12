@@ -2,6 +2,7 @@ package team.silvertown.masil.user.service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,10 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        checkNickname(request.nickname());
+        if (userRepository.existsByNickname(request.nickname())) {
+            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
+        }
+
         update(user, request);
         UserAgreement userAgreement = getUserAgreement(request, user);
         Validator.throwIf(agreementRepository.existsByUser(user),
@@ -98,6 +102,12 @@ public class UserService {
     public void updateInfo(Long memberId, UpdateRequest updateRequest) {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        if (userRepository.existsByNickname(updateRequest.nickname()) && !user.getNickname()
+            .equals(updateRequest.nickname())) {
+            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
+        }
+
         update(user, updateRequest);
         user.toggleIsPublic();
     }
