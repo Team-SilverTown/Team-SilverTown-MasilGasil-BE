@@ -3,11 +3,14 @@ package team.silvertown.masil;
 import jakarta.annotation.PostConstruct;
 import java.util.TimeZone;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import tech.ailef.snapadmin.external.SnapAdminAutoConfiguration;
 
 @SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
+@ImportAutoConfiguration(SnapAdminAutoConfiguration.class)
 @ConfigurationPropertiesScan
 public class MasilApplication {
 
