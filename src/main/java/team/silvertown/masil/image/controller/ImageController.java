@@ -1,8 +1,15 @@
 package team.silvertown.masil.image.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,13 +24,27 @@ import team.silvertown.masil.image.service.ImageService;
 import team.silvertown.masil.image.validator.ImageFile;
 
 @RestController
+@Tag(name = "이미지 API")
 @RequiredArgsConstructor
 public class ImageController {
 
     private final ImageService imageService;
 
-    @PostMapping("/api/v1/images")
+    @PostMapping(
+        value = "/api/v1/images",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(summary = "이미지 업로드")
+    @ApiResponse(
+        responseCode = "201",
+        content = @Content(
+            mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = ImageResponse.class)
+        )
+    )
     public ResponseEntity<ImageResponse> upload(
+        @RequestBody(description = "MIME image type", required = true)
         @RequestPart
         @Valid
         @ImageFile

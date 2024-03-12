@@ -1,6 +1,7 @@
 package team.silvertown.masil.config.security;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -17,6 +18,9 @@ public class HttpRequestsConfigurer
         "/swagger-resources/**"
     };
     private static final String AUTH_RESOURCE = "/api/v1/users/login";
+    private static final String[] POST_GET_RESOURCES = {
+        "/api/v1/posts"
+    };
 
     @Override
     public void customize(
@@ -26,6 +30,8 @@ public class HttpRequestsConfigurer
             .requestMatchers(SWAGGER)
             .permitAll()
             .requestMatchers(AUTH_RESOURCE)
+            .permitAll()
+            .requestMatchers(HttpMethod.GET, POST_GET_RESOURCES)
             .permitAll()
             .anyRequest()
             .authenticated();
