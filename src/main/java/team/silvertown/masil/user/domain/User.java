@@ -83,9 +83,8 @@ public class User extends BaseEntity {
     }
 
     public void updateSex(String sex) {
-        if (UserValidator.validateSex(sex, UserErrorCode.INVALID_SEX)) {
-            this.sex = Sex.valueOf(sex);
-        }
+        Sex validatedSex = Sex.get(sex);
+        this.sex = validatedSex;
     }
 
     public void updateBirthDate(String birthDate) {
@@ -105,9 +104,8 @@ public class User extends BaseEntity {
     }
 
     public void updateExerciseIntensity(String exerciseIntensity) {
-        if (UserValidator.validateExerciseIntensity(exerciseIntensity)) {
-            this.exerciseIntensity = ExerciseIntensity.get(exerciseIntensity);
-        }
+        ExerciseIntensity validatedIntensity = ExerciseIntensity.get(exerciseIntensity);
+        this.exerciseIntensity = validatedIntensity;
     }
 
     public void toggleIsPublic() {
