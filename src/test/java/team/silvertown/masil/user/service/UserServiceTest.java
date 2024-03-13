@@ -224,6 +224,33 @@ class UserServiceTest {
         }
 
         @Test
+        public void 성별과_운동강도를_입력하지_않은경우에도_정상적으로_업데이트된다() throws Exception {
+            //given
+            OnboardRequest noSexAndExerciseIntensity = new OnboardRequest(
+                "nickname",
+                null,
+                format.format(faker.date()
+                    .birthdayLocalDate(20, 40)),
+                getRandomInt(170, 190),
+                getRandomInt(70, 90),
+                null,
+                true,
+                true,
+                true,
+                true
+            );
+
+            //when
+            userService.onboard(unTypedUser.getId(), noSexAndExerciseIntensity);
+            User updatedUser = userRepository.findById(unTypedUser.getId())
+                .get();
+
+            //then
+            assertThat(updatedUser.getSex()).isNull();
+            assertThat(updatedUser.getExerciseIntensity()).isNull();
+        }
+
+        @Test
         public void 이미_사용중인_닉네임이_라면_예외가_발생한다() throws Exception {
             //given
             User user = User.builder().nickname("nickname").build();
