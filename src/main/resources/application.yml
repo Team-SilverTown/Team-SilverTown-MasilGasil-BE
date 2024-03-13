@@ -41,6 +41,7 @@ jwt:
   token-validity-in-seconds: ${TOKEN_EXPIRATION}
 server:
   port: ${SERVER_PORT}
+  forward-headers-strategy: framework
 cors:
   service-origin: ${SERVICE_ORIGIN}
 springdoc:
