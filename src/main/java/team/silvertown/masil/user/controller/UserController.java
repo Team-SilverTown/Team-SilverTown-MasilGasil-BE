@@ -116,11 +116,10 @@ public class UserController {
     }
 
     @PutMapping("/api/v1/users")
-    @SecurityRequirement(name = "토큰 받아오기")
-    @Operation(summary = "카카오 토큰으로 로그인")
+    @Operation(summary = "유저 정보 업데이트 요청")
     @ApiResponse(
         responseCode = "200",
-        description = "유저 정보 업데이트 요청",
+        description = "유저 정보 업데이트 요청 성공 후 바뀐 콘텐츠를 확인한다",
         content = @Content(
             mediaType = "application/json",
             schema = @Schema(implementation = UpdateResponse.class)
