@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import team.silvertown.masil.common.response.ScrollResponse;
+import team.silvertown.masil.common.scroll.OrderType;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
@@ -104,7 +104,7 @@ public class PostController {
             @Parameter(
                 name = "order",
                 in = ParameterIn.QUERY,
-                schema = @Schema(implementation = PostOrderType.class, defaultValue = "LATEST")
+                schema = @Schema(implementation = OrderType.class, defaultValue = "LATEST")
             ),
             @Parameter(
                 name = "cursor",

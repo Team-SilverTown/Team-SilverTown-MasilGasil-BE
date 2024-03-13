@@ -9,14 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
-import team.silvertown.masil.common.response.ScrollRequest;
-import team.silvertown.masil.common.response.ScrollResponse;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.PostPinDetailResponse;
@@ -60,8 +60,6 @@ public class PostService {
         Long loginId,
         NormalListRequest request
     ) {
-        request.validateAddress();
-
         User user = getUserIfLoggedIn(loginId);
         List<PostCursorDto> postsWithCursor = postRepository.findScrollByAddress(user, request);
 

@@ -1,9 +1,9 @@
 package team.silvertown.masil.post.repository;
 
 import java.util.List;
-import team.silvertown.masil.common.response.ScrollRequest;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.post.dto.PostCursorDto;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.user.domain.User;
 
 public interface PostQueryRepository {

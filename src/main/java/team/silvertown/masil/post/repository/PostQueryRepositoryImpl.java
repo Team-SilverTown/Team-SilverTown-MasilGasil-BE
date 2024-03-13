@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import team.silvertown.masil.common.response.ScrollRequest;
+import team.silvertown.masil.common.scroll.OrderType;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.post.domain.QPost;
 import team.silvertown.masil.post.dto.PostCursorDto;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.user.domain.User;
 
@@ -41,10 +41,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         Predicate openness = getOpenness(user, null);
         BooleanBuilder condition = getBasicCondition(request.getScrollRequest(), openness);
 
-        condition
-            .and(post.address.depth1.eq(request.getDepth1()))
-            .and(post.address.depth2.eq(request.getDepth2()))
-            .and(post.address.depth3.eq(request.getDepth3()));
+        if (request.isBasedOnAddress()) {
+            condition
+                .and(post.address.depth1.eq(request.getDepth1()))
+                .and(post.address.depth2.eq(request.getDepth2()))
+                .and(post.address.depth3.eq(request.getDepth3()));
+        }
 
         return queryPostsWith(user, condition, request.getScrollRequest());
     }
@@ -96,12 +98,12 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             .fetch();
     }
 
-    private BooleanExpression getCursorFilter(PostOrderType order, String cursor) {
+    private BooleanExpression getCursorFilter(OrderType order, String cursor) {
         if (StringUtils.isBlank(cursor)) {
             return null;
         }
 
-        if (PostOrderType.isMostPopular(order)) {
+        if (OrderType.isMostPopular(order)) {
             StringExpression toScan = getCursor(order);
 
             return toScan.lt(cursor);
@@ -116,8 +118,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return post.id.lt(idCursor);
     }
 
-    private OrderSpecifier<?> decideOrderTarget(PostOrderType order) {
-        if (PostOrderType.isMostPopular(order)) {
+    private OrderSpecifier<?> decideOrderTarget(OrderType order) {
+        if (OrderType.isMostPopular(order)) {
             return post.likeCount.desc();
         }
 
@@ -125,8 +127,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     }
 
-    private StringExpression getCursor(PostOrderType order) {
-        if (PostOrderType.isMostPopular(order)) {
+    private StringExpression getCursor(OrderType order) {
+        if (OrderType.isMostPopular(order)) {
             return StringExpressions.lpad(post.likeCount.stringValue(), LIKE_COUNT_CURSOR_LENGTH,
                     PADDING)
                 .concat(StringExpressions.lpad(post.id.stringValue(), ID_CURSOR_LENGTH, PADDING));

@@ -24,14 +24,14 @@ import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.map.MapErrorCode;
-import team.silvertown.masil.common.response.ScrollRequest;
-import team.silvertown.masil.common.response.ScrollResponse;
+import team.silvertown.masil.common.scroll.OrderType;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
@@ -183,7 +183,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(PostOrderType.LATEST.name())
+            .order(OrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -209,7 +209,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(PostOrderType.LATEST.name())
+            .order(OrderType.LATEST.name())
             .cursor(idCursor)
             .size(expectedSize)
             .build();
@@ -237,7 +237,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(PostOrderType.MOST_POPULAR.name())
+            .order(OrderType.MOST_POPULAR.name())
             .size(expectedSize)
             .build();
 
@@ -266,7 +266,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(PostOrderType.MOST_POPULAR.name())
+            .order(OrderType.MOST_POPULAR.name())
             .cursor(cursor)
             .size(expectedSize)
             .build();
@@ -293,7 +293,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(PostOrderType.LATEST.name())
+            .order(OrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -319,7 +319,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(PostOrderType.LATEST.name())
+            .order(OrderType.LATEST.name())
             .size(expectedSize)
             .build();
 
@@ -350,7 +350,7 @@ class PostServiceTest {
             .depth1(addressDepth1)
             .depth2(addressDepth2)
             .depth3(addressDepth3)
-            .order(PostOrderType.LATEST.name())
+            .order(OrderType.LATEST.name())
             .cursor(cursor)
             .size(expectedSize)
             .build();
@@ -459,7 +459,7 @@ class PostServiceTest {
         createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), null, expectedSize);
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null, expectedSize);
 
         // when
         ScrollResponse<SimplePostResponse> actual = postService.getScrollByAuthor(null,
@@ -479,7 +479,7 @@ class PostServiceTest {
         long lastId = createPostsAndGetLastId(totalSize);
         int expectedSize = 10;
         String idCursor = String.valueOf(lastId - expectedSize + 1);
-        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), idCursor,
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), idCursor,
             expectedSize);
 
         // when
@@ -503,7 +503,7 @@ class PostServiceTest {
         createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(PostOrderType.MOST_POPULAR.name(), null,
+        ScrollRequest request = new ScrollRequest(OrderType.MOST_POPULAR.name(), null,
             expectedSize);
 
         // when
@@ -527,7 +527,7 @@ class PostServiceTest {
         int expectedSize = 10;
         String idCursor = String.valueOf(lastId - expectedSize + 1);
         String cursor = "0000000000000000".substring(0, 16 - idCursor.length()) + idCursor;
-        ScrollRequest request = new ScrollRequest(PostOrderType.MOST_POPULAR.name(), cursor,
+        ScrollRequest request = new ScrollRequest(OrderType.MOST_POPULAR.name(), cursor,
             expectedSize);
 
         // when
@@ -553,7 +553,7 @@ class PostServiceTest {
         postRepository.save(PostTexture.createPrivatePost(user));
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), null,
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null,
             expectedSize);
 
         // when
@@ -572,7 +572,7 @@ class PostServiceTest {
         createPostsAndGetLastId(totalSize);
 
         int expectedSize = 10;
-        ScrollRequest request = new ScrollRequest(PostOrderType.LATEST.name(), null, expectedSize);
+        ScrollRequest request = new ScrollRequest(OrderType.LATEST.name(), null, expectedSize);
         long invalidId = PostTexture.getRandomId();
 
         // when
