@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import team.silvertown.masil.common.response.ScrollResponse;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.post.dto.request.PostOrderType;

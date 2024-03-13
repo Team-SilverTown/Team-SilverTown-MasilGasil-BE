@@ -1,4 +1,4 @@
-package team.silvertown.masil.common.response;
+package team.silvertown.masil.common.scroll.dto;
 
 import java.util.List;
 
