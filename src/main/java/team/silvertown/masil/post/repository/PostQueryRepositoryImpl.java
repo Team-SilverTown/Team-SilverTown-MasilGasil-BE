@@ -59,7 +59,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     ) {
         // TODO: 좋아요 구현 후 로그인한 사용자 본인이 좋아요한 포스트인지 쿼리 추가
         Predicate openness = getOpenness(loginUser, author);
-        BooleanBuilder condition = getBasicCondition(request, openness);
+        BooleanBuilder condition = getBasicCondition(request, openness)
+            .and(post.user.eq(author));
 
         return queryPostsWith(loginUser, condition, request);
     }
