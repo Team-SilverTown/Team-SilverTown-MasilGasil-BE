@@ -115,11 +115,7 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        if (Objects.nonNull(loginId) && loginId.equals(userId)) {
-            return MyPageInfoResponse.from(user);
-        }
-
-        if (!user.getIsPublic()) {
+        if (!Objects.equals(loginId, userId) && !user.getIsPublic()) {
             return MyPageInfoResponse.fromPrivateUser(user);
         }
 
