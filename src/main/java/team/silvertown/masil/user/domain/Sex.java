@@ -12,14 +12,14 @@ public enum Sex {
     FEMALE;
 
     public static Sex get(String value) {
-        if (Objects.nonNull(value)) {
-            return Arrays.stream(Sex.values())
-                .filter(sex -> sex.name()
-                    .equals(value))
-                .findFirst()
-                .orElseThrow(() -> new BadRequestException(UserErrorCode.INVALID_SEX));
+        if (Objects.isNull(value)) {
+            return null;
         }
 
-        return null;
+        return Arrays.stream(Sex.values())
+            .filter(sex -> sex.name()
+                .equals(value))
+            .findFirst()
+            .orElseThrow(() -> new BadRequestException(UserErrorCode.INVALID_SEX));
     }
 }

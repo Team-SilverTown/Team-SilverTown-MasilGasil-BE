@@ -13,16 +13,16 @@ public enum ExerciseIntensity {
     SUPER_HIGH;
 
     public static ExerciseIntensity get(String value) {
-        if (Objects.nonNull(value)) {
-            return Arrays.stream(ExerciseIntensity.values())
-                .filter(exerciseIntensity -> exerciseIntensity.name()
-                    .equals(value))
-                .findFirst()
-                .orElseThrow(
-                    () -> new BadRequestException(UserErrorCode.INVALID_EXERCISE_INTENSITY));
+        if (Objects.isNull(value)) {
+            return null;
         }
 
-        return null;
+        return Arrays.stream(ExerciseIntensity.values())
+            .filter(exerciseIntensity -> exerciseIntensity.name()
+                .equals(value))
+            .findFirst()
+            .orElseThrow(
+                () -> new BadRequestException(UserErrorCode.INVALID_EXERCISE_INTENSITY));
     }
 
 }
