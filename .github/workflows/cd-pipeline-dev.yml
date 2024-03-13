@@ -39,6 +39,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Redis 실행
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: 7.2.4-alpine
+          redis-port: 6379
+
       - name: application.yml 오버라이드
         uses: microsoft/variable-substitution@v1
         with:
