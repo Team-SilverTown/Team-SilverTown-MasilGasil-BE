@@ -1,10 +1,8 @@
-package team.silvertown.masil.post.dto.request;
+package team.silvertown.masil.common.scroll.dto;
 
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
-import team.silvertown.masil.common.map.MapErrorCode;
-import team.silvertown.masil.common.response.ScrollRequest;
-import team.silvertown.masil.post.validator.PostValidator;
 
 @Getter
 public final class NormalListRequest {
@@ -33,10 +31,8 @@ public final class NormalListRequest {
         return this.scrollRequest.getSize();
     }
 
-    public void validateAddress() {
-        PostValidator.notBlank(depth1, MapErrorCode.BLANK_DEPTH1);
-        PostValidator.notNull(depth2, MapErrorCode.NULL_DEPTH2);
-        PostValidator.notBlank(depth3, MapErrorCode.BLANK_DEPTH3);
+    public boolean isBasedOnAddress() {
+        return Objects.nonNull(depth1) && Objects.nonNull(depth2) && Objects.nonNull(depth3);
     }
 
 }

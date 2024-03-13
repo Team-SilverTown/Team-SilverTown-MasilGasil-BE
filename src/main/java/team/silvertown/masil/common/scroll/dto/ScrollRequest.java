@@ -1,13 +1,13 @@
-package team.silvertown.masil.common.response;
+package team.silvertown.masil.common.scroll.dto;
 
 import lombok.Getter;
+import team.silvertown.masil.common.scroll.OrderType;
 import team.silvertown.masil.common.validator.ScrollValidator;
-import team.silvertown.masil.post.dto.request.PostOrderType;
 
 @Getter
 public final class ScrollRequest {
 
-    private final PostOrderType order;
+    private final OrderType order;
     private final String cursor;
     private final int size;
 
@@ -16,7 +16,7 @@ public final class ScrollRequest {
         String cursor,
         int size
     ) {
-        PostOrderType orderType = PostOrderType.get(order);
+        OrderType orderType = OrderType.get(order);
 
         ScrollValidator.validateCursorFormat(cursor, orderType);
 
