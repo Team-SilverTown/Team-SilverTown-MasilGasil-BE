@@ -10,7 +10,7 @@ import team.silvertown.masil.common.scroll.dto.ScrollErrorCode;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ScrollValidator extends Validator {
 
-    private static final int ID_CURSOR_LENGTH = 11;
+    private static final int ID_CURSOR_LENGTH = 16;
     private static final String INITIAL_CURSUR = "0";
 
     public static void validateCursorFormat(String cursor, OrderType order) {
