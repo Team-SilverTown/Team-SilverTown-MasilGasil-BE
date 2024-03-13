@@ -24,8 +24,13 @@ public class HttpRequestsConfigurer
         "/swagger-resources/**"
     };
     private static final String AUTH_RESOURCE = "/api/v1/users/login";
-    private static final String[] POST_GET_RESOURCES = {
-        "/api/v1/posts"
+    private static final String[] GET_PERMIT_ALL_RESOURCES = {
+        // posts
+        "/api/v1/posts",
+        "/api/v1/posts/**",
+
+        // mates
+        "/api/v1/mates/**"
     };
     private static final String ADMIN_PANEL = "/{0}/**";
 
@@ -40,7 +45,7 @@ public class HttpRequestsConfigurer
             .permitAll()
             .requestMatchers(AUTH_RESOURCE)
             .permitAll()
-            .requestMatchers(HttpMethod.GET, POST_GET_RESOURCES)
+            .requestMatchers(HttpMethod.GET, GET_PERMIT_ALL_RESOURCES)
             .permitAll()
             .requestMatchers(MessageFormat.format(ADMIN_PANEL, snapAdminProperties.getBaseUrl()))
             .permitAll()
