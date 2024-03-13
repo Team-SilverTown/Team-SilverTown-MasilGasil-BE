@@ -6,12 +6,15 @@ import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
 import team.silvertown.masil.common.response.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
+import team.silvertown.masil.post.domain.PostViewHistory;
 import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
@@ -23,6 +26,7 @@ import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
+import team.silvertown.masil.post.repository.PostViewHistoryRepository;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.repository.UserRepository;
 
@@ -33,6 +37,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostPinRepository postPinRepository;
+    private final PostViewHistoryRepository postViewHistoryRepository;
 
     @Transactional
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
@@ -45,11 +50,13 @@ public class PostService {
         return new CreatePostResponse(post.getId());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PostDetailResponse getById(Long id) {
         Post post = postRepository.findById(id)
             .orElseThrow(throwNotFound(PostErrorCode.POST_NOT_FOUND));
         List<PostPinDetailResponse> pins = PostPinDetailResponse.listFrom(post);
+
+        increasePostViewCount(post);
 
         return PostDetailResponse.from(post, pins);
     }
@@ -98,6 +105,25 @@ public class PostService {
         PostPin postPin = createPin(pin, post);
 
         postPinRepository.save(postPin);
+    }
+
+    private void increasePostViewCount(Post post) {
+        String ipAddress = getIpAddress();
+        PostViewHistory history = new PostViewHistory(post.getId(), ipAddress);
+        boolean hasHistory = postViewHistoryRepository.existsById(history.getKey());
+
+        if (hasHistory) {
+            return;
+        }
+
+        postViewHistoryRepository.save(history);
+        post.increaseViewCount();
+    }
+
+    private String getIpAddress() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+            .getRequest()
+            .getRemoteAddr();
     }
 
     private PostPin createPin(CreatePostPinRequest request, Post post) {
