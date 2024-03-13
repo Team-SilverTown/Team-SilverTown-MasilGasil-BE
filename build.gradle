@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+    // spring starter
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -35,6 +36,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.projectlombok:lombok'
+
+    // guava
+    implementation 'com.google.guava:guava:33.0.0-jre'
 
     // MySQL
     runtimeOnly 'com.mysql:mysql-connector-j'
