@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -34,6 +35,7 @@ import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
+import team.silvertown.masil.post.repository.PostViewHistoryRepository;
 import team.silvertown.masil.texture.MapTexture;
 import team.silvertown.masil.texture.MasilTexture;
 import team.silvertown.masil.texture.PostTexture;
@@ -54,6 +56,9 @@ class PostServiceTest {
 
     @Autowired
     PostPinRepository postPinRepository;
+
+    @Autowired
+    PostViewHistoryRepository postViewHistoryRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -82,6 +87,11 @@ class PostServiceTest {
         totalTime = PostTexture.getRandomPositive();
 
         entityManager.clear();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        postViewHistoryRepository.deleteAll();
     }
 
     @ParameterizedTest
@@ -148,7 +158,45 @@ class PostServiceTest {
             .hasFieldOrPropertyWithValue("distance", expected.getDistance())
             .hasFieldOrPropertyWithValue("totalTime", expected.getTotalTime())
             .hasFieldOrPropertyWithValue("isPublic", expected.isPublic())
-            .hasFieldOrPropertyWithValue("viewCount", expected.getViewCount())
+            .hasFieldOrPropertyWithValue("viewCount", expected.getViewCount() + 1)
+            .hasFieldOrPropertyWithValue("likeCount", expected.getLikeCount())
+            .hasFieldOrPropertyWithValue("authorId", user.getId())
+            .hasFieldOrPropertyWithValue("authorName", user.getNickname());
+        assertThat(actual.pins()).hasSize(pinSize);
+    }
+
+    @Test
+    void 같은_IP로_산책로_포스트_단일_조회_시_조회수가_한_번만_증가한다() {
+        // given
+        Post post = PostTexture.createDependentPost(user, 10000);
+        Post expected = postRepository.save(post);
+        int pinSize = 10;
+        User author = post.getUser();
+        List<PostPin> postPins = PostTexture.createDependentPostPins(expected, author.getId(),
+            pinSize);
+
+        postPinRepository.saveAll(postPins);
+        entityManager.clear();
+
+        // when
+        for (int i = 0; i < 10; i++) {
+            postService.getById(expected.getId());
+        }
+
+        PostDetailResponse actual = postService.getById(expected.getId());
+
+        // then
+        assertThat(actual)
+            .hasFieldOrPropertyWithValue("id", expected.getId())
+            .hasFieldOrPropertyWithValue("depth1", expected.getDepth1())
+            .hasFieldOrPropertyWithValue("depth2", expected.getDepth2())
+            .hasFieldOrPropertyWithValue("depth3", expected.getDepth3())
+            .hasFieldOrPropertyWithValue("depth4", expected.getDepth4())
+            .hasFieldOrPropertyWithValue("title", expected.getTitle())
+            .hasFieldOrPropertyWithValue("distance", expected.getDistance())
+            .hasFieldOrPropertyWithValue("totalTime", expected.getTotalTime())
+            .hasFieldOrPropertyWithValue("isPublic", expected.isPublic())
+            .hasFieldOrPropertyWithValue("viewCount", expected.getViewCount() + 1)
             .hasFieldOrPropertyWithValue("likeCount", expected.getLikeCount())
             .hasFieldOrPropertyWithValue("authorId", user.getId())
             .hasFieldOrPropertyWithValue("authorName", user.getNickname());
