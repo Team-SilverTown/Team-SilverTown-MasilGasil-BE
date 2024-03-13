@@ -30,6 +30,7 @@ public class HttpRequestsConfigurer
         "/api/v1/posts/**",
 
         // mates
+        "/api/v1/mates",
         "/api/v1/mates/**"
     };
     private static final String ADMIN_PANEL = "/{0}/**";
