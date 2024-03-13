@@ -1,4 +1,4 @@
-package team.silvertown.masil.mate.repository;
+package team.silvertown.masil.mate.repository.participant;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -6,10 +6,12 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
 import team.silvertown.masil.mate.domain.QMate;
 import team.silvertown.masil.mate.domain.QMateParticipant;
+import team.silvertown.masil.user.domain.QUser;
 import team.silvertown.masil.user.domain.User;
 
 @Repository
@@ -37,6 +39,18 @@ public class MateParticipantQueryRepositoryImpl implements MateParticipantQueryR
             .fetch();
 
         return !participants.isEmpty();
+    }
+
+    @Override
+    public List<MateParticipant> findAllByMate(Mate mate) {
+        QUser user = QUser.user;
+
+        return jpaQueryFactory
+            .selectFrom(mateParticipant)
+            .join(mateParticipant.user, user)
+            .fetchJoin()
+            .where(mateParticipant.mate.eq(mate))
+            .fetch();
     }
 
 }
