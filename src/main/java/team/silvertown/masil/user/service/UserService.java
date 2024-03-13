@@ -128,20 +128,21 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        String profileUrl = null;
-        if (Objects.nonNull(profileImg)) {
-            profileUrl = getProfileUrl(profileImg);
-        }
-
+        String profileUrl = getProfileUrl(profileImg);
         user.updateProfile(profileUrl);
     }
 
     private String getProfileUrl(MultipartFile profileImg) {
-        String profileUrl;
-        ImageFileServiceValidator.validateImgFile(profileImg);
-        URI uploadedUri = imageService.upload(profileImg);
-        profileUrl = uploadedUri.toString();
-        return profileUrl;
+        if (Objects.nonNull(profileImg)) {
+            String profileUrl;
+            ImageFileServiceValidator.validateImgFile(profileImg);
+            URI uploadedUri = imageService.upload(profileImg);
+            profileUrl = uploadedUri.toString();
+
+            return profileUrl;
+        }
+
+        return null;
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
