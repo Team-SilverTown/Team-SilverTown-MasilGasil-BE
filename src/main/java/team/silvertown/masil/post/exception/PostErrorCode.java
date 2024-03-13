@@ -24,7 +24,9 @@ public enum PostErrorCode implements ErrorCode {
     PIN_OWNER_NOT_MATCHING(202_30300, "산책로 포스트의 사용자와 핀의 사용자가 다릅니다"),
 
     NULL_USER(202_90000, "산책로 포스트 사용자를 확인할 수 없습니다"),
-    USER_NOT_FOUND(202_90400, "로그인한 사용자가 존재하지 않습니다");
+    USER_NOT_FOUND(202_90400, "로그인한 사용자가 존재하지 않습니다"),
+
+    INVALID_IP_ADDRESS(202_16001, "IP 주소가 올바르지 않습니다");
 
     private final int code;
     private final String message;
