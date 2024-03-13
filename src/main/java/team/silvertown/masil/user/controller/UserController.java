@@ -105,10 +105,10 @@ public class UserController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "카카오 토큰으로 로그인")
+    @Operation(summary = "유저 프로필 사진 업데이트")
     @ApiResponse(
         responseCode = "204",
-        description = "유저 프로필 사진 업데이트"
+        description = "프로필 사진을 보내 유저 프로필 사진 변경"
     )
     public ResponseEntity<Void> profileUpdate(
         @RequestPart
