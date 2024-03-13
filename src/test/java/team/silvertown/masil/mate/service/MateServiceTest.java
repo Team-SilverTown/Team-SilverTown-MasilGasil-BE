@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,8 @@ import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.map.KakaoPoint;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
@@ -29,6 +33,7 @@ import team.silvertown.masil.mate.dto.response.CreateMateParticipantResponse;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
 import team.silvertown.masil.mate.dto.response.MateDetailResponse;
 import team.silvertown.masil.mate.dto.response.ParticipantResponse;
+import team.silvertown.masil.mate.dto.response.SimpleMateResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.mate.repository.mate.MateRepository;
 import team.silvertown.masil.mate.repository.participant.MateParticipantRepository;
@@ -203,6 +208,7 @@ class MateServiceTest {
     }
 
     @Test
+<<<<<<< HEAD
     void 메이트_참여_요청을_성공한다() {
         // give
         User user = userRepository.save(UserTexture.createValidUser());
@@ -222,10 +228,104 @@ class MateServiceTest {
 
         assertThat(actual.id()).isEqualTo(expected.getId());
         assertThat(expected.getStatus()).isEqualTo(ParticipantStatus.REQUESTED);
+=======
+    void 메이트_모집을_최신순_조회를_성공한다() {
+        // given
+        int totalSize = MateTexture.getRandomInt(21, 99);
+
+        createMatesAndGetLastId(totalSize);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(post.getDepth1())
+            .depth2(post.getDepth2())
+            .depth3(post.getDepth3())
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimpleMateResponse> actual = mateService.getScrollByAddress(request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(expectedSize - 1);
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @Test
+    void 다음_커서_기반으로_산책로_포스트_최신순_조회를_성공한다() {
+        // given
+        int totalSize = MateTexture.getRandomInt(21, 99);
+        long lastId = createMatesAndGetLastId(totalSize);
+        int expectedSize = 10;
+        String idCursor = String.valueOf(lastId - expectedSize + 1);
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(post.getDepth1())
+            .depth2(post.getDepth2())
+            .depth3(post.getDepth3())
+            .cursor(idCursor)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimpleMateResponse> actual = mateService.getScrollByAddress(request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(
+            (int) (lastId - (Integer.parseInt(idCursor) - expectedSize)));
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    @Test
+    void 메이트_모집이_없어도_목록_조회를_성공한다() {
+        // given
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(post.getDepth1())
+            .depth2(post.getDepth2())
+            .depth3(post.getDepth3())
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimpleMateResponse> actual = mateService.getScrollByAddress(request);
+
+        // then
+        assertThat(actual.isEmpty()).isTrue();
+        assertThat(actual.contents()).isEmpty();
+        assertThat(actual.nextCursor()).isNull();
+    }
+
+    @Test
+    void 조회_대상_메이트_모집_수가_조회_사이즈보다_작으면_다음_커서가_없다() {
+        // given
+        int actualSize = MateTexture.getRandomInt(1, 9);
+
+        createMatesAndGetLastId(actualSize);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(post.getDepth1())
+            .depth2(post.getDepth2())
+            .depth3(post.getDepth3())
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimpleMateResponse> actual = mateService.getScrollByAddress(request);
+
+        // then
+        assertThat(actual.contents()).hasSize(actualSize);
+        assertThat(actual.nextCursor()).isNull();
+>>>>>>> 4447400 (feat: 메이트 목록 조회 서비스 구현)
     }
 
     @ParameterizedTest
     @NullAndEmptySource
+<<<<<<< HEAD
     @ValueSource(strings = " ")
     void 메세지가_빈_값이어도_메이트_참가_요청을_성공한다(String blankMessage) {
         // given
@@ -334,6 +434,60 @@ class MateServiceTest {
         // then
         assertThatExceptionOfType(DuplicateResourceException.class).isThrownBy(apply)
             .withMessage(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME.getMessage());
+=======
+    @ValueSource(strings = {" ", "0"})
+    void 커서가_빈_값이거나_0이면_처음부터_목록_조회한다(String cursor) {
+        // given
+        int totalSize = MateTexture.getRandomInt(21, 99);
+
+        createMatesAndGetLastId(totalSize);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(post.getDepth1())
+            .depth2(post.getDepth2())
+            .depth3(post.getDepth3())
+            .cursor(cursor)
+            .size(expectedSize)
+            .build();
+
+        // when
+        ScrollResponse<SimpleMateResponse> actual = mateService.getScrollByAddress(request);
+
+        // then
+        String expectedLastCursor = getLastLatestCursor(expectedSize - 1);
+
+        assertThat(actual.contents()).hasSize(expectedSize);
+        assertThat(actual.nextCursor()).contains(expectedLastCursor);
+    }
+
+    long createMatesAndGetLastId(int size) {
+        List<Mate> mates = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            mates.add(
+                MateTexture.createMateWithAddress(author, post, post.getDepth1(), post.getDepth2(),
+                    post.getDepth3()));
+        }
+
+        List<Mate> saved = mateRepository.saveAll(mates);
+
+        return saved.get(saved.size() - 1)
+            .getId();
+    }
+
+    private String getLastLatestCursor(int skipSize) {
+        List<Mate> mates = mateRepository.findAll();
+
+        Collections.reverse(mates);
+
+        return mates.stream()
+            .skip(skipSize)
+            .findFirst()
+            .orElseThrow()
+            .getId()
+            .toString();
+>>>>>>> 4447400 (feat: 메이트 목록 조회 서비스 구현)
     }
 
 }

@@ -36,6 +36,23 @@ public class MateTexture extends BaseDomainTexture {
             .atOffset(ZoneOffset.of("+09:00"));
     }
 
+    public static Mate createMateWithAddress(
+        User author,
+        Post post,
+        String depth1,
+        String depth2,
+        String depth3
+    ) {
+        String title = getRandomSentenceWithMax(30);
+        String content = getRandomSentenceWithMax(10000);
+        Point point = MapTexture.createPoint();
+        String detail = getRandomSentenceWithMax(50);
+        int capacity = getRandomInt(1, 10);
+
+        return createMate(author, post, depth1, depth2, depth3, "", title, content, point, detail,
+            OffsetDateTime.now().plusMinutes(5), capacity);
+    }
+
     public static Mate createDependentMate(User user, Post post) {
         return createDependentMate(user, post, getFutureDateTime());
     }
