@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -20,9 +21,11 @@ import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
 import team.silvertown.masil.mate.dto.request.CreateMateRequest;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
+import team.silvertown.masil.mate.dto.response.MateDetailResponse;
+import team.silvertown.masil.mate.dto.response.ParticipantResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
-import team.silvertown.masil.mate.repository.MateParticipantRepository;
-import team.silvertown.masil.mate.repository.MateRepository;
+import team.silvertown.masil.mate.repository.mate.MateRepository;
+import team.silvertown.masil.mate.repository.participant.MateParticipantRepository;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.repository.PostRepository;
 import team.silvertown.masil.texture.MapTexture;
@@ -158,6 +161,39 @@ class MateServiceTest {
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(create)
             .withMessage(MateErrorCode.POST_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 메이트_모집_상세_조회를_성공한다() {
+        // given
+        Mate expected = mateRepository.save(MateTexture.createDependentMate(author, post));
+        MateParticipant savedAuthor = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(author, expected, ParticipantStatus.ACCEPTED.name()));
+
+        // when
+        MateDetailResponse actual = mateService.getDetailById(expected.getId());
+
+        // then
+        ParticipantResponse expectedAuthor = ParticipantResponse.from(savedAuthor);
+
+        assertThat(actual)
+            .hasFieldOrPropertyWithValue("id", expected.getId())
+            .hasFieldOrPropertyWithValue("participants", List.of(expectedAuthor))
+            .hasFieldOrPropertyWithValue("authorId", author.getId())
+            .hasFieldOrPropertyWithValue("authorNickname", author.getNickname());
+    }
+
+    @Test
+    void 메이트가_존재하지_않으면_메이트_상세_조회를_실패한다() {
+        // given
+        long invalidId = MateTexture.getRandomId();
+
+        // when
+        ThrowingCallable getDetailById = () -> mateService.getDetailById(invalidId);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getDetailById)
+            .withMessage(MateErrorCode.MATE_NOT_FOUND.getMessage());
     }
 
 }
