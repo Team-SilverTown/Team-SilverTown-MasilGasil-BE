@@ -35,8 +35,6 @@ import team.silvertown.masil.user.domain.User;
 @Getter
 public class Masil extends BaseEntity {
 
-    @OneToMany(mappedBy = "masil")
-    private final List<MasilPin> masilPins = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,6 +61,8 @@ public class Masil extends BaseEntity {
     @Column(name = "started_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     @TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
     private OffsetDateTime startedAt;
+    @OneToMany(mappedBy = "masil")
+    private final List<MasilPin> masilPins = new ArrayList<>();
 
     @Builder
     private Masil(
