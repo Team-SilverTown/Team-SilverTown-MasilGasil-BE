@@ -11,8 +11,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
+<<<<<<< HEAD
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollRequest;
+=======
+>>>>>>> 3f6963a (feat: 메이트 모집 목록 조회 요청 응답 dto 구현)
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;

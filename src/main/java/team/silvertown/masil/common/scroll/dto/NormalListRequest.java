@@ -19,7 +19,11 @@ public final class NormalListRequest {
         String depth3,
         String order,
         String cursor,
+<<<<<<< HEAD
         Integer size
+=======
+        int size
+>>>>>>> 3f6963a (feat: 메이트 모집 목록 조회 요청 응답 dto 구현)
     ) {
         this.depth1 = depth1;
         this.depth2 = depth2;
