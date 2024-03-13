@@ -25,15 +25,11 @@ public class UserValidator extends Validator {
         notMatching(nickname, VALID_NICKNAME_PATTERN, userErrorCode);
     }
 
-    public static boolean validateSex(String sex, UserErrorCode userErrorCode) {
+    public static void validateSex(String sex, UserErrorCode userErrorCode) {
         if (sex != null) {
             notBlank(sex, userErrorCode);
             Sex.get(sex);
-
-            return true;
         }
-
-        return false;
     }
 
     public static void validateBirthDate(String birthDate, UserErrorCode userErrorCode) {
@@ -55,15 +51,12 @@ public class UserValidator extends Validator {
         }
     }
 
-    public static boolean validateExerciseIntensity(
+    public static void validateExerciseIntensity(
         String exerciseIntensity
     ) {
         if (exerciseIntensity != null) {
             ExerciseIntensity.get(exerciseIntensity);
-            return true;
         }
-
-        return false;
     }
 
     public static void validateIsAllowingMarketing(
