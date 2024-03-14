@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,8 +43,9 @@ public class MateParticipantController {
     ) {
         CreateMateParticipantResponse response = mateService.applyParticipation(
             userId, id, request);
+        URI uri = URI.create("/api/v1/mates/" + id);
 
-        return ResponseEntity.created(null)
+        return ResponseEntity.created(uri)
             .body(response);
     }
 
