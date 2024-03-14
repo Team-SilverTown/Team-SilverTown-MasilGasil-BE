@@ -1,5 +1,6 @@
 package team.silvertown.masil.mate.service;
 
+import java.util.List;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -14,9 +15,11 @@ import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
 import team.silvertown.masil.mate.dto.request.CreateMateRequest;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
+import team.silvertown.masil.mate.dto.response.MateDetailResponse;
+import team.silvertown.masil.mate.dto.response.ParticipantResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
-import team.silvertown.masil.mate.repository.MateParticipantRepository;
-import team.silvertown.masil.mate.repository.MateRepository;
+import team.silvertown.masil.mate.repository.mate.MateRepository;
+import team.silvertown.masil.mate.repository.participant.MateParticipantRepository;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.repository.PostRepository;
 import team.silvertown.masil.user.domain.User;
@@ -49,6 +52,18 @@ public class MateService {
         createMateParticipant(author, mate, ParticipantStatus.ACCEPTED.name());
 
         return new CreateMateResponse(mate.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public MateDetailResponse getDetailById(Long id) {
+        Mate mate = mateRepository.findDetailById(id)
+            .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
+        List<ParticipantResponse> participants = mateParticipantRepository.findAllByMate(mate)
+            .stream()
+            .map(ParticipantResponse::from)
+            .toList();
+
+        return MateDetailResponse.from(mate, participants);
     }
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
