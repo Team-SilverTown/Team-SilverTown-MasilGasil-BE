@@ -1,5 +1,6 @@
 package team.silvertown.masil.common.scroll.dto;
 
+import java.util.Objects;
 import lombok.Getter;
 import team.silvertown.masil.common.scroll.OrderType;
 import team.silvertown.masil.common.validator.ScrollValidator;
@@ -16,7 +17,7 @@ public final class ScrollRequest {
     public ScrollRequest(
         String order,
         String cursor,
-        int size
+        Integer size
     ) {
         OrderType orderType = OrderType.get(order);
 
@@ -24,7 +25,7 @@ public final class ScrollRequest {
 
         this.order = orderType;
         this.cursor = cursor;
-        this.size = (size == 0) ? DEFAULT_SIZE : size;
+        this.size = Objects.isNull(size) ? DEFAULT_SIZE : size;
     }
 
 }
