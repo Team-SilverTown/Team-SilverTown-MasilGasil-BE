@@ -7,6 +7,8 @@ import team.silvertown.masil.common.validator.ScrollValidator;
 @Getter
 public final class ScrollRequest {
 
+    private static final int DEFAULT_SIZE = 10;
+
     private final OrderType order;
     private final String cursor;
     private final int size;
@@ -22,7 +24,7 @@ public final class ScrollRequest {
 
         this.order = orderType;
         this.cursor = cursor;
-        this.size = size;
+        this.size = (size == 0) ? DEFAULT_SIZE : size;
     }
 
 }
