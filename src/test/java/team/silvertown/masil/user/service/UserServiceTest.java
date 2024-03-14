@@ -10,7 +10,6 @@ import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,8 +24,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
@@ -36,7 +33,6 @@ import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.texture.UserAuthorityTexture;
 import team.silvertown.masil.texture.UserTexture;
 import team.silvertown.masil.test.LocalstackTest;
-import team.silvertown.masil.texture.UserTexture;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
 import team.silvertown.masil.user.domain.Provider;
@@ -457,7 +453,7 @@ class UserServiceTest extends LocalstackTest {
             userRepository.save(user);
             UserAuthority userAuthority = UserAuthorityTexture.generateRestrictAuthority(user);
             userAuthorityRepository.save(userAuthority);
-            privateUser = UserTexture.privateUser();
+            privateUser = UserTexture.createPrivateUser();
             userRepository.save(privateUser);
             UserAuthority priavteUserAuthority = UserAuthorityTexture.generateRestrictAuthority(privateUser);
             userAuthorityRepository.save(priavteUserAuthority);

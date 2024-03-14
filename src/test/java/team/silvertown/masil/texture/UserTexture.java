@@ -37,7 +37,7 @@ public final class UserTexture extends BaseDomainTexture {
             String.valueOf(getRandomId()));
     }
 
-    public static User privateUser() {
+    public static User createPrivateUser() {
         String nickname = faker.funnyName()
             .name();
         LocalDate birthDate = faker.date()
