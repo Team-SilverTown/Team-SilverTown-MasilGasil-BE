@@ -22,7 +22,7 @@ import team.silvertown.masil.user.validator.UserValidator;
 
 @Entity
 @Table(name = "users")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
@@ -106,6 +106,10 @@ public class User extends BaseEntity {
     public void updateExerciseIntensity(String exerciseIntensity) {
         UserValidator.validateExerciseIntensity(exerciseIntensity);
         this.exerciseIntensity = ExerciseIntensity.valueOf(exerciseIntensity);
+    }
+
+    public void updateProfile(String profileImg) {
+        this.profileImg = profileImg;
     }
 
     public void toggleIsPublic() {

@@ -43,3 +43,7 @@ springdoc:
   swagger-ui:
     path: /docs
     filter: true
+snapadmin:
+  baseUrl: admin-panel
+  modelsPackage: team.silvertown.masil
+  sql-console-enabled: false
