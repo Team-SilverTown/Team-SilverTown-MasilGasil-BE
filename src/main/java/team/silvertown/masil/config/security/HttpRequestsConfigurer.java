@@ -25,6 +25,9 @@ public class HttpRequestsConfigurer
     };
     private static final String AUTH_RESOURCE = "/api/v1/users/login";
     private static final String[] GET_PERMIT_ALL_RESOURCES = {
+        // users
+        "api/v1/users/**",
+
         // posts
         "/api/v1/posts",
         "/api/v1/posts/**",
@@ -32,6 +35,7 @@ public class HttpRequestsConfigurer
         // mates
         "/api/v1/mates/**"
     };
+    private static final String USER_ME_RESOURCE = "/api/v1/users/me";
     private static final String ADMIN_PANEL = "/{0}/**";
 
     private final SnapAdminProperties snapAdminProperties;
@@ -49,6 +53,8 @@ public class HttpRequestsConfigurer
             .permitAll()
             .requestMatchers(MessageFormat.format(ADMIN_PANEL, snapAdminProperties.getBaseUrl()))
             .permitAll()
+            .requestMatchers(HttpMethod.GET, USER_ME_RESOURCE)
+            .authenticated()
             .anyRequest()
             .authenticated();
     }

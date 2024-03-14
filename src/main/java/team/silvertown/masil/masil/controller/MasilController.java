@@ -1,12 +1,16 @@
 package team.silvertown.masil.masil.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.masil.dto.request.CreateMasilRequest;
 import team.silvertown.masil.masil.dto.request.PeriodRequest;
@@ -29,7 +34,6 @@ import team.silvertown.masil.masil.service.MasilService;
 public class MasilController {
 
     public final MasilService masilService;
-
 
     @PostMapping("/api/v1/masils")
     @Operation(summary = "마실 생성")
@@ -69,6 +73,7 @@ public class MasilController {
     public ResponseEntity<RecentMasilResponse> getRecent(
         @AuthenticationPrincipal
         Long userId,
+        @RequestParam(required = false, defaultValue = "10")
         Integer size
     ) {
         RecentMasilResponse response = masilService.getRecent(userId, size);
@@ -85,9 +90,28 @@ public class MasilController {
             schema = @Schema(implementation = PeriodResponse.class)
         )
     )
+    @Parameters(
+        {
+            @Parameter(
+                name = "startDate",
+                in = ParameterIn.QUERY,
+                schema = @Schema(implementation = LocalDate.class),
+                example = "2024-03-12",
+                description = "없을 시 오늘이 포함된 월 초하루"
+            ),
+            @Parameter(
+                name = "endDate",
+                in = ParameterIn.QUERY,
+                schema = @Schema(implementation = LocalDate.class),
+                example = "2024-03-12",
+                description = "없을 시 시작 날짜가 포함된 월 말일"
+            )
+        }
+    )
     public ResponseEntity<PeriodResponse> getInGivenPeriod(
         @AuthenticationPrincipal
         Long userId,
+        @Parameter(hidden = true)
         PeriodRequest request
     ) {
         PeriodResponse response = masilService.getInGivenPeriod(userId, request);

@@ -1,6 +1,7 @@
 package team.silvertown.masil.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanInstantiationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -89,6 +90,19 @@ public class GlobalExceptionHandler {
         }
 
         return handleUnknownException((Exception) rootCause);
+    }
+
+    @ExceptionHandler(BeanInstantiationException.class)
+    public ResponseEntity<ErrorResponse> handleBeanInstantiationException(
+        BeanInstantiationException e
+    ) {
+        Throwable rootCause = e.getRootCause();
+
+        if (rootCause instanceof BadRequestException) {
+            return handleBadRequestException((BadRequestException) rootCause);
+        }
+
+        return handleUnknownException(e);
     }
 
 }

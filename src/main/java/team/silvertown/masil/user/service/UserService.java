@@ -1,16 +1,21 @@
 package team.silvertown.masil.user.service;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.image.service.ImageService;
+import team.silvertown.masil.image.validator.ImageFileServiceValidator;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
@@ -19,10 +24,12 @@ import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
+import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
@@ -38,6 +45,7 @@ public class UserService {
     private final UserAuthorityRepository userAuthorityRepository;
     private final KakaoOAuthService kakaoOAuthService;
     private final JwtTokenProvider tokenProvider;
+    private final ImageService imageService;
 
     @Transactional
     public LoginResponse login(String kakaoToken) {
@@ -57,7 +65,6 @@ public class UserService {
         }
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
-        assignDefaultAuthority(justSavedUser);
         String newUserToken = tokenProvider.createToken(justSavedUser.getId());
 
         return new LoginResponse(newUserToken);
@@ -70,11 +77,11 @@ public class UserService {
     }
 
     @Transactional
-    public void onboard(long userId, OnboardRequest request) {
+    public void onboard(OnboardRequest request, Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        checkNickname(request.nickname());
+        checkNickname(request.nickname(), user);
         update(user, request);
         UserAgreement userAgreement = getUserAgreement(request, user);
         Validator.throwIf(agreementRepository.existsByUser(user),
@@ -95,33 +102,61 @@ public class UserService {
     }
 
     @Transactional
-    public void updateInfo(Long memberId, UpdateRequest updateRequest) {
+    public UpdateResponse updateInfo(Long memberId, UpdateRequest updateRequest) {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
-        update(user, updateRequest);
-        user.toggleIsPublic();
+
+        checkNickname(updateRequest.nickname(), user);
+        return update(user, updateRequest);
     }
 
     public NicknameCheckResponse checkNickname(String nickname) {
         boolean isDuplicated = userRepository.existsByNickname(nickname);
+
         return NicknameCheckResponse.builder()
             .nickname(nickname)
             .isDuplicated(isDuplicated)
             .build();
     }
 
-    public MeInfoResponse getMe(Long memberId) {
-        User user = userRepository.findById(memberId)
+    public MyPageInfoResponse getMyPageInfo(Long userId, Long loginId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        if (!Objects.equals(loginId, userId) && !user.getIsPublic()) {
+            return MyPageInfoResponse.fromPrivateUser(user);
+        }
+
+        return MyPageInfoResponse.from(user);
+    }
+
+    public MeInfoResponse getMe(Long userId) {
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         return MeInfoResponse.from(user);
     }
 
-    private static UserAuthority generateUserAuthority(User user, Authority authority) {
-        return UserAuthority.builder()
-            .authority(authority)
-            .user(user)
-            .build();
+    @Transactional
+    public void updateProfile(MultipartFile profileImg, Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        String profileUrl = getProfileUrl(profileImg);
+        user.updateProfile(profileUrl);
+    }
+
+    private String getProfileUrl(MultipartFile profileImg) {
+        if (Objects.nonNull(profileImg)) {
+            String profileUrl;
+            ImageFileServiceValidator.validateImgFile(profileImg);
+            URI uploadedUri = imageService.upload(profileImg);
+            profileUrl = uploadedUri.toString();
+
+            return profileUrl;
+        }
+
+        return null;
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
@@ -144,20 +179,32 @@ public class UserService {
         user.updateExerciseIntensity(updateRequest.exerciseIntensity());
     }
 
-    private void update(User user, UpdateRequest updateRequest) {
+    private UpdateResponse update(User user, UpdateRequest updateRequest) {
+        checkNickname(updateRequest.nickname(), user);
+
         user.updateNickname(updateRequest.nickname());
         user.updateSex(updateRequest.sex());
         user.updateBirthDate(updateRequest.birthDate());
         user.updateHeight(updateRequest.height());
         user.updateWeight(updateRequest.weight());
         user.updateExerciseIntensity(updateRequest.exerciseIntensity());
+
+        return UpdateResponse.from(user);
+    }
+
+    private void checkNickname(String nickname, User user) {
+        boolean isDuplicated = userRepository.existsByNickname(nickname);
+
+        if (isDuplicated && !Objects.equals(user.getNickname(), nickname)){
+            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
+        }
     }
 
     private UserAgreement getUserAgreement(OnboardRequest request, User user) {
         OffsetDateTime marketingConsentedAt = request.isAllowingMarketing() ? OffsetDateTime.now()
             : null;
 
-        UserAgreement userAgreement = UserAgreement.builder()
+        return UserAgreement.builder()
             .user(user)
             .isAllowingMarketing(request.isAllowingMarketing())
             .isLocationInfoConsented(request.isLocationInfoConsented())
@@ -165,8 +212,6 @@ public class UserService {
             .isUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed())
             .marketingConsentedAt(marketingConsentedAt)
             .build();
-
-        return userAgreement;
     }
 
     private User createAndSave(Provider authenticatedProvider, String providerId) {
@@ -188,6 +233,13 @@ public class UserService {
     private void assignDefaultAuthority(User user) {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
+    }
+
+    private UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
+            .build();
     }
 
 }

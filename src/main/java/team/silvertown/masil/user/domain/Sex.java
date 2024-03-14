@@ -1,6 +1,7 @@
 package team.silvertown.masil.user.domain;
 
 import java.util.Arrays;
+import java.util.Objects;
 import lombok.Getter;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -11,6 +12,10 @@ public enum Sex {
     FEMALE;
 
     public static Sex get(String value) {
+        if (Objects.isNull(value)) {
+            return null;
+        }
+
         return Arrays.stream(Sex.values())
             .filter(sex -> sex.name()
                 .equals(value))
