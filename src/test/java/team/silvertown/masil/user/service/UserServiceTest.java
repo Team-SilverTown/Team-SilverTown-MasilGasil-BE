@@ -27,6 +27,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.image.exception.ImageErrorCode;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
@@ -235,7 +236,8 @@ class UserServiceTest extends LocalstackTest {
                 .collect(Collectors.toList()))
                 .contains(Authority.NORMAL);
 
-            UserAgreement byUser = userAgreementRepository.findByUser(updatedUser).get();
+            UserAgreement byUser = userAgreementRepository.findByUser(updatedUser)
+                .get();
             assertThat(byUser.getIsLocationInfoConsented()).isTrue();
             assertThat(byUser.getIsPersonalInfoConsented()).isTrue();
             assertThat(byUser.getIsUnderAgeConsentConfirmed()).isTrue();
@@ -259,7 +261,7 @@ class UserServiceTest extends LocalstackTest {
             );
 
             //when
-            userService.onboard(unTypedUser.getId(), noSexAndExerciseIntensity);
+            userService.onboard(noSexAndExerciseIntensity, unTypedUser.getId());
             User updatedUser = userRepository.findById(unTypedUser.getId())
                 .get();
 
@@ -271,7 +273,9 @@ class UserServiceTest extends LocalstackTest {
         @Test
         public void 이미_사용중인_닉네임이_라면_예외가_발생한다() throws Exception {
             //given
-            User user = User.builder().nickname("nickname").build();
+            User user = User.builder()
+                .nickname("nickname")
+                .build();
             userRepository.save(user);
             OnboardRequest request = getNormalRequest();
             List<UserAuthority> beforeUpdatedAuthority = userAuthorityRepository.findByUser(
@@ -281,7 +285,7 @@ class UserServiceTest extends LocalstackTest {
                 .getAuthority()).isEqualTo(Authority.RESTRICTED);
 
             //when, then
-            assertThatThrownBy(() -> userService.onboard(unTypedUser.getId(), request))
+            assertThatThrownBy(() -> userService.onboard(request, unTypedUser.getId()))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage(UserErrorCode.DUPLICATED_NICKNAME.getMessage());
         }
@@ -500,7 +504,8 @@ class UserServiceTest extends LocalstackTest {
             userAuthorityRepository.save(userAuthority);
             privateUser = UserTexture.createPrivateUser();
             userRepository.save(privateUser);
-            UserAuthority priavteUserAuthority = UserAuthorityTexture.generateRestrictAuthority(privateUser);
+            UserAuthority priavteUserAuthority = UserAuthorityTexture.generateRestrictAuthority(
+                privateUser);
             userAuthorityRepository.save(priavteUserAuthority);
         }
 
@@ -643,5 +648,5 @@ class UserServiceTest extends LocalstackTest {
         }
 
     }
-    
+
 }
