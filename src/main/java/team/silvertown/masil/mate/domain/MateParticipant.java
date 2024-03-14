@@ -54,6 +54,7 @@ public class MateParticipant extends BaseEntity {
     ) {
         MateValidator.notNull(user, MateErrorCode.NULL_USER);
         MateValidator.notNull(mate, MateErrorCode.NULL_MATE);
+        MateValidator.validateMessage(message);
 
         this.user = user;
         this.mate = mate;

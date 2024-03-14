@@ -1,5 +1,6 @@
 package team.silvertown.masil.mate.validator;
 
+import io.micrometer.common.util.StringUtils;
 import java.time.OffsetDateTime;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ public final class MateValidator extends Validator {
     private static final int MAX_TITLE_LENGTH = 30;
     private static final int MAX_DETAIL_LENGTH = 50;
     private static final int MAX_CAPACITY = 10;
+    private static final int MAX_MESSAGE_LENGTH = 255;
 
     public static void validateTitle(String title) {
         notBlank(title, MateErrorCode.BLANK_TITLE);
@@ -35,6 +37,12 @@ public final class MateValidator extends Validator {
         notNull(capacity, MateErrorCode.NULL_CAPACITY);
         notUnder(capacity, 0, MateErrorCode.NON_POSITIVE_CAPACITY);
         notOver(capacity, MAX_CAPACITY, MateErrorCode.CAPACITY_TOO_LARGE);
+    }
+
+    public static void validateMessage(String message) {
+        if (StringUtils.isNotBlank(message)) {
+            notOver(message.length(), MAX_MESSAGE_LENGTH, MateErrorCode.MESSAGE_TOO_LONG);
+        }
     }
 
 }
