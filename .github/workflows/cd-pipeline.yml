@@ -14,14 +14,14 @@ env:
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}
   ECS_TASK_DEFINITION: .aws/${{ vars.ECS_TASK_DEFINITION }}
-  SPRING_ACTIVE_PROFILE: ${{ vars.SPRING_ACTIVE_PROFILE }}
+  SPRING_ACTIVE_PROFILE: ${{ vars.ENVIRONMENT }}
   SERVER_PORT: 8080
 
 jobs:
   job:
     name: Deploy API
     runs-on: ubuntu-latest
-    environment: ${{ vars.GITHUB_ENVIRONMENT }}
+    environment: ${{ vars.ENVIRONMENT }}
     steps:
       - name: 체크 아웃
         uses: actions/checkout@v3
