@@ -83,14 +83,14 @@ public class User extends BaseEntity {
     }
 
     public void updateSex(String sex) {
-        UserValidator.validateSex(sex, UserErrorCode.INVALID_SEX);
-        this.sex = Sex.valueOf(sex);
+        Sex validatedSex = Sex.get(sex);
+        this.sex = validatedSex;
     }
 
     public void updateBirthDate(String birthDate) {
         UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
-        this.birthDate = DateValidator.parseDate(birthDate,
-            UserErrorCode.INVALID_BIRTH_DATE);
+        this.birthDate = DateValidator.parseDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
+
     }
 
     public void updateHeight(Integer height) {
@@ -104,8 +104,12 @@ public class User extends BaseEntity {
     }
 
     public void updateExerciseIntensity(String exerciseIntensity) {
-        UserValidator.validateExerciseIntensity(exerciseIntensity);
-        this.exerciseIntensity = ExerciseIntensity.valueOf(exerciseIntensity);
+        ExerciseIntensity validatedIntensity = ExerciseIntensity.get(exerciseIntensity);
+        this.exerciseIntensity = validatedIntensity;
+    }
+
+    public void updateProfile(String profileImg) {
+        this.profileImg = profileImg;
     }
 
     public void toggleIsPublic() {
