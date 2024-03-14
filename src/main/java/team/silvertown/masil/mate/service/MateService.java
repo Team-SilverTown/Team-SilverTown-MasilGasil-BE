@@ -69,6 +69,7 @@ public class MateService {
         return MateDetailResponse.from(mate, participants);
     }
 
+    @Transactional(readOnly = true)
     public CreateMateParticipantResponse applyParticipation(
         Long userId,
         Long id,
