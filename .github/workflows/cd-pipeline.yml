@@ -9,19 +9,13 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-2
-  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
-  ECS_TASK_DEFINITION: .aws/${{ vars.ECS_TASK_DEFINITION }}
-  SPRING_ACTIVE_PROFILE: ${{ vars.ENVIRONMENT }}
   SERVER_PORT: 8080
 
 jobs:
   job:
     name: Deploy API
     runs-on: ubuntu-latest
-    environment: ${{ vars.ENVIRONMENT }}
+    environment: ${{ github.head_ref }}
     steps:
       - name: 체크 아웃
         uses: actions/checkout@v3
@@ -74,8 +68,9 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
-          PROFILE: ${{ env.SPRING_ACTIVE_PROFILE }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+          PROFILE: ${{ vars.ENVIRONMENT }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg PROFILE=$PROFILE .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -85,14 +80,14 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
+          task-definition: ${{ vars.ECS_TASK_DEFINITION }}
+          container-name: ${{ vars.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Amazon ECS task definition 배포
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ vars.ECS_CLUSTER }}
+          cluster: ${{ vars.ECS_SERVICE }}
           wait-for-service-stability: true
