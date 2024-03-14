@@ -1,6 +1,5 @@
 package team.silvertown.masil.mate.domain;
 
-import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,7 +49,7 @@ public class MateParticipant extends BaseEntity {
         User user,
         Mate mate,
         String message,
-        String status
+        ParticipantStatus status
     ) {
         MateValidator.notNull(user, MateErrorCode.NULL_USER);
         MateValidator.notNull(mate, MateErrorCode.NULL_MATE);
@@ -59,8 +58,7 @@ public class MateParticipant extends BaseEntity {
         this.user = user;
         this.mate = mate;
         this.message = message;
-        this.status = StringUtils.isBlank(status) ? ParticipantStatus.REQUESTED
-            : ParticipantStatus.get(status);
+        this.status = status;
     }
 
 }

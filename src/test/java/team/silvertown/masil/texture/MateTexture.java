@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
+import team.silvertown.masil.mate.domain.ParticipantStatus;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.user.domain.User;
 
@@ -84,7 +85,11 @@ public class MateTexture extends BaseDomainTexture {
             .build();
     }
 
-    public static MateParticipant createMateParticipant(User user, Mate mate, String status) {
+    public static MateParticipant createMateParticipant(
+        User user,
+        Mate mate,
+        ParticipantStatus status
+    ) {
         String message = faker.harryPotter()
             .quote();
 

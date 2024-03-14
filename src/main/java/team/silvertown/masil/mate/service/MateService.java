@@ -52,7 +52,7 @@ public class MateService {
             .orElseThrow(getNotFoundException(MateErrorCode.POST_NOT_FOUND));
         Mate mate = createMate(author, post, request);
 
-        createMateParticipant(author, mate, ParticipantStatus.ACCEPTED.name(), null);
+        createMateParticipant(author, mate, ParticipantStatus.ACCEPTED, null);
 
         return new CreateMateResponse(mate.getId());
     }
@@ -87,7 +87,7 @@ public class MateService {
         }
 
         MateParticipant mateParticipant = createMateParticipant(user, mate,
-            ParticipantStatus.REQUESTED.name(), request.message());
+            ParticipantStatus.REQUESTED, request.message());
 
         return new CreateMateParticipantResponse(mateParticipant.getId());
     }
@@ -119,7 +119,7 @@ public class MateService {
     private MateParticipant createMateParticipant(
         User user,
         Mate mate,
-        String status,
+        ParticipantStatus status,
         String message
     ) {
         MateParticipant mateParticipant = MateParticipant.builder()
