@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import team.silvertown.masil.mate.domain.Mate;
+import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.user.domain.User;
 
@@ -35,6 +36,10 @@ public class MateTexture extends BaseDomainTexture {
     }
 
     public static Mate createDependentMate(User user, Post post) {
+        return createDependentMate(user, post, getFutureDateTime());
+    }
+
+    public static Mate createDependentMate(User user, Post post, OffsetDateTime gatherAt) {
         String addressDepth1 = post.getDepth1();
         String addressDepth2 = post.getDepth2();
         String addressDepth3 = post.getDepth3();
@@ -43,7 +48,6 @@ public class MateTexture extends BaseDomainTexture {
         String content = getRandomSentenceWithMax(10000);
         Point point = MapTexture.createPoint();
         String detail = getRandomSentenceWithMax(50);
-        OffsetDateTime gatherAt = getFutureDateTime();
         int capacity = getRandomInt(1, 10);
 
         return createMate(user, post, addressDepth1, addressDepth2, addressDepth3, addressDepth4,
@@ -77,6 +81,18 @@ public class MateTexture extends BaseDomainTexture {
             .gatheringPlaceDetail(gatheringPlaceDetail)
             .gatheringAt(gatherAt)
             .capacity(capacity)
+            .build();
+    }
+
+    public static MateParticipant createMateParticipant(User user, Mate mate, String status) {
+        String message = faker.harryPotter()
+            .quote();
+
+        return MateParticipant.builder()
+            .user(user)
+            .mate(mate)
+            .status(status)
+            .message(message)
             .build();
     }
 

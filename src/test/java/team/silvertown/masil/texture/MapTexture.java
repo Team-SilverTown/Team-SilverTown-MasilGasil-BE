@@ -39,12 +39,16 @@ public final class MapTexture {
     }
 
     public static Point createPoint() {
+        KakaoPoint point = createKakaoPoint();
+
+        return KakaoPointMapper.mapToPoint(point);
+    }
+
+    public static KakaoPoint createKakaoPoint() {
         Random random = new Random();
         double latitude = random.nextDouble(-90, 90);
         double longitude = random.nextDouble(-180, 180);
-        KakaoPoint point = new KakaoPoint(latitude, longitude);
-
-        return KakaoPointMapper.mapToPoint(point);
+        return new KakaoPoint(latitude, longitude);
     }
 
 }
