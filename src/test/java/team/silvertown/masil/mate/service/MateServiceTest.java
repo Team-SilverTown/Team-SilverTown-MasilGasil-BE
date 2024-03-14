@@ -135,7 +135,7 @@ class MateServiceTest {
         Mate anotherMate = mateRepository.save(
             MateTexture.createDependentMate(anotherUser, anotherPost, gatherAt.plusMinutes(30)));
         MateParticipant mateParticipant = MateTexture.createMateParticipant(author, anotherMate,
-            ParticipantStatus.ACCEPTED.name());
+            ParticipantStatus.ACCEPTED);
 
         mateParticipantRepository.save(mateParticipant);
 
@@ -174,7 +174,7 @@ class MateServiceTest {
         // given
         Mate expected = mateRepository.save(MateTexture.createDependentMate(author, post));
         MateParticipant savedAuthor = mateParticipantRepository.save(
-            MateTexture.createMateParticipant(author, expected, ParticipantStatus.ACCEPTED.name()));
+            MateTexture.createMateParticipant(author, expected, ParticipantStatus.ACCEPTED));
 
         // when
         MateDetailResponse actual = mateService.getDetailById(expected.getId());
@@ -208,7 +208,7 @@ class MateServiceTest {
         User user = userRepository.save(UserTexture.createValidUser());
         Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
         mateParticipantRepository.save(MateTexture.createMateParticipant(this.author, mate,
-            ParticipantStatus.ACCEPTED.name()));
+            ParticipantStatus.ACCEPTED));
         String message = MateTexture.getRandomSentenceWithMax(255);
         CreateMateParticipantRequest request = new CreateMateParticipantRequest(message);
 
@@ -232,7 +232,7 @@ class MateServiceTest {
         User user = userRepository.save(UserTexture.createValidUser());
         Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
         mateParticipantRepository.save(MateTexture.createMateParticipant(this.author, mate,
-            ParticipantStatus.ACCEPTED.name()));
+            ParticipantStatus.ACCEPTED));
 
         CreateMateParticipantRequest request = new CreateMateParticipantRequest(blankMessage);
 
@@ -290,9 +290,9 @@ class MateServiceTest {
         Mate anotherMate = mateRepository.save(MateTexture.createDependentMate(author, post,
             mate.getGatheringAt().plusMinutes(future)));
         MateParticipant authorParticipation = MateTexture.createMateParticipant(this.author, mate,
-            ParticipantStatus.ACCEPTED.name());
+            ParticipantStatus.ACCEPTED);
         MateParticipant anotherParticipation = MateTexture.createMateParticipant(user, anotherMate,
-            ParticipantStatus.ACCEPTED.name());
+            ParticipantStatus.ACCEPTED);
 
         mateParticipantRepository.saveAll(List.of(authorParticipation, anotherParticipation));
 
@@ -318,9 +318,9 @@ class MateServiceTest {
         Mate anotherMate = mateRepository.save(MateTexture.createDependentMate(author, post,
             mate.getGatheringAt().minusMinutes(past)));
         MateParticipant authorParticipation = MateTexture.createMateParticipant(this.author, mate,
-            ParticipantStatus.ACCEPTED.name());
+            ParticipantStatus.ACCEPTED);
         MateParticipant anotherParticipation = MateTexture.createMateParticipant(user, anotherMate,
-            ParticipantStatus.ACCEPTED.name());
+            ParticipantStatus.ACCEPTED);
 
         mateParticipantRepository.saveAll(List.of(authorParticipation, anotherParticipation));
 
