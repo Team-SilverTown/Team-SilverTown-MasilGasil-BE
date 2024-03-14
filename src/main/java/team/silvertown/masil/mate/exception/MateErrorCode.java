@@ -10,7 +10,7 @@ public enum MateErrorCode implements ErrorCode {
     BLANK_CONTENT(11002, "메이트 모집 내용이 입력되지 않았습니다"),
     BLANK_DETAIL(11003, "메이트 모집 장소 상세정보가 입력되지 않았습니다"),
     DETAIL_TOO_LONG(11004, "메이트 모집 장소 상세정보 길이가 제한을 초과했습니다"),
-    BLANK_STATUS(11005, "메이트 참여 상태가 입력되지 않았습니다"),
+    BLANK_PARTICIPANT_STATUS(11005, "메이트 참여 상태가 입력되지 않았습니다"),
     INVALID_STATUS(11006, "올바르지 않은 메이트 참여 상태입니다"),
     MESSAGE_TOO_LONG(11007, "메세지가 너무 깁니다"),
 

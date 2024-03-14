@@ -17,7 +17,7 @@ public enum ParticipantStatus {
     }
 
     private boolean isMatching(String value) {
-        MateValidator.notBlank(value, MateErrorCode.BLANK_STATUS);
+        MateValidator.notBlank(value, MateErrorCode.BLANK_PARTICIPANT_STATUS);
 
         return value.equals(this.name());
     }

@@ -27,7 +27,7 @@ class ParticipantStatusTest {
 
         // then
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(get)
-            .withMessage(MateErrorCode.BLANK_STATUS.getMessage());
+            .withMessage(MateErrorCode.BLANK_PARTICIPANT_STATUS.getMessage());
     }
 
     @Test
