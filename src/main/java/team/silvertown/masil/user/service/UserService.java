@@ -106,6 +106,7 @@ public class UserService {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
+        checkNickname(updateRequest.nickname(), user);
         return update(user, updateRequest);
     }
 
