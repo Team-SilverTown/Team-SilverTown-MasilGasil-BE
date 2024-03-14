@@ -6,7 +6,7 @@ public enum UserErrorCode implements ErrorCode {
     INVALID_ALLOWING_MARKETING(10010000, "올바르지 않은 형식의 마케팅 동의입니다."),
     INVALID_PERSONAL_INFO_CONSENTED(10010001, "올바르지 않은 형식의 개인 정보 이용 동의입니다."),
     INVALID_LOCATION_INFO_CONSENTED(10010002, "올바르지 않은 형식의 위치 정보 이용 동의 동의입니다."),
-    INVALID_UNDER_AGE_CONSENTED(10010003, "올바르지 않은 형식의 이용 영령 동의입니다."),
+    INVALID_UNDER_AGE_CONSENTED(10010003, "올바르지 않은 형식의 이용 연령 동의입니다."),
     INVALID_NICKNAME(10011000, "올바르지 않은 형식의 닉네임 정보입니다."),
     INVALID_SEX(10011001, "올바르지 않은 형식의 성별 정보입니다."),
     INVALID_EXERCISE_INTENSITY(10011002, "올바르지 않은 형식의 운동강도 정보입니다."),
