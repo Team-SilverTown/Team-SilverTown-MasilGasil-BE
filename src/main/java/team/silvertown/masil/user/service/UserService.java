@@ -29,6 +29,7 @@ import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
+import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
@@ -80,7 +81,7 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        checkNickname(request.nickname());
+        checkNickname(request.nickname(), user);
         update(user, request);
         UserAgreement userAgreement = getUserAgreement(request, user);
         Validator.throwIf(agreementRepository.existsByUser(user),
@@ -101,15 +102,16 @@ public class UserService {
     }
 
     @Transactional
-    public void updateInfo(Long memberId, UpdateRequest updateRequest) {
+    public UpdateResponse updateInfo(Long memberId, UpdateRequest updateRequest) {
         User user = userRepository.findById(memberId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
-        update(user, updateRequest);
-        user.toggleIsPublic();
+
+        return update(user, updateRequest);
     }
 
     public NicknameCheckResponse checkNickname(String nickname) {
         boolean isDuplicated = userRepository.existsByNickname(nickname);
+
         return NicknameCheckResponse.builder()
             .nickname(nickname)
             .isDuplicated(isDuplicated)
@@ -176,13 +178,25 @@ public class UserService {
         user.updateExerciseIntensity(updateRequest.exerciseIntensity());
     }
 
-    private void update(User user, UpdateRequest updateRequest) {
+    private UpdateResponse update(User user, UpdateRequest updateRequest) {
+        checkNickname(updateRequest.nickname(), user);
+
         user.updateNickname(updateRequest.nickname());
         user.updateSex(updateRequest.sex());
         user.updateBirthDate(updateRequest.birthDate());
         user.updateHeight(updateRequest.height());
         user.updateWeight(updateRequest.weight());
         user.updateExerciseIntensity(updateRequest.exerciseIntensity());
+
+        return UpdateResponse.from(user);
+    }
+
+    private void checkNickname(String nickname, User user) {
+        boolean isDuplicated = userRepository.existsByNickname(nickname);
+
+        if (isDuplicated && !Objects.equals(user.getNickname(), nickname)){
+            throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
+        }
     }
 
     private UserAgreement getUserAgreement(OnboardRequest request, User user) {

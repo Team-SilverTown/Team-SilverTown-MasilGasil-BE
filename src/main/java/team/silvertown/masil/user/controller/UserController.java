@@ -29,6 +29,7 @@ import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
+import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.service.UserService;
 
 @RestController
@@ -141,16 +142,22 @@ public class UserController {
     }
 
     @PutMapping("/api/v1/users")
-    public ResponseEntity<Void> updateInfo(
+    @Operation(summary = "유저 정보 업데이트 요청")
+    @ApiResponse(
+        responseCode = "200",
+        description = "유저 정보 업데이트 요청 성공 후 바뀐 콘텐츠를 확인한다",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = UpdateResponse.class)
+        )
+    )
+    public ResponseEntity<UpdateResponse> updateInfo(
         @RequestBody
         UpdateRequest updateRequest,
         @AuthenticationPrincipal
         Long memberId
     ) {
-        userService.updateInfo(memberId, updateRequest);
-
-        return ResponseEntity.noContent()
-            .build();
+        return ResponseEntity.ok(userService.updateInfo(memberId, updateRequest));
     }
 
     @GetMapping("api/v1/users/{userId}")
