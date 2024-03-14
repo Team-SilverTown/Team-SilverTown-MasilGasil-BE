@@ -9,18 +9,23 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
@@ -45,7 +50,7 @@ public class UserController {
         @AuthenticationPrincipal
         Long userId
     ) {
-        userService.onboard(userId, request);
+        userService.onboard(request, userId);
 
         return ResponseEntity.noContent()
             .build();
@@ -81,7 +86,6 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/users/login")
-    @SecurityRequirement(name = "토큰 받아오기")
     @Operation(summary = "카카오 토큰으로 로그인")
     @ApiResponse(
         responseCode = "200",
@@ -96,6 +100,28 @@ public class UserController {
         String accessToken
     ) {
         return ResponseEntity.ok(userService.login(accessToken));
+    }
+
+    @PutMapping(
+        value = "api/v1/users/profiles",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(summary = "유저 프로필 사진 업데이트")
+    @ApiResponse(
+        responseCode = "204",
+        description = "프로필 사진을 보내 유저 프로필 사진 변경"
+    )
+    public ResponseEntity<Void> profileUpdate(
+        @RequestPart
+        MultipartFile profileImg,
+        @AuthenticationPrincipal
+        Long userId
+    ) {
+        userService.updateProfile(profileImg, userId);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @PatchMapping("/api/v1/users/is-public")
@@ -125,6 +151,25 @@ public class UserController {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @GetMapping("api/v1/users/{userId}")
+    @Operation(summary = "유저 마이페이지 조회")
+    @ApiResponse(
+        responseCode = "200",
+        description = "유저의 마이페이지 정보 조회",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = MyPageInfoResponse.class)
+        )
+    )
+    public ResponseEntity<MyPageInfoResponse> getMyPage(
+        @PathVariable
+        Long userId,
+        @AuthenticationPrincipal
+        Long loginId
+    ) {
+        return ResponseEntity.ok(userService.getMyPageInfo(userId, loginId));
     }
 
 }
