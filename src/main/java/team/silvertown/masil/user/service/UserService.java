@@ -65,13 +65,15 @@ public class UserService {
         }
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
-        String newUserToken = tokenProvider.createToken(justSavedUser.getId());
+        List<Authority> authorities = getUserAuthorities(justSavedUser);
+        String newUserToken = tokenProvider.createToken(justSavedUser.getId(), authorities);
 
         return new LoginResponse(newUserToken);
     }
 
     private LoginResponse joinedUserResponse(User joinedUser) {
-        String token = tokenProvider.createToken(joinedUser.getId());
+        List<Authority> authorities = getUserAuthorities(joinedUser);
+        String token = tokenProvider.createToken(joinedUser.getId(), authorities);
 
         return new LoginResponse(token);
     }
@@ -162,7 +164,7 @@ public class UserService {
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
         boolean hasNormalAuthority = authorities.stream()
             .map(UserAuthority::getAuthority)
-            .anyMatch(a -> a.equals(Authority.NORMAL));
+            .anyMatch(a -> a == Authority.NORMAL);
 
         if (!hasNormalAuthority) {
             UserAuthority normalAuthority = generateUserAuthority(user, Authority.NORMAL);
@@ -195,7 +197,7 @@ public class UserService {
     private void checkNickname(String nickname, User user) {
         boolean isDuplicated = userRepository.existsByNickname(nickname);
 
-        if (isDuplicated && !Objects.equals(user.getNickname(), nickname)){
+        if (isDuplicated && !Objects.equals(user.getNickname(), nickname)) {
             throw new DuplicateResourceException(UserErrorCode.DUPLICATED_NICKNAME);
         }
     }
@@ -233,6 +235,14 @@ public class UserService {
     private void assignDefaultAuthority(User user) {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
+    }
+
+    private List<Authority> getUserAuthorities(User user) {
+        List<UserAuthority> authorities = userAuthorityRepository.findByUser(user);
+
+        return authorities.stream()
+            .map(UserAuthority::getAuthority)
+            .toList();
     }
 
     private UserAuthority generateUserAuthority(User user, Authority authority) {
