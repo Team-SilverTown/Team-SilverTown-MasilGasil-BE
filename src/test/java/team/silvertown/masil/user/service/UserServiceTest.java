@@ -598,6 +598,5 @@ class UserServiceTest extends LocalstackTest {
         }
 
     }
-
-
+    
 }
