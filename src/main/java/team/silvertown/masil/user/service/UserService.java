@@ -1,5 +1,6 @@
 package team.silvertown.masil.user.service;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -8,10 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.image.service.ImageService;
+import team.silvertown.masil.image.validator.ImageFileServiceValidator;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
@@ -40,6 +44,7 @@ public class UserService {
     private final UserAuthorityRepository userAuthorityRepository;
     private final KakaoOAuthService kakaoOAuthService;
     private final JwtTokenProvider tokenProvider;
+    private final ImageService imageService;
 
     @Transactional
     public LoginResponse login(String kakaoToken) {
@@ -71,7 +76,7 @@ public class UserService {
     }
 
     @Transactional
-    public void onboard(long userId, OnboardRequest request) {
+    public void onboard(OnboardRequest request, Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
@@ -122,18 +127,33 @@ public class UserService {
         return MyPageInfoResponse.from(user);
     }
 
-    public MeInfoResponse getMe(Long memberId) {
-        User user = userRepository.findById(memberId)
+    public MeInfoResponse getMe(Long userId) {
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
         return MeInfoResponse.from(user);
     }
 
-    private UserAuthority generateUserAuthority(User user, Authority authority) {
-        return UserAuthority.builder()
-            .authority(authority)
-            .user(user)
-            .build();
+    @Transactional
+    public void updateProfile(MultipartFile profileImg, Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        String profileUrl = getProfileUrl(profileImg);
+        user.updateProfile(profileUrl);
+    }
+
+    private String getProfileUrl(MultipartFile profileImg) {
+        if (Objects.nonNull(profileImg)) {
+            String profileUrl;
+            ImageFileServiceValidator.validateImgFile(profileImg);
+            URI uploadedUri = imageService.upload(profileImg);
+            profileUrl = uploadedUri.toString();
+
+            return profileUrl;
+        }
+
+        return null;
     }
 
     private void updatingAuthority(List<UserAuthority> authorities, User user) {
@@ -169,7 +189,7 @@ public class UserService {
         OffsetDateTime marketingConsentedAt = request.isAllowingMarketing() ? OffsetDateTime.now()
             : null;
 
-        UserAgreement userAgreement = UserAgreement.builder()
+        return UserAgreement.builder()
             .user(user)
             .isAllowingMarketing(request.isAllowingMarketing())
             .isLocationInfoConsented(request.isLocationInfoConsented())
@@ -177,8 +197,6 @@ public class UserService {
             .isUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed())
             .marketingConsentedAt(marketingConsentedAt)
             .build();
-
-        return userAgreement;
     }
 
     private User createAndSave(Provider authenticatedProvider, String providerId) {
@@ -200,6 +218,13 @@ public class UserService {
     private void assignDefaultAuthority(User user) {
         UserAuthority newAuthority = generateUserAuthority(user, Authority.RESTRICTED);
         userAuthorityRepository.save(newAuthority);
+    }
+
+    private UserAuthority generateUserAuthority(User user, Authority authority) {
+        return UserAuthority.builder()
+            .authority(authority)
+            .user(user)
+            .build();
     }
 
 }

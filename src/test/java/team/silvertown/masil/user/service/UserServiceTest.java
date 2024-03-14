@@ -10,6 +10,7 @@ import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,23 +18,31 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.image.exception.ImageErrorCode;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.texture.UserAuthorityTexture;
+import team.silvertown.masil.texture.UserTexture;
+import team.silvertown.masil.test.LocalstackTest;
 import team.silvertown.masil.texture.UserTexture;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.ExerciseIntensity;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
+import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
@@ -43,6 +52,7 @@ import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.exception.UserErrorCode;
+import team.silvertown.masil.user.repository.UserAgreementRepository;
 import team.silvertown.masil.user.repository.UserAuthorityRepository;
 import team.silvertown.masil.user.repository.UserRepository;
 
@@ -50,7 +60,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 @SpringBootTest
 @Transactional
-class UserServiceTest {
+class UserServiceTest extends LocalstackTest {
 
     private static final Faker faker = new Faker();
     private static final String VALID_PROVIDER = "kakao";
@@ -72,6 +82,9 @@ class UserServiceTest {
 
     @Autowired
     UserAuthorityRepository userAuthorityRepository;
+
+    @Autowired
+    UserAgreementRepository userAgreementRepository;
 
     @MockBean
     KakaoOAuthService kakaoOAuthService;
@@ -201,7 +214,7 @@ class UserServiceTest {
                 .getAuthority()).isEqualTo(Authority.RESTRICTED);
 
             //when
-            userService.onboard(unTypedUser.getId(), request);
+            userService.onboard(request, unTypedUser.getId());
 
             //then
             User updatedUser = userRepository.findById(unTypedUser.getId())
@@ -225,6 +238,11 @@ class UserServiceTest {
                 .map(UserAuthority::getAuthority)
                 .collect(Collectors.toList()))
                 .contains(Authority.NORMAL);
+
+            UserAgreement byUser = userAgreementRepository.findByUser(updatedUser).get();
+            assertThat(byUser.getIsLocationInfoConsented()).isTrue();
+            assertThat(byUser.getIsPersonalInfoConsented()).isTrue();
+            assertThat(byUser.getIsUnderAgeConsentConfirmed()).isTrue();
         }
 
     }
@@ -278,7 +296,7 @@ class UserServiceTest {
                 .getAuthority()).isEqualTo(Authority.RESTRICTED);
 
             //when
-            userService.onboard(unTypedUser.getId(), request);
+            userService.onboard(request, unTypedUser.getId());
 
             //then
             User updatedUser = userRepository.findById(unTypedUser.getId())
@@ -504,5 +522,86 @@ class UserServiceTest {
         }
 
     }
+
+    @Nested
+    class 유저_프로필_업데이트_테스트 {
+
+        private User user;
+
+        @BeforeEach
+        public void setting() {
+            user = UserTexture.createValidUser();
+            userRepository.save(user);
+        }
+
+        @ParameterizedTest
+        @ValueSource(
+            strings = {
+                "image/apng", "image/avif", "image/gif", "image/jpeg", "image/png", "image/svg+xml",
+                "image/webp"
+            }
+        )
+        public void 정상적으로_프로필을_업데이트한다(String validImageType) throws Exception {
+            //given
+            String filename = "valid file";
+            String originalFilename = filename + ".jpeg";
+            byte[] content = "content".getBytes();
+
+            MockMultipartFile file = new MockMultipartFile(filename, originalFilename,
+                validImageType,
+                content);
+            User savedUser = userRepository.findById(user.getId())
+                .get();
+
+            //when
+            userService.updateProfile(file, savedUser.getId());
+
+            //then
+            String profileImg = user.getProfileImg();
+            assertThat(profileImg).isNotBlank();
+        }
+
+        @Test
+        public void 프로필_사진을_보내지_않는_경우_null로_프로필을_업데이트한다() throws Exception {
+            //given
+            MockMultipartFile file = null;
+            User savedUser = userRepository.findById(user.getId())
+                .get();
+
+            //when
+            userService.updateProfile(file, savedUser.getId());
+
+            //then
+            String profileImg = user.getProfileImg();
+            assertThat(profileImg).isNull();
+        }
+
+        @ParameterizedTest
+        @ValueSource(
+            strings = {
+                "text/html; charset=utf-8", "application/javascript", "text/javascript",
+                "application/ecmascript", "text/ecmascript", " ", ""
+            }
+        )
+        public void 비정상적인_확장자인_경우_예외가_발생한다(String invalidImageType) throws Exception {
+            //given
+            String filename = "valid file";
+            String originalFilename = filename + ".jpeg";
+            byte[] content = "content".getBytes();
+
+            MockMultipartFile file = new MockMultipartFile(filename, originalFilename,
+                invalidImageType,
+                content);
+            User savedUser = userRepository.findById(user.getId())
+                .get();
+
+            //when, then
+            assertThatThrownBy(() -> userService.updateProfile(file, savedUser.getId()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ImageErrorCode.NOT_SUPPORTED_CONTENT.getMessage());
+        }
+
+    }
+
 
 }
