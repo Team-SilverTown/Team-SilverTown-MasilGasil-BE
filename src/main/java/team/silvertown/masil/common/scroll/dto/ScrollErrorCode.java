@@ -12,5 +12,4 @@ public enum ScrollErrorCode implements ErrorCode {
 
     private final int code;
     private final String message;
-
 }
