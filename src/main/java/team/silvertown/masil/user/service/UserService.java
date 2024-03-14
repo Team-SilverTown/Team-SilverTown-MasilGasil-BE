@@ -24,6 +24,7 @@ import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
@@ -63,7 +64,6 @@ public class UserService {
         }
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
-        assignDefaultAuthority(justSavedUser);
         String newUserToken = tokenProvider.createToken(justSavedUser.getId());
 
         return new LoginResponse(newUserToken);
@@ -114,6 +114,17 @@ public class UserService {
             .nickname(nickname)
             .isDuplicated(isDuplicated)
             .build();
+    }
+
+    public MyPageInfoResponse getMyPageInfo(Long userId, Long loginId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
+
+        if (!Objects.equals(loginId, userId) && !user.getIsPublic()) {
+            return MyPageInfoResponse.fromPrivateUser(user);
+        }
+
+        return MyPageInfoResponse.from(user);
     }
 
     public MeInfoResponse getMe(Long userId) {
@@ -178,7 +189,7 @@ public class UserService {
         OffsetDateTime marketingConsentedAt = request.isAllowingMarketing() ? OffsetDateTime.now()
             : null;
 
-        UserAgreement userAgreement = UserAgreement.builder()
+        return UserAgreement.builder()
             .user(user)
             .isAllowingMarketing(request.isAllowingMarketing())
             .isLocationInfoConsented(request.isLocationInfoConsented())
@@ -186,8 +197,6 @@ public class UserService {
             .isUnderAgeConsentConfirmed(request.isUnderAgeConsentConfirmed())
             .marketingConsentedAt(marketingConsentedAt)
             .build();
-
-        return userAgreement;
     }
 
     private User createAndSave(Provider authenticatedProvider, String providerId) {
