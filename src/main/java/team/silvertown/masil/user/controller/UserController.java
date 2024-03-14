@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
+import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
@@ -156,6 +158,25 @@ public class UserController {
         Long memberId
     ) {
         return ResponseEntity.ok(userService.updateInfo(memberId, updateRequest));
+    }
+
+    @GetMapping("api/v1/users/{userId}")
+    @Operation(summary = "유저 마이페이지 조회")
+    @ApiResponse(
+        responseCode = "200",
+        description = "유저의 마이페이지 정보 조회",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = MyPageInfoResponse.class)
+        )
+    )
+    public ResponseEntity<MyPageInfoResponse> getMyPage(
+        @PathVariable
+        Long userId,
+        @AuthenticationPrincipal
+        Long loginId
+    ) {
+        return ResponseEntity.ok(userService.getMyPageInfo(userId, loginId));
     }
 
 }
