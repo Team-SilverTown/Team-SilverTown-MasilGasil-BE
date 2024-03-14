@@ -38,7 +38,7 @@ public class MateParticipant extends BaseEntity {
     @JoinColumn(name = "mate_id", referencedColumnName = "id")
     private Mate mate;
 
-    @Column(name = "message", length = 255)
+    @Column(name = "message")
     private String message;
 
     @Enumerated(EnumType.STRING)
