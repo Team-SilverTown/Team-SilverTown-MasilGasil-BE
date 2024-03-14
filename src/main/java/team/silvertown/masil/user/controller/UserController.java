@@ -154,7 +154,7 @@ public class UserController {
     }
 
     @GetMapping("api/v1/users/{userId}")
-    @Operation(summary = "계정 공개여부 변경")
+    @Operation(summary = "유저 마이페이지 조회")
     @ApiResponse(
         responseCode = "200",
         description = "유저의 마이페이지 정보 조회",
