@@ -29,9 +29,6 @@ jobs:
 
       - name: AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v1
-        env:
-          ACTION_ENVIRONMENT: ${{ env.ACTION_ENVIRONMENT }}
-        run: echo "action-environment=$ACTION_ENVIRONMENT" >> $GITHUB_OUTPUT
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
