@@ -1,8 +1,8 @@
-name: Deploy API to Amazon ECS
+name: Deploy dev API to Amazon ECS
 
 on:
   push:
-    branches: [ "dev", "prod" ]
+    branches: [ "dev" ]
 
 permissions:
   contents: read
@@ -10,13 +10,12 @@ permissions:
 env:
   AWS_REGION: ap-northeast-2
   SERVER_PORT: 8080
-  ACTION_ENVIRONMENT: ${{ github.head_ref }}
 
 jobs:
   job:
-    name: Deploy API
+    name: Deploy dev API
     runs-on: ubuntu-latest
-    environment: ${{ env.ACTION_ENVIRONMENT }}
+    environment: dev
     steps:
       - name: 체크 아웃
         uses: actions/checkout@v3
@@ -80,7 +79,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
-          PROFILE: ${{ vars.ENVIRONMENT }}
+          PROFILE: ${{ vars.SPRING_ACTIVE_PROFILE }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg PROFILE=$PROFILE .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
