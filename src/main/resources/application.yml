@@ -13,6 +13,10 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   servlet:
     multipart:
       enabled: true
@@ -37,6 +41,7 @@ jwt:
   token-validity-in-seconds: ${TOKEN_EXPIRATION}
 server:
   port: ${SERVER_PORT}
+  forward-headers-strategy: framework
 cors:
   service-origin: ${SERVICE_ORIGIN}
 springdoc:

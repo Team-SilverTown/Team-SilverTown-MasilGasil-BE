@@ -11,3 +11,6 @@ logging:
       file-name-pattern: logs/ddudu.%d{yyyy-MM-dd}.%i.log
       max-file-size: 1MB
       total-size-cap: 5MB
+springdoc:
+  swagger-ui:
+    enabled: false

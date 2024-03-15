@@ -6,16 +6,20 @@ import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
-import team.silvertown.masil.common.response.ScrollResponse;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
+import team.silvertown.masil.post.domain.PostViewHistory;
 import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.PostPinDetailResponse;
@@ -23,6 +27,7 @@ import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
+import team.silvertown.masil.post.repository.PostViewHistoryRepository;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.repository.UserRepository;
 
@@ -33,11 +38,12 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostPinRepository postPinRepository;
+    private final PostViewHistoryRepository postViewHistoryRepository;
 
     @Transactional
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
+            .orElseThrow(getNotFoundException(PostErrorCode.LOGIN_USER_NOT_FOUND));
         Post post = createPost(request, user);
 
         savePins(request.pins(), post);
@@ -45,27 +51,44 @@ public class PostService {
         return new CreatePostResponse(post.getId());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PostDetailResponse getById(Long id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(throwNotFound(PostErrorCode.POST_NOT_FOUND));
+            .orElseThrow(getNotFoundException(PostErrorCode.POST_NOT_FOUND));
         List<PostPinDetailResponse> pins = PostPinDetailResponse.listFrom(post);
+
+        increasePostViewCount(post);
 
         return PostDetailResponse.from(post, pins);
     }
 
     @Transactional(readOnly = true)
-    public ScrollResponse<SimplePostResponse> getSliceByAddress(
-        Long userId,
+    public ScrollResponse<SimplePostResponse> getScrollByAddress(
+        Long loginId,
         NormalListRequest request
     ) {
-        User user = getUserIfLoggedIn(userId);
-        List<PostCursorDto> postsWithCursor = postRepository.findSliceBy(user, request);
+        User user = getUserIfLoggedIn(loginId);
+        List<PostCursorDto> postsWithCursor = postRepository.findScrollByAddress(user, request);
 
-        return getScrollResponse(postsWithCursor, request.size());
+        return getScrollResponse(postsWithCursor, request.getSize());
     }
 
-    private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
+    @Transactional(readOnly = true)
+    public ScrollResponse<SimplePostResponse> getScrollByAuthor(
+        Long loginId,
+        Long userId,
+        ScrollRequest request
+    ) {
+        User author = userRepository.findById(userId)
+            .orElseThrow(getNotFoundException(PostErrorCode.AUTHOR_NOT_FOUND));
+        User loginUser = getUserIfLoggedIn(loginId);
+        List<PostCursorDto> postsWithCursor = postRepository.findScrollByUser(loginUser, author,
+            request);
+
+        return getScrollResponse(postsWithCursor, request.getSize());
+    }
+
+    private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
 
@@ -100,6 +123,25 @@ public class PostService {
         postPinRepository.save(postPin);
     }
 
+    private void increasePostViewCount(Post post) {
+        String ipAddress = getIpAddress();
+        PostViewHistory history = new PostViewHistory(post.getId(), ipAddress);
+        boolean hasHistory = postViewHistoryRepository.existsById(history.getKey());
+
+        if (hasHistory) {
+            return;
+        }
+
+        postViewHistoryRepository.save(history);
+        post.increaseViewCount();
+    }
+
+    private String getIpAddress() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+            .getRequest()
+            .getRemoteAddr();
+    }
+
     private PostPin createPin(CreatePostPinRequest request, Post post) {
         User owner = post.getUser();
 
@@ -118,7 +160,7 @@ public class PostService {
         }
 
         return userRepository.findById(userId)
-            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
+            .orElseThrow(getNotFoundException(PostErrorCode.LOGIN_USER_NOT_FOUND));
     }
 
     private ScrollResponse<SimplePostResponse> getScrollResponse(
