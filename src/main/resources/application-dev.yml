@@ -1,0 +1,6 @@
+logging:
+  org:
+    hibernate:
+      SQL: debug
+snapadmin:
+  enabled: true

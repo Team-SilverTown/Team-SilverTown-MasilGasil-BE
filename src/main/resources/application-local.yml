@@ -1,0 +1,26 @@
+logging:
+  level:
+    tor$SharedEntityManagerInvocationHandler: debug
+    org:
+      springframework:
+        orm:
+          jpa:
+            JpaTransactionManager: debug
+            SharedEntityManagerCreator: debug
+      hibernate:
+        event:
+          internal:
+            AbstractFlushingEventListener: debug
+        internal:
+          util:
+            EntityPrinter: debug
+    root: info
+spring:
+  jpa:
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+snapadmin:
+  enabled: true
