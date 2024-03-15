@@ -48,7 +48,6 @@ springdoc:
   swagger-ui:
     path: /docs
     filter: true
-    enabled: ${SWAGGER_ENABLED}
 snapadmin:
   baseUrl: admin-panel
   modelsPackage: team.silvertown.masil
