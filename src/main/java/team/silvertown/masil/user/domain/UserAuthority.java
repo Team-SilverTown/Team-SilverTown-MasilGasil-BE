@@ -14,8 +14,6 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Entity
 @Table(name = "user_authorities")
@@ -43,8 +41,8 @@ public class UserAuthority {
         this.authority = authority;
     }
 
-    public GrantedAuthority getName() {
-        return new SimpleGrantedAuthority(ROLE_PREFIX + authority.name());
+    public String getRole() {
+        return ROLE_PREFIX + authority.getAuthority();
     }
 
 }

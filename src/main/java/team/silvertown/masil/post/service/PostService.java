@@ -9,13 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
-import team.silvertown.masil.common.response.ScrollResponse;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.PostPinDetailResponse;
@@ -37,7 +38,7 @@ public class PostService {
     @Transactional
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
+            .orElseThrow(getNotFoundException(PostErrorCode.LOGIN_USER_NOT_FOUND));
         Post post = createPost(request, user);
 
         savePins(request.pins(), post);
@@ -48,24 +49,39 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostDetailResponse getById(Long id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(throwNotFound(PostErrorCode.POST_NOT_FOUND));
+            .orElseThrow(getNotFoundException(PostErrorCode.POST_NOT_FOUND));
         List<PostPinDetailResponse> pins = PostPinDetailResponse.listFrom(post);
 
         return PostDetailResponse.from(post, pins);
     }
 
     @Transactional(readOnly = true)
-    public ScrollResponse<SimplePostResponse> getSliceByAddress(
-        Long userId,
+    public ScrollResponse<SimplePostResponse> getScrollByAddress(
+        Long loginId,
         NormalListRequest request
     ) {
-        User user = getUserIfLoggedIn(userId);
-        List<PostCursorDto> postsWithCursor = postRepository.findSliceBy(user, request);
+        User user = getUserIfLoggedIn(loginId);
+        List<PostCursorDto> postsWithCursor = postRepository.findScrollByAddress(user, request);
 
-        return getScrollResponse(postsWithCursor, request.size());
+        return getScrollResponse(postsWithCursor, request.getSize());
     }
 
-    private Supplier<DataNotFoundException> throwNotFound(ErrorCode errorCode) {
+    @Transactional(readOnly = true)
+    public ScrollResponse<SimplePostResponse> getScrollByAuthor(
+        Long loginId,
+        Long userId,
+        ScrollRequest request
+    ) {
+        User author = userRepository.findById(userId)
+            .orElseThrow(getNotFoundException(PostErrorCode.AUTHOR_NOT_FOUND));
+        User loginUser = getUserIfLoggedIn(loginId);
+        List<PostCursorDto> postsWithCursor = postRepository.findScrollByUser(loginUser, author,
+            request);
+
+        return getScrollResponse(postsWithCursor, request.getSize());
+    }
+
+    private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
 
@@ -118,7 +134,7 @@ public class PostService {
         }
 
         return userRepository.findById(userId)
-            .orElseThrow(throwNotFound(PostErrorCode.USER_NOT_FOUND));
+            .orElseThrow(getNotFoundException(PostErrorCode.LOGIN_USER_NOT_FOUND));
     }
 
     private ScrollResponse<SimplePostResponse> getScrollResponse(
