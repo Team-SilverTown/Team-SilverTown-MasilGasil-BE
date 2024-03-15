@@ -6,6 +6,7 @@ logging:
         orm:
           jpa:
             JpaTransactionManager: debug
+            SharedEntityManagerCreator: debug
       hibernate:
         event:
           internal:
