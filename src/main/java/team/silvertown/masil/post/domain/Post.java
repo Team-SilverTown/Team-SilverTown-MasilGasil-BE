@@ -33,33 +33,45 @@ import team.silvertown.masil.user.domain.User;
 @Getter
 public class Post extends BaseEntity {
 
-    @OneToMany(mappedBy = "post")
-    private final List<PostPin> postPins = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @OneToMany(mappedBy = "post")
+    private final List<PostPin> postPins = new ArrayList<>();
+
     @Embedded
     @Getter(AccessLevel.NONE)
     private Address address;
+
     @Column(name = "path", nullable = false)
     private LineString path;
+
     @Column(name = "title", nullable = false, length = 30)
     private String title;
+
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
+
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
+
     @Column(name = "distance", nullable = false)
     private Integer distance;
+
     @Column(name = "total_time", nullable = false)
     private Integer totalTime;
+
     @Column(name = "is_public", nullable = false)
     private boolean isPublic;
+
     @Column(name = "view_count", nullable = false)
     private int viewCount;
+
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
@@ -117,6 +129,10 @@ public class Post extends BaseEntity {
         return Arrays.stream(this.path.getCoordinates())
             .map(KakaoPoint::from)
             .toList();
+    }
+
+    public void increaseViewCount() {
+        this.viewCount++;
     }
 
 }

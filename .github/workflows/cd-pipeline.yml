@@ -1,27 +1,21 @@
-name: Deploy dev API to Amazon ECS
+name: Deploy API to Amazon ECS
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev", "prod" ]
 
 permissions:
   contents: read
 
 env:
   AWS_REGION: ap-northeast-2
-  CONTAINER_NAME: masilgasil-ecs-container
-  ECR_REPOSITORY: masilgasil-ecr-private
-  ECS_CLUSTER: masilgasil-ecs-cluster
-  ECS_SERVICE: masilgasil-ecs-service-dev
-  ECS_TASK_DEFINITION: .aws/masilgasil-ecs-task-revision1.json
-  ACTIVE_PROFILE: dev
   SERVER_PORT: 8080
 
 jobs:
   job:
-    name: Deploy dev API
+    name: Deploy API
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ github.head_ref }}
     steps:
       - name: 체크 아웃
         uses: actions/checkout@v3
@@ -38,6 +32,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Redis 실행
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: 7.2.4-alpine
+          redis-port: 6379
 
       - name: application.yml 오버라이드
         uses: microsoft/variable-substitution@v1
@@ -74,8 +74,9 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
-          PROFILE: ${{ env.ACTIVE_PROFILE }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+          PROFILE: ${{ vars.ENVIRONMENT }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg PROFILE=$PROFILE .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -85,14 +86,14 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
+          task-definition: ${{ vars.ECS_TASK_DEFINITION }}
+          container-name: ${{ vars.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Amazon ECS task definition 배포
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ vars.ECS_CLUSTER }}
+          cluster: ${{ vars.ECS_SERVICE }}
           wait-for-service-stability: true
