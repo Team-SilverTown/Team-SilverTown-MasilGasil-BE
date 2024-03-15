@@ -51,6 +51,9 @@ jobs:
           spring.datasource.password: ${{ secrets.MYSQL_PASSWORD }}
           spring.datasource.url: ${{ secrets.MYSQL_URL }}
 
+          spring.data.redis.host: ${{ secrets.REDIS_HOST }}
+          spring.data.redis.port: ${{ secrets.REDIS_PORT }}
+
           spring.cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
           spring.cloud.aws.credentials.secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           spring.cloud.aws.region.static: ${{ env.AWS_REGION }}
