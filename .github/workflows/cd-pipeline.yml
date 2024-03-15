@@ -10,7 +10,7 @@ permissions:
 env:
   AWS_REGION: ap-northeast-2
   SERVER_PORT: 8080
-  SERVER_ENVIRONMENT: ${{ github.head_ref }}
+  ACTION_ENVIRONMENT: ${{ github.head_ref }}
 
 jobs:
   job:
@@ -29,6 +29,9 @@ jobs:
 
       - name: AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v1
+        env:
+          ACTION_ENVIRONMENT: ${{ env.SERVER_ENVIRONMENT }}
+        run: echo "server environment=$SERVER_ENVIRONMENT" >> $GITHUB_OUTPUT
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
