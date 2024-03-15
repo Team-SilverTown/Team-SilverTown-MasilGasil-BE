@@ -28,6 +28,7 @@ import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.dto.RefreshTokenRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -66,16 +67,14 @@ public class UserService {
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
         List<Authority> authorities = getUserAuthorities(justSavedUser);
-        String newUserToken = tokenProvider.createToken(justSavedUser.getId(), authorities);
 
-        return new LoginResponse(newUserToken);
+        return tokenProvider.createToken(justSavedUser.getId(), authorities);
     }
 
     private LoginResponse joinedUserResponse(User joinedUser) {
         List<Authority> authorities = getUserAuthorities(joinedUser);
-        String token = tokenProvider.createToken(joinedUser.getId(), authorities);
 
-        return new LoginResponse(token);
+        return tokenProvider.createToken(joinedUser.getId(), authorities);
     }
 
     @Transactional
@@ -250,6 +249,12 @@ public class UserService {
             .authority(authority)
             .user(user)
             .build();
+    }
+
+    public LoginResponse refresh(RefreshTokenRequest request) {
+        String expiredToken = request.expiredToken();
+
+        return null;
     }
 
 }

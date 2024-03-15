@@ -22,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import team.silvertown.masil.user.domain.Authority;
+import team.silvertown.masil.user.dto.LoginResponse;
 
 @Slf4j
 @Component
@@ -37,7 +38,8 @@ public class JwtTokenProvider {
     private static final String AUTHORITIES_DELIM = " ";
     private static final int MILLS = 1000;
 
-    private final long tokenValidityInMilliseconds;
+    private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
     private final String issuer;
     private final MacAlgorithm algorithm;
     private final SecretKey secretKey;
@@ -46,7 +48,10 @@ public class JwtTokenProvider {
     public JwtTokenProvider(JwtProperties jwtProperties) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
 
-        this.tokenValidityInMilliseconds = jwtProperties.tokenValidityInSeconds() * MILLS;
+        this.accessTokenValidityInMilliseconds = jwtProperties.accessTokenValidityInSeconds()
+            * MILLS;
+        this.refreshTokenValidityInMilliseconds = jwtProperties.refreshTokenValiditySeconds()
+            * MILLS;
         this.issuer = jwtProperties.issuer();
         this.algorithm = Jwts.SIG.HS512;
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
@@ -56,19 +61,35 @@ public class JwtTokenProvider {
             .build();
     }
 
-    public String createToken(long userId, List<Authority> authorities) {
+    public LoginResponse createToken(long userId, List<Authority> authorities) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + tokenValidityInMilliseconds);
+        Date accessValidity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
+        Date refreshValidity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
+
         StringJoiner joiner = new StringJoiner(" ");
+        String accessToken = createAccessToken(userId, now, accessValidity, joiner);
+        String refreshToken = createRefreshToken(userId);
 
         authorities.forEach(authority -> joiner.add(authority.getAuthority()));
 
+        return new LoginResponse(accessToken, refreshToken);
+    }
+
+    private String createAccessToken(long userId, Date now, Date validity, StringJoiner joiner) {
         return Jwts.builder()
             .issuer(issuer)
             .issuedAt(now)
             .expiration(validity)
             .claim(USER_ID_CLAIM, userId)
             .claim(AUTHORITIES_CLAIM, joiner.toString())
+            .signWith(secretKey, algorithm)
+            .compact();
+    }
+
+    private String createRefreshToken(Long userId) {
+        return Jwts.builder()
+            .issuer(issuer)
+            .claim(USER_ID_CLAIM, userId)
             .signWith(secretKey, algorithm)
             .compact();
     }

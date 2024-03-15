@@ -8,6 +8,10 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.user.exception.UserErrorCode;
+import team.silvertown.masil.user.service.UserService;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 
 @SpringBootTest
@@ -24,11 +28,15 @@ class JwtTokenProviderTest {
 
         //when
         String token = jwtTokenProvider.createToken(userId, Collections.emptyList());
+        LoginResponse response = jwtTokenProvider.createToken(userId);
 
         //then
         assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(token))
             .isInstanceOf(InsufficientAuthenticationException.class)
             .hasMessage("No authority included in JWT");
+        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(response.accessToken()))
+            .isInstanceOf(DataNotFoundException.class)
+            .hasMessage(UserErrorCode.AUTHORITY_NOT_FOUND.getMessage());
     }
 
 }
