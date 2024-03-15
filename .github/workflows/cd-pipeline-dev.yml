@@ -61,6 +61,8 @@ jobs:
           jwt.base64-secret: ${{ secrets.TOKEN_SECRET }}
           jwt.token-validity-in-seconds: ${{ secrets.TOKEN_EXPIRATION }}
 
+          springdoc.swagger-ui.enabled: ${{ vars.SWAGGER_ENABLED }}
+
       - name: 프로젝트 빌드
         uses: gradle/gradle-build-action@v3.1.0
         with:
