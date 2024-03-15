@@ -16,7 +16,7 @@ jobs:
   job:
     name: Deploy API
     runs-on: ubuntu-latest
-    environment: ${{ env.SERVER_ENVIRONMENT }}
+    environment: ${{ env.ACTION_ENVIRONMENT }}
     steps:
       - name: 체크 아웃
         uses: actions/checkout@v3
@@ -30,8 +30,8 @@ jobs:
       - name: AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v1
         env:
-          ACTION_ENVIRONMENT: ${{ env.SERVER_ENVIRONMENT }}
-        run: echo "server environment=$SERVER_ENVIRONMENT" >> $GITHUB_OUTPUT
+          ACTION_ENVIRONMENT: ${{ env.ACTION_ENVIRONMENT }}
+        run: echo "action-environment=$ACTION_ENVIRONMENT" >> $GITHUB_OUTPUT
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
