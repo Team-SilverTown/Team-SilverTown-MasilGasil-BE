@@ -19,7 +19,7 @@ public final class NormalListRequest {
         String depth3,
         String order,
         String cursor,
-        int size
+        Integer size
     ) {
         this.depth1 = depth1;
         this.depth2 = depth2;

@@ -57,7 +57,7 @@ public class ImageController {
             .body(imageResponse);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(
         HandlerMethodValidationException ignored
     ) {
