@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,13 +25,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
+import team.silvertown.masil.user.dto.RefreshTokenRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.dto.UpdateResponse;
+import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.service.UserService;
 
 @RestController
@@ -101,6 +106,23 @@ public class UserController {
         String accessToken
     ) {
         return ResponseEntity.ok(userService.login(accessToken));
+    }
+
+    @GetMapping("api/v1/users/login/refresh")
+    @Operation(summary = "리프레시 토큰으로 새 토큰 받기")
+    public ResponseEntity<LoginResponse> refresh(
+        @RequestBody
+        RefreshTokenRequest request
+    ) {
+        return ResponseEntity.ok(userService.refresh(request));
+    }
+
+    private void validateExistHeader(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String refreshTokenHeader = request.getHeader("Refresh-Token");
+        if (Objects.isNull(authorizationHeader) || Objects.isNull(refreshTokenHeader)) {
+            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
+        }
     }
 
     @PutMapping(
