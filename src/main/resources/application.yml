@@ -34,7 +34,8 @@ spring:
 jwt:
   issuer: ${TOKEN_ISSUER}
   base64-secret: ${TOKEN_SECRET}
-  token-validity-in-seconds: ${TOKEN_EXPIRATION}
+  access-token-validity-in-seconds: ${ACCESS_TOKEN_EXPIRATION}
+  refresh-token-validity-in-seconds: ${REFRESH_TOKEN_EXPIRATION}
 server:
   port: ${SERVER_PORT}
 cors:
