@@ -90,7 +90,6 @@ public class User extends BaseEntity {
     public void updateBirthDate(String birthDate) {
         UserValidator.validateBirthDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
         this.birthDate = DateValidator.parseDate(birthDate, UserErrorCode.INVALID_BIRTH_DATE);
-
     }
 
     public void updateHeight(Integer height) {
