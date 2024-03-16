@@ -9,7 +9,7 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-2
-  SERVER_PORT: 80
+  SERVER_PORT: 8080
 
 jobs:
   job:
@@ -58,13 +58,6 @@ jobs:
           jwt.base64-secret: ${{ secrets.TOKEN_SECRET }}
           jwt.token-validity-in-seconds: ${{ secrets.TOKEN_EXPIRATION }}
 
-      - name: 테스트 application.yml 오버라이드
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ./src/test/resources/application.yml
-        env:
-          server.port: ${{ env.SERVER_PORT }}
-
       - name: Redis 실행
         uses: supercharge/redis-github-action@1.7.0
         with:
@@ -86,7 +79,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
-          PROFILE: ${{ vars.ENVIRONMENT }}
+          PROFILE: ${{ vars.SPRING_ACTIVE_PROFILE }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg PROFILE=$PROFILE .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
