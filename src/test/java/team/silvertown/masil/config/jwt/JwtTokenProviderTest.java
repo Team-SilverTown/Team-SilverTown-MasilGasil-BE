@@ -27,16 +27,12 @@ class JwtTokenProviderTest {
         Long userId = 1L;
 
         //when
-        String token = jwtTokenProvider.createToken(userId, Collections.emptyList());
-        LoginResponse response = jwtTokenProvider.createToken(userId);
+        LoginResponse response = jwtTokenProvider.createToken(userId, Collections.emptyList());
 
         //then
-        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(token))
+        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(response.accessToken()))
             .isInstanceOf(InsufficientAuthenticationException.class)
             .hasMessage("No authority included in JWT");
-        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(response.accessToken()))
-            .isInstanceOf(DataNotFoundException.class)
-            .hasMessage(UserErrorCode.AUTHORITY_NOT_FOUND.getMessage());
     }
 
 }
