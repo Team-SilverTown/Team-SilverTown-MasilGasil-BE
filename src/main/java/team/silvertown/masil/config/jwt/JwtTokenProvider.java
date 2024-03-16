@@ -39,7 +39,6 @@ public class JwtTokenProvider {
     private static final int MILLS = 1000;
 
     private final long accessTokenValidityInMilliseconds;
-    private final long refreshTokenValidityInMilliseconds;
     private final String issuer;
     private final MacAlgorithm algorithm;
     private final SecretKey secretKey;
@@ -49,8 +48,6 @@ public class JwtTokenProvider {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
 
         this.accessTokenValidityInMilliseconds = jwtProperties.accessTokenValidityInSeconds()
-            * MILLS;
-        this.refreshTokenValidityInMilliseconds = jwtProperties.refreshTokenValiditySeconds()
             * MILLS;
         this.issuer = jwtProperties.issuer();
         this.algorithm = Jwts.SIG.HS512;
@@ -62,24 +59,22 @@ public class JwtTokenProvider {
     }
 
     public LoginResponse createToken(long userId, List<Authority> authorities) {
-        Date now = new Date();
-        Date accessValidity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
-        Date refreshValidity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
-
-        StringJoiner joiner = new StringJoiner(" ");
-        String accessToken = createAccessToken(userId, now, accessValidity, joiner);
+        String accessToken = createAccessToken(userId, authorities);
         String refreshToken = createRefreshToken(userId);
-
-        authorities.forEach(authority -> joiner.add(authority.getAuthority()));
 
         return new LoginResponse(accessToken, refreshToken);
     }
 
-    private String createAccessToken(long userId, Date now, Date validity, StringJoiner joiner) {
+    public String createAccessToken(long userId, List<Authority> authorities) {
+        Date now = new Date();
+        Date accessValidity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
+        StringJoiner joiner = new StringJoiner(" ");
+        authorities.forEach(authority -> joiner.add(authority.getAuthority()));
+
         return Jwts.builder()
             .issuer(issuer)
             .issuedAt(now)
-            .expiration(validity)
+            .expiration(accessValidity)
             .claim(USER_ID_CLAIM, userId)
             .claim(AUTHORITIES_CLAIM, joiner.toString())
             .signWith(secretKey, algorithm)
