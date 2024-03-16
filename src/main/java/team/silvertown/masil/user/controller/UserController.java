@@ -116,6 +116,12 @@ public class UserController {
 
     @GetMapping("api/v1/users/login/refresh")
     @Operation(summary = "리프레시 토큰으로 새 토큰 받기")
+    @SecurityRequirements(
+        {
+            @SecurityRequirement(name = "카카오 토큰 로그인"),
+            @SecurityRequirement(name = "리프레시 토큰")
+        }
+    )
     public ResponseEntity<Void> refresh(
         HttpServletRequest request
     ) {
