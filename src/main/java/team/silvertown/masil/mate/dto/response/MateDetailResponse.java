@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.Builder;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.mate.domain.Mate;
+import team.silvertown.masil.post.domain.Post;
 
 @Builder
 public record MateDetailResponse(
@@ -18,10 +19,13 @@ public record MateDetailResponse(
     Integer capacity,
     Long authorId,
     String authorNickname,
-    String authorProfileUrl
+    String authorProfileUrl,
+    Long postId
 ) {
 
     public static MateDetailResponse from(Mate mate, List<ParticipantResponse> participants) {
+        Post post = mate.getPost();
+
         return MateDetailResponse.builder()
             .id(mate.getId())
             .title(mate.getTitle())
@@ -34,6 +38,7 @@ public record MateDetailResponse(
             .authorId(mate.getAuthor().getId())
             .authorNickname(mate.getAuthor().getNickname())
             .authorProfileUrl(mate.getAuthor().getProfileImg())
+            .postId(post.getId())
             .build();
     }
 
