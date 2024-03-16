@@ -32,7 +32,6 @@ import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
-import team.silvertown.masil.user.dto.RefreshTokenRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
@@ -42,6 +41,9 @@ import team.silvertown.masil.user.service.UserService;
 @RequiredArgsConstructor
 @Tag(name = "회원 관련 API")
 public class UserController {
+
+    private static final String ACCESS_TOKEN_PREFIX = "Bearer ";
+    private static final String REFRESH_TOKEN_HEADER = "Refresh-Token";
 
     private final UserService userService;
 
@@ -114,19 +116,25 @@ public class UserController {
 
     @GetMapping("api/v1/users/login/refresh")
     @Operation(summary = "리프레시 토큰으로 새 토큰 받기")
-    public ResponseEntity<LoginResponse> refresh(
-        @RequestBody
-        RefreshTokenRequest request
+    public ResponseEntity<Void> refresh(
+        HttpServletRequest request
     ) {
-        return ResponseEntity.ok(userService.refresh(request));
+        String refreshToken = validateExistHeader(request);
+        String newToken = userService.refresh(refreshToken);
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN_PREFIX + newToken)
+            .build();
     }
 
-    private void validateExistHeader(HttpServletRequest request) {
+    private String validateExistHeader(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String refreshTokenHeader = request.getHeader("Refresh-Token");
+        String refreshTokenHeader = request.getHeader(REFRESH_TOKEN_HEADER);
         if (Objects.isNull(authorizationHeader) || Objects.isNull(refreshTokenHeader)) {
             throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
         }
+
+        return request.getHeader("Refresh-Token");
     }
 
     @PutMapping(
