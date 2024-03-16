@@ -58,9 +58,6 @@ jobs:
           jwt.base64-secret: ${{ secrets.TOKEN_SECRET }}
           jwt.token-validity-in-seconds: ${{ secrets.TOKEN_EXPIRATION }}
 
-        env:
-          server.port: ${{ env.SERVER_PORT }}
-
       - name: Redis 실행
         uses: supercharge/redis-github-action@1.7.0
         with:
