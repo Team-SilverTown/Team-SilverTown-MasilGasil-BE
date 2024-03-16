@@ -17,6 +17,8 @@ import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.image.service.ImageService;
 import team.silvertown.masil.image.validator.ImageFileServiceValidator;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
+import team.silvertown.masil.token.domain.RefreshToken;
+import team.silvertown.masil.token.repository.RefreshTokenRepository;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
@@ -47,6 +49,7 @@ public class UserService {
     private final KakaoOAuthService kakaoOAuthService;
     private final JwtTokenProvider tokenProvider;
     private final ImageService imageService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public LoginResponse login(String kakaoToken) {
@@ -62,13 +65,19 @@ public class UserService {
         Optional<User> user = userRepository.findByProviderAndSocialId(provider,
             oAuthResponse.providerId());
         if (user.isPresent()) {
-            return joinedUserResponse(user.get());
+            LoginResponse loginResponse = joinedUserResponse(user.get());
+            refreshTokenRepository.save(new RefreshToken(loginResponse.refreshToken(), user.get()
+                .getId()));
+            return loginResponse;
         }
 
         User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
         List<Authority> authorities = getUserAuthorities(justSavedUser);
+        LoginResponse loginResponse = tokenProvider.createToken(justSavedUser.getId(), authorities);
+        refreshTokenRepository.save(
+            new RefreshToken(loginResponse.refreshToken(), justSavedUser.getId()));
 
-        return tokenProvider.createToken(justSavedUser.getId(), authorities);
+        return loginResponse;
     }
 
     private LoginResponse joinedUserResponse(User joinedUser) {
@@ -145,6 +154,24 @@ public class UserService {
 
         String profileUrl = getProfileUrl(profileImg);
         user.updateProfile(profileUrl);
+    }
+
+    public String refresh(String refreshToken) {
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
+        }
+        User user = getUserFromRefreshToken(refreshToken);
+        List<Authority> userAuthorities = getUserAuthorities(user);
+
+        return tokenProvider.createAccessToken(user.getId(), userAuthorities);
+    }
+
+    private User getUserFromRefreshToken(String refreshToken) {
+        RefreshToken tokenInRedis = refreshTokenRepository.findById(refreshToken)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.REFRESH_TOKEN_NOT_FOUND));
+        Long userId = tokenInRedis.getMemberId();
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
     }
 
     private String getProfileUrl(MultipartFile profileImg) {
@@ -249,12 +276,6 @@ public class UserService {
             .authority(authority)
             .user(user)
             .build();
-    }
-
-    public LoginResponse refresh(RefreshTokenRequest request) {
-        String expiredToken = request.expiredToken();
-
-        return null;
     }
 
 }
