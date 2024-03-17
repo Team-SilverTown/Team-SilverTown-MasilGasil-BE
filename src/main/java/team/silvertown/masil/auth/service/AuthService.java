@@ -55,21 +55,17 @@ public class AuthService {
 
     public String refresh(String refreshToken, String accessToken) {
         User user = getUserFromRefreshToken(refreshToken);
-        Long userIdPrincipal = tokenProvider.getUserIdPrincipal(accessToken);
-        validateToken(accessToken, refreshToken, user, userIdPrincipal);
+        validateToken(accessToken, refreshToken);
         List<Authority> userAuthorities = userService.getUserAuthorities(user);
 
         return tokenProvider.createAccessToken(user.getId(), userAuthorities);
     }
 
-    private void validateToken(String accessToken, String refreshToken, User user, Long userIdPrincipal) {
+    private void validateToken(String accessToken, String refreshToken) {
         Validator.notNull(accessToken, UserErrorCode.INVALID_JWT_TOKEN);
         Validator.notNull(refreshToken, UserErrorCode.INVALID_JWT_TOKEN);
 
         if (!tokenProvider.validateToken(refreshToken)) {
-            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
-        }
-        if(!Objects.equals(user.getId(), userIdPrincipal)){
             throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
         }
     }
