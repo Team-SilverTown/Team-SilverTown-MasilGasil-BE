@@ -1,6 +1,7 @@
 package team.silvertown.masil.auth.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.auth.domain.RefreshToken;
 import team.silvertown.masil.auth.repository.RefreshTokenRepository;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
@@ -51,14 +53,25 @@ public class AuthService {
         return loginResponse;
     }
 
-    public String refresh(String refreshToken) {
-        if (!tokenProvider.validateToken(refreshToken)) {
-            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
-        }
+    public String refresh(String refreshToken, String accessToken) {
         User user = getUserFromRefreshToken(refreshToken);
+        Long userIdPrincipal = tokenProvider.getUserIdPrincipal(accessToken);
+        validateToken(accessToken, refreshToken, user, userIdPrincipal);
         List<Authority> userAuthorities = userService.getUserAuthorities(user);
 
         return tokenProvider.createAccessToken(user.getId(), userAuthorities);
+    }
+
+    private void validateToken(String accessToken, String refreshToken, User user, Long userIdPrincipal) {
+        Validator.notNull(accessToken, UserErrorCode.INVALID_JWT_TOKEN);
+        Validator.notNull(refreshToken, UserErrorCode.INVALID_JWT_TOKEN);
+
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
+        }
+        if(!Objects.equals(user.getId(), userIdPrincipal)){
+            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
+        }
     }
 
     private void saveRefreshToken(LoginResponse loginResponse, User justSavedUser) {

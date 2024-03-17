@@ -659,8 +659,9 @@ class UserServiceTest extends LocalstackTest {
 
         JwtParser jwtParser;
         User user;
+        User anotherUser;
         UserAuthority userAuthority;
-
+        UserAuthority anotherUserAuthority;
 
         private static final String USER_ID_CLAIM = "user_id";
 
@@ -675,13 +676,17 @@ class UserServiceTest extends LocalstackTest {
                 .build();
 
             user = UserTexture.createValidUser();
+            anotherUser = UserTexture.createValidUser();
             userRepository.save(user);
+            userRepository.save(anotherUser);
             userAuthority = UserAuthorityTexture.generateRestrictAuthority(user);
+            anotherUserAuthority = UserAuthorityTexture.generateRestrictAuthority(anotherUser);
             userAuthorityRepository.save(userAuthority);
+            userAuthorityRepository.save(anotherUserAuthority);
         }
 
         @Test
-        public void 정상적으_리프레시_토큰을_받아_새로운_accessToken을_생성한다() throws Exception {
+        public void 정상적으로_리프레시_토큰을_받아_새로운_accessToken을_생성한다() throws Exception {
             //given
             OAuthResponse mockOAuthResponse = new OAuthResponse(VALID_PROVIDER, "123456");
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
@@ -691,7 +696,7 @@ class UserServiceTest extends LocalstackTest {
             Long loginedUserId = claims.get(USER_ID_CLAIM, Long.class);
 
             //when
-            String newAccessToken = authService.refresh(tokenResponse.refreshToken());
+            String newAccessToken = authService.refresh(tokenResponse.refreshToken(), tokenResponse.accessToken());
             Claims newClaims = jwtParser.parseSignedClaims(newAccessToken)
                 .getPayload();
             Long newLoginedUserId = newClaims.get(USER_ID_CLAIM, Long.class);
@@ -705,9 +710,10 @@ class UserServiceTest extends LocalstackTest {
         public void 유효하지_않은_refreshToken을_전송할_경우_예외가_발생한다() throws Exception {
             //given, when, then
             assertThatThrownBy(() -> authService.refresh(UUID.randomUUID()
+                .toString(), UUID.randomUUID()
                 .toString()))
-                .isInstanceOf(InvalidAuthenticationException.class)
-                .hasMessage(UserErrorCode.INVALID_JWT_TOKEN.getMessage());
+                .isInstanceOf(DataNotFoundException.class)
+                .hasMessage(UserErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
         }
 
         @Test
@@ -717,7 +723,7 @@ class UserServiceTest extends LocalstackTest {
                 Collections.singletonList(userAuthority.getAuthority()));
 
             //when, then
-            assertThatThrownBy(() -> authService.refresh(token.refreshToken()))
+            assertThatThrownBy(() -> authService.refresh(token.refreshToken(), token.accessToken()))
                 .isInstanceOf(DataNotFoundException.class)
                 .hasMessage(UserErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
         }

@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.auth.service.AuthService;
-import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.auth.dto.LoginResponse;
-import team.silvertown.masil.user.exception.UserErrorCode;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,22 +59,13 @@ public class AuthController {
     public ResponseEntity<Void> refresh(
         HttpServletRequest request
     ) {
-        String refreshToken = validateExistHeader(request);
-        String newToken = authService.refresh(refreshToken);
+        String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
+        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String newToken = authService.refresh(refreshToken, accessToken);
 
         return ResponseEntity.ok()
             .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN_PREFIX + newToken)
             .build();
-    }
-
-    private String validateExistHeader(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String refreshTokenHeader = request.getHeader(REFRESH_TOKEN_HEADER);
-        if (Objects.isNull(authorizationHeader) || Objects.isNull(refreshTokenHeader)) {
-            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
-        }
-
-        return request.getHeader(REFRESH_TOKEN_HEADER);
     }
 
 }

@@ -109,6 +109,12 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userId, token, authorities);
     }
 
+    public Long getUserIdPrincipal(String token){
+        Claims claims = jwtParser.parseSignedClaims(token)
+            .getPayload();
+        return claims.get(USER_ID_CLAIM, Long.class);
+    }
+
     public boolean validateToken(String token) {
         try {
             jwtParser.parseSignedClaims(token);
