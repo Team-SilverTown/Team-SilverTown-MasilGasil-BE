@@ -2,7 +2,7 @@ spring:
   profiles:
     active: local
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: ${DRIVER_CLASS_NAME}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     url: ${MYSQL_URL}
@@ -52,3 +52,5 @@ snapadmin:
   baseUrl: admin-panel
   modelsPackage: team.silvertown.masil
   sql-console-enabled: false
+sentry:
+  dsn: ${SENTRY_DSN}

@@ -14,3 +14,11 @@ logging:
 springdoc:
   swagger-ui:
     enabled: false
+sentry:
+  enabled: true
+  environment: prod
+  enable-tracing: true
+  traces-sample-rate: 1.0
+  debug: false
+  logging:
+    minimum-event-level: error

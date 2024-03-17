@@ -13,3 +13,5 @@ spring:
       port: 6379
   flyway:
     enabled: false
+sentry:
+  enabled: false
