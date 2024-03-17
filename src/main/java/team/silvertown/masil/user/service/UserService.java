@@ -4,7 +4,6 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,22 +12,16 @@ import org.springframework.web.multipart.MultipartFile;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.validator.Validator;
-import team.silvertown.masil.config.jwt.JwtTokenProvider;
 import team.silvertown.masil.image.service.ImageService;
 import team.silvertown.masil.image.validator.ImageFileServiceValidator;
-import team.silvertown.masil.security.exception.InvalidAuthenticationException;
-import team.silvertown.masil.token.domain.RefreshToken;
-import team.silvertown.masil.token.repository.RefreshTokenRepository;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
-import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.dto.UpdateResponse;
@@ -45,45 +38,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAgreementRepository agreementRepository;
     private final UserAuthorityRepository userAuthorityRepository;
-    private final KakaoOAuthService kakaoOAuthService;
-    private final JwtTokenProvider tokenProvider;
     private final ImageService imageService;
-    private final RefreshTokenRepository refreshTokenRepository;
-
-    @Transactional
-    public LoginResponse login(String kakaoToken) {
-        OAuthResponse oAuthResponse;
-        try {
-            oAuthResponse = kakaoOAuthService.getUserInfo(kakaoToken);
-        } catch (Exception e) {
-            log.error("social login error occured, the reason is: {}", e.getMessage(), e);
-            throw new InvalidAuthenticationException(UserErrorCode.INVALID_OAUTH2_TOKEN);
-        }
-
-        Provider provider = Provider.get(oAuthResponse.provider());
-        Optional<User> user = userRepository.findByProviderAndSocialId(provider,
-            oAuthResponse.providerId());
-        if (user.isPresent()) {
-            LoginResponse loginResponse = joinedUserResponse(user.get());
-            refreshTokenRepository.save(new RefreshToken(loginResponse.refreshToken(), user.get()
-                .getId()));
-            return loginResponse;
-        }
-
-        User justSavedUser = createAndSave(provider, oAuthResponse.providerId());
-        List<Authority> authorities = getUserAuthorities(justSavedUser);
-        LoginResponse loginResponse = tokenProvider.createToken(justSavedUser.getId(), authorities);
-        refreshTokenRepository.save(
-            new RefreshToken(loginResponse.refreshToken(), justSavedUser.getId()));
-
-        return loginResponse;
-    }
-
-    private LoginResponse joinedUserResponse(User joinedUser) {
-        List<Authority> authorities = getUserAuthorities(joinedUser);
-
-        return tokenProvider.createToken(joinedUser.getId(), authorities);
-    }
 
     @Transactional
     public void onboard(OnboardRequest request, Long userId) {
@@ -155,24 +110,6 @@ public class UserService {
         user.updateProfile(profileUrl);
     }
 
-    public String refresh(String refreshToken) {
-        if (!tokenProvider.validateToken(refreshToken)) {
-            throw new InvalidAuthenticationException(UserErrorCode.INVALID_JWT_TOKEN);
-        }
-        User user = getUserFromRefreshToken(refreshToken);
-        List<Authority> userAuthorities = getUserAuthorities(user);
-
-        return tokenProvider.createAccessToken(user.getId(), userAuthorities);
-    }
-
-    private User getUserFromRefreshToken(String refreshToken) {
-        RefreshToken tokenInRedis = refreshTokenRepository.findById(refreshToken)
-            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.REFRESH_TOKEN_NOT_FOUND));
-        Long userId = tokenInRedis.getMemberId();
-        return userRepository.findById(userId)
-            .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
-    }
-
     private String getProfileUrl(MultipartFile profileImg) {
         if (Objects.nonNull(profileImg)) {
             String profileUrl;
@@ -241,7 +178,7 @@ public class UserService {
             .build();
     }
 
-    private User createAndSave(Provider authenticatedProvider, String providerId) {
+    public User createAndSave(Provider authenticatedProvider, String providerId) {
         User newUser = create(authenticatedProvider, providerId);
         User savedUser = userRepository.save(newUser);
         assignDefaultAuthority(savedUser);
@@ -262,7 +199,7 @@ public class UserService {
         userAuthorityRepository.save(newAuthority);
     }
 
-    private List<Authority> getUserAuthorities(User user) {
+    public List<Authority> getUserAuthorities(User user) {
         List<UserAuthority> authorities = userAuthorityRepository.findByUser(user);
 
         return authorities.stream()

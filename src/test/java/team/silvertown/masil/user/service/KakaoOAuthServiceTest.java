@@ -57,7 +57,7 @@ class KakaoOAuthServiceTest {
         //when, then
         assertThatThrownBy(() -> kakaoOAuthService.getUserInfo(VALID_TOKEN))
             .isInstanceOf(InvalidAuthenticationException.class)
-            .hasMessage(UserErrorCode.INVALID_PROVIDER_ID.getMessage());
+            .hasMessage(UserErrorCode.INVALID_OAUTH2_TOKEN.getMessage());
     }
 
 }

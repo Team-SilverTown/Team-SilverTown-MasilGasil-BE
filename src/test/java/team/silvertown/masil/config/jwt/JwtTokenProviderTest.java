@@ -8,10 +8,7 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import team.silvertown.masil.common.exception.DataNotFoundException;
-import team.silvertown.masil.user.dto.LoginResponse;
-import team.silvertown.masil.user.exception.UserErrorCode;
-import team.silvertown.masil.user.service.UserService;
+import team.silvertown.masil.auth.dto.LoginResponse;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 
 @SpringBootTest

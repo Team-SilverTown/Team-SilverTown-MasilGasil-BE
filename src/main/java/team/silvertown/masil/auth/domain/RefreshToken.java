@@ -1,4 +1,4 @@
-package team.silvertown.masil.token.domain;
+package team.silvertown.masil.auth.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

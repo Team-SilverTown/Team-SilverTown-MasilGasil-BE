@@ -11,10 +11,8 @@ import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.Jwts.SIG;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.MacAlgorithm;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.auth.service.AuthService;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
@@ -52,7 +51,7 @@ import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.auth.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
@@ -96,6 +95,9 @@ class UserServiceTest extends LocalstackTest {
 
     @Autowired
     JwtProperties jwtProperties;
+
+    @Autowired
+    AuthService authService;
 
     @MockBean
     KakaoOAuthService kakaoOAuthService;
@@ -145,21 +147,10 @@ class UserServiceTest extends LocalstackTest {
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
 
             //when
-            LoginResponse tokenResponse = userService.login(VALID_KAKAO_TOKEN);
+            LoginResponse tokenResponse = authService.login(VALID_KAKAO_TOKEN);
 
             //then
             assertThat(tokenProvider.validateToken(tokenResponse.accessToken())).isTrue();
-        }
-
-        @Test
-        public void 토큰인증과정에서_문제가_생기면_예외가_발생한다() throws Exception {
-            //given
-            given(kakaoOAuthService.getUserInfo(anyString())).willThrow(RuntimeException.class);
-
-            //when, then
-            assertThatThrownBy(() -> userService.login(VALID_KAKAO_TOKEN))
-                .isInstanceOf(InvalidAuthenticationException.class)
-                .hasMessage(UserErrorCode.INVALID_OAUTH2_TOKEN.getMessage());
         }
 
         @Test
@@ -169,7 +160,7 @@ class UserServiceTest extends LocalstackTest {
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
 
             //when, then
-            assertThatThrownBy(() -> userService.login(VALID_KAKAO_TOKEN))
+            assertThatThrownBy(() -> authService.login(VALID_KAKAO_TOKEN))
                 .isInstanceOf(InvalidAuthenticationException.class)
                 .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
         }
@@ -694,13 +685,13 @@ class UserServiceTest extends LocalstackTest {
             //given
             OAuthResponse mockOAuthResponse = new OAuthResponse(VALID_PROVIDER, "123456");
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
-            LoginResponse tokenResponse = userService.login(VALID_KAKAO_TOKEN);
+            LoginResponse tokenResponse = authService.login(VALID_KAKAO_TOKEN);
             Claims claims = jwtParser.parseSignedClaims(tokenResponse.accessToken())
                 .getPayload();
             Long loginedUserId = claims.get(USER_ID_CLAIM, Long.class);
 
             //when
-            String newAccessToken = userService.refresh(tokenResponse.refreshToken());
+            String newAccessToken = authService.refresh(tokenResponse.refreshToken());
             Claims newClaims = jwtParser.parseSignedClaims(newAccessToken)
                 .getPayload();
             Long newLoginedUserId = newClaims.get(USER_ID_CLAIM, Long.class);
@@ -713,7 +704,7 @@ class UserServiceTest extends LocalstackTest {
         @Test
         public void 유효하지_않은_refreshToken을_전송할_경우_예외가_발생한다() throws Exception {
             //given, when, then
-            assertThatThrownBy(() -> userService.refresh(UUID.randomUUID()
+            assertThatThrownBy(() -> authService.refresh(UUID.randomUUID()
                 .toString()))
                 .isInstanceOf(InvalidAuthenticationException.class)
                 .hasMessage(UserErrorCode.INVALID_JWT_TOKEN.getMessage());
@@ -726,7 +717,7 @@ class UserServiceTest extends LocalstackTest {
                 Collections.singletonList(userAuthority.getAuthority()));
 
             //when, then
-            assertThatThrownBy(() -> userService.refresh(token.refreshToken()))
+            assertThatThrownBy(() -> authService.refresh(token.refreshToken()))
                 .isInstanceOf(DataNotFoundException.class)
                 .hasMessage(UserErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
         }

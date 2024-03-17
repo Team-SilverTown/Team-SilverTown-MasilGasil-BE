@@ -1,4 +1,4 @@
-package team.silvertown.masil.user.dto;
+package team.silvertown.masil.auth.dto;
 
 public record LoginResponse(
     String accessToken,
