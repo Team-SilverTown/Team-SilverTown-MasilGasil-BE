@@ -40,7 +40,9 @@ jobs:
         env:
           server.port: ${{ env.SERVER_PORT }}
           cors.service-origin: ${{ secrets.SERVICE_ORIGIN }}
+          sentry.dsn: ${{ secrets.SENTRY_DSN }}
 
+          spring.datasource.driver-class-name: ${{ secrets.DRIVER_CLASS_NAME }}
           spring.datasource.username: ${{ secrets.MYSQL_USERNAME }}
           spring.datasource.password: ${{ secrets.MYSQL_PASSWORD }}
           spring.datasource.url: ${{ secrets.MYSQL_URL }}
