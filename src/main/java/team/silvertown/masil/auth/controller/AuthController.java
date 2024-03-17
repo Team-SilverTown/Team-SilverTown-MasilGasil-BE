@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import team.silvertown.masil.auth.dto.LoginResponse;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "토큰 관련 API")
 public class AuthController {
 
     private static final String ACCESS_TOKEN_PREFIX = "Bearer ";
