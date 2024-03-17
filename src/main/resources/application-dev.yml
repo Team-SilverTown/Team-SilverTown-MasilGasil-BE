@@ -5,7 +5,7 @@ logging:
 snapadmin:
   enabled: true
 sentry:
-  dsn: ${SENTRY_DSN}
+  enabled: true
   environment: dev
   enable-tracing: true
   traces-sample-rate: 1.0

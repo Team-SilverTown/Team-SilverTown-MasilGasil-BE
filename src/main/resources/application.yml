@@ -52,3 +52,5 @@ snapadmin:
   baseUrl: admin-panel
   modelsPackage: team.silvertown.masil
   sql-console-enabled: false
+sentry:
+  dsn: ${SENTRY_DSN}
