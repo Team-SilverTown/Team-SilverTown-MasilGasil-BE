@@ -30,7 +30,6 @@ import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.dto.OnboardRequest;
-import team.silvertown.masil.user.dto.RefreshTokenRequest;
 import team.silvertown.masil.user.dto.UpdateRequest;
 import team.silvertown.masil.user.dto.UpdateResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
