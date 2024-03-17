@@ -15,7 +15,7 @@ springdoc:
   swagger-ui:
     enabled: false
 sentry:
-  dsn: ${SENTRY_DSN}
+  enabled: true
   environment: prod
   enable-tracing: true
   traces-sample-rate: 1.0
