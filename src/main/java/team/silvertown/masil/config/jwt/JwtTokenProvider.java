@@ -82,8 +82,11 @@ public class JwtTokenProvider {
     }
 
     private String createRefreshToken(Long userId) {
+        Date now = new Date();
+
         return Jwts.builder()
             .issuer(issuer)
+            .issuedAt(now)
             .claim(USER_ID_CLAIM, userId)
             .signWith(secretKey, algorithm)
             .compact();
