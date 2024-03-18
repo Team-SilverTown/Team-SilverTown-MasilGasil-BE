@@ -36,6 +36,7 @@ public class HttpRequestsConfigurer
         "/api/v1/posts/**",
 
         // mates
+        "/api/v1/mates",
         "/api/v1/mates/**"
     };
     private static final String USER_ME_RESOURCE = "/api/v1/users/me";
