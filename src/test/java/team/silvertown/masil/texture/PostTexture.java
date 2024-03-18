@@ -32,7 +32,19 @@ public final class PostTexture extends BaseDomainTexture {
         int totalTime = getRandomInt(600, 4200);
 
         return createPost(user, depth1, depth2, depth3, "", path, title, null, null,
-            (int) path.getLength(), totalTime);
+            (int) path.getLength(), totalTime, null);
+    }
+
+    public static Post createPrivatePost(User user) {
+        String addressDepth1 = MasilTexture.createAddressDepth1();
+        String addressDepth2 = MasilTexture.createAddressDepth2();
+        String addressDepth3 = MasilTexture.createAddressDepth3();
+        LineString path = MapTexture.createLineString(100);
+        String title = getRandomSentenceWithMax(29);
+        int totalTime = getRandomInt(600, 4200);
+
+        return createPost(user, addressDepth1, addressDepth2, addressDepth3, "", path, title, null,
+            null, (int) path.getLength(), totalTime, false);
     }
 
     public static Post createDependentPost(User user, int pathSize) {
@@ -44,7 +56,7 @@ public final class PostTexture extends BaseDomainTexture {
         int totalTime = getRandomInt(600, 4200);
 
         return createPost(user, addressDepth1, addressDepth2, addressDepth3, "", path, title, null,
-            null, (int) path.getLength(), totalTime);
+            null, (int) path.getLength(), totalTime, null);
     }
 
     public static Post createPostWithOptional(String content, String thumbnailUrl) {
@@ -57,7 +69,7 @@ public final class PostTexture extends BaseDomainTexture {
         int totalTime = getRandomInt(600, 4200);
 
         return createPost(user, addressDepth1, addressDepth2, addressDepth3, "", path, title,
-            content, thumbnailUrl, (int) path.getLength(), totalTime);
+            content, thumbnailUrl, (int) path.getLength(), totalTime, null);
     }
 
     public static Post createPost(
@@ -71,7 +83,8 @@ public final class PostTexture extends BaseDomainTexture {
         String content,
         String thumbnailUrl,
         Integer distance,
-        Integer totalTime
+        Integer totalTime,
+        Boolean isPublic
     ) {
         return Post.builder()
             .user(user)
@@ -85,6 +98,7 @@ public final class PostTexture extends BaseDomainTexture {
             .thumbnailUrl(thumbnailUrl)
             .distance(distance)
             .totalTime(totalTime)
+            .isPublic(isPublic)
             .build();
     }
 

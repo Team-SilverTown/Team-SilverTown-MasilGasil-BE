@@ -24,6 +24,32 @@ public final class UserTexture extends BaseDomainTexture {
             String.valueOf(getRandomId()));
     }
 
+    public static User createWalkedUser() {
+        String nickname = faker.funnyName()
+            .name();
+        LocalDate birthDate = faker.date()
+            .birthdayLocalDate(20, 40);
+        int height = getRandomInt(170, 190);
+        int weight = getRandomInt(70, 90);
+
+        return createUser(nickname, Sex.MALE, birthDate, height, weight,
+            ExerciseIntensity.MIDDLE, 5, 3, 200, true, true, Provider.KAKAO,
+            String.valueOf(getRandomId()));
+    }
+
+    public static User createPrivateUser() {
+        String nickname = faker.funnyName()
+            .name();
+        LocalDate birthDate = faker.date()
+            .birthdayLocalDate(20, 40);
+        int height = getRandomInt(170, 190);
+        int weight = getRandomInt(70, 90);
+
+        return createUser(nickname, Sex.MALE, birthDate, height, weight,
+            ExerciseIntensity.MIDDLE, 5, 3, 200, false, true, Provider.KAKAO,
+            String.valueOf(getRandomId()));
+    }
+
     public static User createUser(
         String nickname,
         Sex sex,

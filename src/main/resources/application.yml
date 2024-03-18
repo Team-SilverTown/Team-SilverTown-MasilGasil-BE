@@ -2,7 +2,7 @@ spring:
   profiles:
     active: local
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: ${DRIVER_CLASS_NAME}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     url: ${MYSQL_URL}
@@ -13,6 +13,10 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   servlet:
     multipart:
       enabled: true
@@ -37,6 +41,7 @@ jwt:
   token-validity-in-seconds: ${TOKEN_EXPIRATION}
 server:
   port: ${SERVER_PORT}
+  forward-headers-strategy: framework
 cors:
   service-origin: ${SERVICE_ORIGIN}
 springdoc:
@@ -47,3 +52,5 @@ snapadmin:
   baseUrl: admin-panel
   modelsPackage: team.silvertown.masil
   sql-console-enabled: false
+sentry:
+  dsn: ${SENTRY_DSN}

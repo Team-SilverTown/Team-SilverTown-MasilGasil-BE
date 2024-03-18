@@ -4,3 +4,12 @@ logging:
       SQL: debug
 snapadmin:
   enabled: true
+sentry:
+  enabled: true
+  environment: dev
+  enable-tracing: true
+  traces-sample-rate: 1.0
+  debug: false
+  logging:
+    minimum-event-level: warn
+    minimum-breadcrumb-level: debug

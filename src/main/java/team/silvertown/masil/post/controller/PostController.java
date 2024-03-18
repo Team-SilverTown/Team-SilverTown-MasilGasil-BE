@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,11 +19,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import team.silvertown.masil.common.scroll.OrderType;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
-import team.silvertown.masil.post.dto.request.NormalListRequest;
-import team.silvertown.masil.post.dto.request.PostOrderType;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
@@ -70,6 +72,7 @@ public class PostController {
             schema = @Schema(implementation = PostDetailResponse.class)
         )
     )
+    @SecurityRequirements
     public ResponseEntity<PostDetailResponse> getById(
         @PathVariable
         Long id
@@ -102,7 +105,7 @@ public class PostController {
             @Parameter(
                 name = "order",
                 in = ParameterIn.QUERY,
-                schema = @Schema(implementation = PostOrderType.class, defaultValue = "LATEST")
+                schema = @Schema(implementation = OrderType.class, defaultValue = "LATEST")
             ),
             @Parameter(
                 name = "cursor",
@@ -117,16 +120,29 @@ public class PostController {
         }
     )
     @SecurityRequirements()
-    public ResponseEntity<ScrollResponse<SimplePostResponse>> getSliceByAddress(
+    public ResponseEntity<ScrollResponse<SimplePostResponse>> getScrollBy(
         @AuthenticationPrincipal
-        Long userId,
+        Long loginId,
+        @RequestParam(required = false)
+        Long authorId,
         @Parameter(hidden = true)
         NormalListRequest request
     ) {
-        ScrollResponse<SimplePostResponse> response = postService.getSliceByAddress(userId,
-            request);
+        ScrollResponse<SimplePostResponse> response = getScrollResponse(loginId, authorId, request);
 
         return ResponseEntity.ok(response);
+    }
+
+    private ScrollResponse<SimplePostResponse> getScrollResponse(
+        Long loginId,
+        Long authorId,
+        NormalListRequest request
+    ) {
+        if (Objects.isNull(authorId)) {
+            return postService.getScrollByAddress(loginId, request);
+        }
+
+        return postService.getScrollByAuthor(loginId, authorId, request.getScrollRequest());
     }
 
 }
