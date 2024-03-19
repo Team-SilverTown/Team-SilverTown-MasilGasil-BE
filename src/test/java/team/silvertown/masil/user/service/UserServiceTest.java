@@ -33,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.auth.service.AuthService;
 import team.silvertown.masil.auth.service.KakaoOAuthService;
 import team.silvertown.masil.common.exception.BadRequestException;
@@ -163,7 +164,7 @@ class UserServiceTest extends LocalstackTest {
             //when, then
             assertThatThrownBy(() -> authService.login(VALID_KAKAO_TOKEN))
                 .isInstanceOf(InvalidAuthenticationException.class)
-                .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
+                .hasMessage(AuthErrorCode.INVALID_PROVIDER.getMessage());
         }
 
     }
@@ -714,7 +715,7 @@ class UserServiceTest extends LocalstackTest {
                 .toString(), UUID.randomUUID()
                 .toString()))
                 .isInstanceOf(DataNotFoundException.class)
-                .hasMessage(UserErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
+                .hasMessage(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
         }
 
         @Test
@@ -728,7 +729,7 @@ class UserServiceTest extends LocalstackTest {
                 //when, then
             assertThatThrownBy(() -> authService.refresh(token.refreshToken(), token.accessToken()))
                 .isInstanceOf(DataNotFoundException.class)
-                .hasMessage(UserErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
+                .hasMessage(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
         }
 
     }

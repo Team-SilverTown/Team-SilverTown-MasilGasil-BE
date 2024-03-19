@@ -2,6 +2,7 @@ package team.silvertown.masil.user.exception;
 
 import java.util.List;
 import java.util.Objects;
+import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
@@ -16,7 +17,7 @@ public class UserValidator extends Validator {
 
     public static void validateProvidedId(String providerId) {
         throwIf(Objects.isNull(providerId) || providerId.isEmpty(),
-            () -> new InvalidAuthenticationException(UserErrorCode.INVALID_PROVIDER_ID));
+            () -> new InvalidAuthenticationException(AuthErrorCode.INVALID_PROVIDER_ID));
     }
 
 }

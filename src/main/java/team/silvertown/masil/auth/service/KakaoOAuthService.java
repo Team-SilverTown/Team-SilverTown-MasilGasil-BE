@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.dto.KakaoResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
-import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.exception.UserValidator;
 import team.silvertown.masil.user.service.restTemplate.RestTemplateService;
 
@@ -23,7 +23,7 @@ public class KakaoOAuthService implements OAuthService {
     private final ObjectMapper objectMapper;
     private final RestTemplateService restTemplateService;
 
-    public OAuthResponse getUserInfo(String kakaoToken){
+    public OAuthResponse getUserInfo(String kakaoToken) {
         HashMap<String, Object> userInfo = new HashMap<>();
 
         try {
@@ -39,9 +39,9 @@ public class KakaoOAuthService implements OAuthService {
             userInfo.put("provider", KAKAO_PROVIDER);
 
             return OAuthResponse.from(userInfo);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("social login error occured, the reason is: {}", e.getMessage(), e);
-            throw new InvalidAuthenticationException(UserErrorCode.INVALID_OAUTH2_TOKEN);
+            throw new InvalidAuthenticationException(AuthErrorCode.INVALID_OAUTH2_TOKEN);
         }
 
     }

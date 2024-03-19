@@ -22,7 +22,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import team.silvertown.masil.user.domain.Authority;
-import team.silvertown.masil.auth.dto.LoginResponse;
 
 @Slf4j
 @Component

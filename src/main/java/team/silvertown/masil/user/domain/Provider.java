@@ -2,6 +2,7 @@ package team.silvertown.masil.user.domain;
 
 import java.util.Arrays;
 import lombok.Getter;
+import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.exception.UserErrorCode;
 
@@ -20,6 +21,6 @@ public enum Provider {
             .filter(provider -> provider.getValue()
                 .equals(value))
             .findFirst()
-            .orElseThrow(() -> new InvalidAuthenticationException(UserErrorCode.INVALID_PROVIDER));
+            .orElseThrow(() -> new InvalidAuthenticationException(AuthErrorCode.INVALID_PROVIDER));
     }
 }

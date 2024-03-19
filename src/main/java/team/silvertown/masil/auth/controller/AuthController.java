@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import team.silvertown.masil.auth.service.AuthService;
 import team.silvertown.masil.auth.dto.LoginResponse;
+import team.silvertown.masil.auth.service.AuthService;
 
 @RestController
 @RequiredArgsConstructor

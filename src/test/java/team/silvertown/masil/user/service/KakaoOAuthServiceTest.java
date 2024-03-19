@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.auth.service.KakaoOAuthService;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.dto.OAuthResponse;
@@ -58,7 +59,7 @@ class KakaoOAuthServiceTest {
         //when, then
         assertThatThrownBy(() -> kakaoOAuthService.getUserInfo(VALID_TOKEN))
             .isInstanceOf(InvalidAuthenticationException.class)
-            .hasMessage(UserErrorCode.INVALID_OAUTH2_TOKEN.getMessage());
+            .hasMessage(AuthErrorCode.INVALID_OAUTH2_TOKEN.getMessage());
     }
 
 }
