@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.Builder;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.mate.domain.Mate;
+import team.silvertown.masil.mate.domain.MateStatus;
 import team.silvertown.masil.post.domain.Post;
 
 @Builder
@@ -17,6 +18,7 @@ public record MateDetailResponse(
     OffsetDateTime gatheringAt,
     List<ParticipantResponse> participants,
     Integer capacity,
+    MateStatus status,
     Long authorId,
     String authorNickname,
     String authorProfileUrl,
@@ -35,6 +37,7 @@ public record MateDetailResponse(
             .gatheringAt(mate.getGatheringAt())
             .participants(participants)
             .capacity(mate.getCapacity())
+            .status(mate.getStatus())
             .authorId(mate.getAuthor().getId())
             .authorNickname(mate.getAuthor().getNickname())
             .authorProfileUrl(mate.getAuthor().getProfileImg())
