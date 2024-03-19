@@ -2,6 +2,7 @@ package team.silvertown.masil.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class KakaoOAuthService implements OAuthService {
     private final RestTemplateService restTemplateService;
 
     public OAuthResponse getUserInfo(String kakaoToken) {
-        HashMap<String, Object> userInfo = new HashMap<>();
+        Map<String, Object> userInfo = new HashMap<>();
 
         try {
             ResponseEntity<String> accountInfoResponse = restTemplateService.requestKaKaoInfo(
