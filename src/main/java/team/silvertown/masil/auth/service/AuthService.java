@@ -1,7 +1,6 @@
 package team.silvertown.masil.auth.service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,7 @@ import team.silvertown.masil.auth.domain.RefreshToken;
 import team.silvertown.masil.auth.repository.RefreshTokenRepository;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.validator.Validator;
-import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.auth.jwt.JwtTokenProvider;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.user.domain.Authority;
 import team.silvertown.masil.user.domain.Provider;
@@ -19,7 +18,6 @@ import team.silvertown.masil.auth.dto.LoginResponse;
 import team.silvertown.masil.user.dto.OAuthResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
 import team.silvertown.masil.user.repository.UserRepository;
-import team.silvertown.masil.user.service.KakaoOAuthService;
 import team.silvertown.masil.user.service.UserService;
 
 @Service
@@ -40,14 +38,13 @@ public class AuthService {
             oAuthResponse.providerId());
 
         if (user.isPresent()) {
-            LoginResponse loginResponse = joinedUserResponse(user.get());
+            LoginResponse loginResponse = returnLoginResponse(user.get());
             saveRefreshToken(loginResponse, user.get());
             return loginResponse;
         }
 
         User justSavedUser = userService.createAndSave(provider, oAuthResponse.providerId());
-        List<Authority> authorities = userService.getUserAuthorities(justSavedUser);
-        LoginResponse loginResponse = tokenProvider.createToken(justSavedUser.getId(), authorities);
+        LoginResponse loginResponse = returnLoginResponse(justSavedUser);
         saveRefreshToken(loginResponse, justSavedUser);
 
         return loginResponse;
@@ -83,10 +80,12 @@ public class AuthService {
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    private LoginResponse joinedUserResponse(User joinedUser) {
+    private LoginResponse returnLoginResponse(User joinedUser) {
         List<Authority> authorities = userService.getUserAuthorities(joinedUser);
+        String accessToken = tokenProvider.createAccessToken(joinedUser.getId(), authorities);
+        String refreshToken = tokenProvider.createRefreshToken(joinedUser.getId());
 
-        return tokenProvider.createToken(joinedUser.getId(), authorities);
+        return new LoginResponse(accessToken, refreshToken);
     }
 
 }
