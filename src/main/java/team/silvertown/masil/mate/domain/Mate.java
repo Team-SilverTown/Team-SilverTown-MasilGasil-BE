@@ -124,4 +124,12 @@ public class Mate extends BaseEntity {
         return this.gathering.getGatheringAt();
     }
 
+    public void closeIfPassed() {
+        OffsetDateTime now = OffsetDateTime.now();
+
+        if (now.isAfter(this.gathering.getGatheringAt())) {
+            this.status = MateStatus.CLOSED;
+        }
+    }
+
 }

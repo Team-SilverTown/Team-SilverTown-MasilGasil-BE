@@ -18,10 +18,15 @@ import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
 =======
 import team.silvertown.masil.mate.dto.MateCursorDto;
 >>>>>>> 4447400 (feat: 메이트 목록 조회 서비스 구현)
+=======
+import team.silvertown.masil.mate.dto.MateCursorDto;
+import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
+>>>>>>> 034ba79 (feat: 메이트 조회 시 모임 시간이 지나면 상태 변경)
 import team.silvertown.masil.mate.dto.request.CreateMateRequest;
 import team.silvertown.masil.mate.dto.response.CreateMateParticipantResponse;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
@@ -65,7 +70,7 @@ public class MateService {
         return new CreateMateResponse(mate.getId());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public MateDetailResponse getDetailById(Long id) {
         Mate mate = mateRepository.findDetailById(id)
             .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
@@ -74,10 +79,31 @@ public class MateService {
             .map(ParticipantResponse::from)
             .toList();
 
+        mate.closeIfPassed();
+
         return MateDetailResponse.from(mate, participants);
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    @Transactional
+    public ScrollResponse<SimpleMateResponse> getScrollByAddress(NormalListRequest request) {
+        List<MateCursorDto> matesWithCursor = mateRepository.findScrollByAddress(request);
+
+        return getScrollResponse(matesWithCursor, request.getSize());
+    }
+
+    @Transactional
+    public ScrollResponse<SimpleMateResponse> getScrollByPost(Long postId, ScrollRequest request) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(getNotFoundException(MateErrorCode.POST_NOT_FOUND));
+        List<MateCursorDto> matesWithCursor = mateRepository.findScrollByPost(post, request);
+
+        return getScrollResponse(matesWithCursor, request.getSize());
+    }
+
+>>>>>>> 034ba79 (feat: 메이트 조회 시 모임 시간이 지나면 상태 변경)
     @Transactional
     public CreateMateParticipantResponse applyParticipation(
         Long userId,
@@ -164,7 +190,7 @@ public class MateService {
     ) {
         List<SimpleMateResponse> mates = matesWithCursor.stream()
             .limit(size)
-            .map(MateCursorDto::mate)
+            .map(this::getSimpleMate)
             .toList();
         String lastCursor = getLastCursor(matesWithCursor, size);
 
@@ -178,6 +204,14 @@ public class MateService {
         }
 
         return null;
+    }
+
+    private SimpleMateResponse getSimpleMate(MateCursorDto mateCursorDto) {
+        Mate mate = mateCursorDto.mate();
+
+        mate.closeIfPassed();
+
+        return SimpleMateResponse.from(mate);
     }
 
 }
