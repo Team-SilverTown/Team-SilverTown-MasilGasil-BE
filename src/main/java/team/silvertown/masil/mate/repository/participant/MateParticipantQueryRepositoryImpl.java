@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import team.silvertown.masil.mate.domain.Mate;
@@ -20,10 +21,10 @@ public class MateParticipantQueryRepositoryImpl implements MateParticipantQueryR
 
     private final JPAQueryFactory jpaQueryFactory;
     private final QMateParticipant mateParticipant = QMateParticipant.mateParticipant;
+    private final QMate mate = QMate.mate;
 
     @Override
     public boolean existsInSimilarTime(User user, OffsetDateTime gatheringAt) {
-        QMate mate = QMate.mate;
         OffsetDateTime beforeHour = gatheringAt.minusHours(1);
         OffsetDateTime afterHour = gatheringAt.plusHours(1);
         BooleanBuilder condition = new BooleanBuilder()
@@ -51,6 +52,16 @@ public class MateParticipantQueryRepositoryImpl implements MateParticipantQueryR
             .fetchJoin()
             .where(mateParticipant.mate.eq(mate))
             .fetch();
+    }
+
+    @Override
+    public Optional<MateParticipant> findByIdWithMate(Long id) {
+        return Optional.ofNullable(jpaQueryFactory
+            .selectFrom(mateParticipant)
+            .join(mateParticipant.mate, mate)
+            .fetchJoin()
+            .where(mateParticipant.id.eq(id))
+            .fetchFirst());
     }
 
 }
