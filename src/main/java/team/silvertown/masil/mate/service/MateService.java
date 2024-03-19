@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
-import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
@@ -28,6 +26,7 @@ import team.silvertown.masil.mate.dto.response.SimpleMateResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.mate.repository.mate.MateRepository;
 import team.silvertown.masil.mate.repository.participant.MateParticipantRepository;
+import team.silvertown.masil.mate.validator.MateValidator;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.repository.PostRepository;
 import team.silvertown.masil.user.domain.User;
@@ -46,12 +45,10 @@ public class MateService {
     public CreateMateResponse create(Long userId, CreateMateRequest request) {
         User author = userRepository.findById(userId)
             .orElseThrow(getNotFoundException(MateErrorCode.USER_NOT_FOUND));
-        boolean isParticipating = mateParticipantRepository.existsInSimilarTime(author,
+        boolean isParticipatingAnother = mateParticipantRepository.existsInSimilarTime(author,
             request.gatheringAt());
 
-        if (isParticipating) {
-            throw new BadRequestException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME);
-        }
+        MateValidator.validateSoleParticipation(isParticipatingAnother);
 
         Post post = postRepository.findById(request.postId())
             .orElseThrow(getNotFoundException(MateErrorCode.POST_NOT_FOUND));
@@ -103,17 +100,30 @@ public class MateService {
         Mate mate = mateRepository.findById(id)
             .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
 
-        boolean participatesAround = mateParticipantRepository.existsInSimilarTime(user,
+        boolean isParticipatingAnother = mateParticipantRepository.existsInSimilarTime(user,
             mate.getGatheringAt());
 
-        if (participatesAround) {
-            throw new DuplicateResourceException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME);
-        }
+        MateValidator.validateSoleParticipation(isParticipatingAnother);
 
         MateParticipant mateParticipant = createMateParticipant(user, mate,
             ParticipantStatus.REQUESTED, request.message());
 
         return new CreateMateParticipantResponse(mateParticipant.getId());
+    }
+
+    @Transactional
+    public void acceptParticipation(Long authorId, Long id, Long participantId) {
+        MateParticipant mateParticipant = mateParticipantRepository.findWithMateById(participantId)
+            .orElseThrow(getNotFoundException(MateErrorCode.PARTICIPANT_NOT_FOUND));
+
+        MateValidator.validateParticipantAcceptance(authorId, id, mateParticipant);
+
+        boolean isParticipatingAnother = mateParticipantRepository.existsInSimilarTime(
+            mateParticipant.getUser(), mateParticipant.getMate().getGatheringAt());
+
+        MateValidator.validateSoleParticipation(isParticipatingAnother);
+
+        mateParticipant.acceptParticipant();
     }
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
