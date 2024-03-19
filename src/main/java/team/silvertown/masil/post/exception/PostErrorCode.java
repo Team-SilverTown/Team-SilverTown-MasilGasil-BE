@@ -19,6 +19,7 @@ public enum PostErrorCode implements ErrorCode {
     POST_NOT_FOUND(20220400, "해당 아이디의 산책로 포스트를 찾을 수 없습니다"),
 
     NULL_MASIL(202_30000, "핀의 산책로 포스트를 확인할 수 없습니다"),
+    NULL_IS_LIKE(202_30001, "좋아요 상태는 null이 될 수 없습니다"),
     PIN_OWNER_NOT_MATCHING(202_30300, "산책로 포스트의 사용자와 핀의 사용자가 다릅니다"),
 
     NULL_USER(202_90000, "산책로 포스트 사용자를 확인할 수 없습니다"),
