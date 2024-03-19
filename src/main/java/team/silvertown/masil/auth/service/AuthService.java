@@ -80,6 +80,7 @@ public class AuthService {
         RefreshToken tokenInRedis = refreshTokenRepository.findById(refreshToken)
             .orElseThrow(() -> new BadRequestException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
         Long userId = tokenInRedis.getMemberId();
+
         return userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
     }
