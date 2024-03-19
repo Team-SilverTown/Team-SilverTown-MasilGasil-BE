@@ -155,7 +155,7 @@ class MateServiceTest {
         ThrowingCallable create = () -> mateService.create(author.getId(), request);
 
         // then
-        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+        assertThatExceptionOfType(DuplicateResourceException.class).isThrownBy(create)
             .withMessage(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME.getMessage());
     }
 

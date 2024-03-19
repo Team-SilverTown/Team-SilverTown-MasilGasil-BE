@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.exception.BadRequestException;
+import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.mate.domain.Mate;
@@ -57,6 +58,11 @@ public final class MateValidator extends Validator {
 
         validateAuthForManipulation(authorId, mate);
         validateParticipantUnderMate(mateId, mate);
+    }
+
+    public static void validateSoleParticipation(boolean isParticipatingAnotherMate) {
+        throwIf(isParticipatingAnotherMate,
+            () -> new DuplicateResourceException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME));
     }
 
     private static void validateParticipantUnderMate(
