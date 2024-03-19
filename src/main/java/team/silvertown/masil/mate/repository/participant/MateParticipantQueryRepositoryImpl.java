@@ -55,7 +55,7 @@ public class MateParticipantQueryRepositoryImpl implements MateParticipantQueryR
     }
 
     @Override
-    public Optional<MateParticipant> findByIdWithMate(Long id) {
+    public Optional<MateParticipant> findWithMateById(Long id) {
         return Optional.ofNullable(jpaQueryFactory
             .selectFrom(mateParticipant)
             .join(mateParticipant.mate, mate)

@@ -16,7 +16,6 @@ import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.QMate;
 import team.silvertown.masil.mate.dto.MateCursorDto;
-import team.silvertown.masil.mate.dto.response.SimpleMateResponse;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.user.domain.QUser;
 
@@ -90,22 +89,8 @@ public class MateQueryRepositoryImpl implements MateQueryRepository {
     private ConstructorExpression<MateCursorDto> projectMateCursor(StringExpression cursor) {
         return Projections.constructor(
             MateCursorDto.class,
-            projectSimpleMate(),
+            mate,
             cursor
-        );
-    }
-
-    private ConstructorExpression<SimpleMateResponse> projectSimpleMate() {
-        return Projections.constructor(
-            SimpleMateResponse.class,
-            mate.id,
-            mate.title,
-            mate.gathering.gatheringAt,
-            mate.status,
-            mate.capacity,
-            mate.author.id,
-            mate.author.nickname,
-            mate.author.profileImg
         );
     }
 
