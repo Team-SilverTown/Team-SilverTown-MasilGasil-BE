@@ -1,7 +1,6 @@
-package team.silvertown.masil.user.service;
+package team.silvertown.masil.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

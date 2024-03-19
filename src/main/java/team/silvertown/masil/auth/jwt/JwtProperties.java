@@ -1,4 +1,4 @@
-package team.silvertown.masil.config.jwt;
+package team.silvertown.masil.auth.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

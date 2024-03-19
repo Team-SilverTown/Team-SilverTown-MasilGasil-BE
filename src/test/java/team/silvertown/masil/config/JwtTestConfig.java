@@ -6,7 +6,7 @@ import java.util.Base64;
 import javax.crypto.SecretKey;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import team.silvertown.masil.config.jwt.JwtProperties;
+import team.silvertown.masil.auth.jwt.JwtProperties;
 
 @Configuration
 public class JwtTestConfig {
