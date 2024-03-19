@@ -72,6 +72,7 @@ public class PostController {
             schema = @Schema(implementation = PostDetailResponse.class)
         )
     )
+    @SecurityRequirements
     public ResponseEntity<PostDetailResponse> getById(
         @PathVariable
         Long id

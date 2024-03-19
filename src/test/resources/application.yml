@@ -7,5 +7,11 @@ spring:
     hibernate:
       ddl-auto: create-drop
     open-in-view: false
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
   flyway:
     enabled: false
+sentry:
+  enabled: false

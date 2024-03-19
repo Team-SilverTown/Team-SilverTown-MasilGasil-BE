@@ -1,8 +1,8 @@
-name: Deploy dev API to Amazon ECS
+name: Deploy prod API to Amazon ECS
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "prod" ]
 
 permissions:
   contents: read
@@ -13,9 +13,9 @@ env:
 
 jobs:
   job:
-    name: Deploy dev API
+    name: Deploy prod API
     runs-on: ubuntu-latest
-    environment: dev
+    environment: prod
     steps:
       - name: 체크 아웃
         uses: actions/checkout@v3

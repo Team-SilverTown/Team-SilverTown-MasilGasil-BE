@@ -11,15 +11,20 @@ import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
+import team.silvertown.masil.common.scroll.dto.NormalListRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollRequest;
+import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
 import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
+import team.silvertown.masil.mate.dto.MateCursorDto;
 import team.silvertown.masil.mate.dto.request.CreateMateRequest;
 import team.silvertown.masil.mate.dto.response.CreateMateParticipantResponse;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
 import team.silvertown.masil.mate.dto.response.MateDetailResponse;
 import team.silvertown.masil.mate.dto.response.ParticipantResponse;
+import team.silvertown.masil.mate.dto.response.SimpleMateResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.mate.repository.mate.MateRepository;
 import team.silvertown.masil.mate.repository.participant.MateParticipantRepository;
@@ -67,6 +72,22 @@ public class MateService {
             .toList();
 
         return MateDetailResponse.from(mate, participants);
+    }
+
+    @Transactional(readOnly = true)
+    public ScrollResponse<SimpleMateResponse> getScrollByAddress(NormalListRequest request) {
+        List<MateCursorDto> matesWithCursor = mateRepository.findScrollByAddress(request);
+
+        return getScrollResponse(matesWithCursor, request.getSize());
+    }
+
+    @Transactional(readOnly = true)
+    public ScrollResponse<SimpleMateResponse> getScrollByPost(Long postId, ScrollRequest request) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(getNotFoundException(MateErrorCode.POST_NOT_FOUND));
+        List<MateCursorDto> matesWithCursor = mateRepository.findScrollByPost(post, request);
+
+        return getScrollResponse(matesWithCursor, request.getSize());
     }
 
     @Transactional
@@ -131,6 +152,28 @@ public class MateService {
             .build();
 
         return mateParticipantRepository.save(mateParticipant);
+    }
+
+    private ScrollResponse<SimpleMateResponse> getScrollResponse(
+        List<MateCursorDto> matesWithCursor,
+        int size
+    ) {
+        List<SimpleMateResponse> mates = matesWithCursor.stream()
+            .limit(size)
+            .map(MateCursorDto::mate)
+            .toList();
+        String lastCursor = getLastCursor(matesWithCursor, size);
+
+        return ScrollResponse.from(mates, lastCursor);
+    }
+
+    private String getLastCursor(List<MateCursorDto> matesWithCursor, int size) {
+        if (matesWithCursor.size() > size) {
+            return matesWithCursor.get(size - 1)
+                .cursor();
+        }
+
+        return null;
     }
 
 }

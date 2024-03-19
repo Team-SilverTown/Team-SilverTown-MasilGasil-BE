@@ -25,6 +25,9 @@ public class HttpRequestsConfigurer
     };
     private static final String AUTH_RESOURCE = "/api/v1/users/login";
     private static final String[] GET_PERMIT_ALL_RESOURCES = {
+        // health check
+        "/healthy",
+
         // users
         "api/v1/users/**",
 
@@ -33,6 +36,7 @@ public class HttpRequestsConfigurer
         "/api/v1/posts/**",
 
         // mates
+        "/api/v1/mates",
         "/api/v1/mates/**"
     };
     private static final String USER_ME_RESOURCE = "/api/v1/users/me";

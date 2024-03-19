@@ -22,3 +22,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+snapadmin:
+  enabled: true
+sentry:
+  enabled: false

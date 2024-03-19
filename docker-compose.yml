@@ -32,5 +32,17 @@ services:
     volumes:
       - "./localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+  redis-local:
+    image: redis:7.2.4-alpine
+    container_name: redis-local
+    ports:
+      - "6379:6379"
+    volumes:
+      - data_volume:/data
+      - data_volume:/usr/local/conf/redis.conf
+    labels:
+      - name=redis
+      - mode=standalone
+    command: redis-server /usr/local/conf/redis.conf
 volumes:
   data_volume:
