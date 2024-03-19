@@ -38,6 +38,7 @@ public class JwtTokenProvider {
     private static final int MILLS = 1000;
 
     private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
     private final String issuer;
     private final MacAlgorithm algorithm;
     private final SecretKey secretKey;
@@ -47,6 +48,8 @@ public class JwtTokenProvider {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
 
         this.accessTokenValidityInMilliseconds = jwtProperties.accessTokenValidityInSeconds()
+            * MILLS;
+        refreshTokenValidityInMilliseconds = jwtProperties.refreshTokenValidityInSeconds()
             * MILLS;
         this.issuer = jwtProperties.issuer();
         this.algorithm = Jwts.SIG.HS512;
@@ -75,10 +78,12 @@ public class JwtTokenProvider {
 
     public String createRefreshToken(Long userId) {
         Date now = new Date();
+        Date refreshValidity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
 
         return Jwts.builder()
             .issuer(issuer)
             .issuedAt(now)
+            .expiration(refreshValidity)
             .claim(USER_ID_CLAIM, userId)
             .signWith(secretKey, algorithm)
             .compact();

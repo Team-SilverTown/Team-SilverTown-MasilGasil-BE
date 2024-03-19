@@ -12,7 +12,8 @@ import team.silvertown.masil.auth.jwt.JwtProperties;
 public class JwtTestConfig {
 
     private static final String JWT_ISSUER = "test issuer";
-    private static final Long TOKEN_VALIDITY_IN_SECONDS = 1000L;
+    private static final Long ACCESS_TOKEN_VALIDITY_IN_SECONDS = 1000L;
+    private static final Long REFRESH_TOKEN_VALIDITY_IN_SECONDS = 10000L;
 
     @Bean
     public JwtProperties jwtProperties() {
@@ -23,7 +24,8 @@ public class JwtTestConfig {
 
         return new JwtProperties(JWT_ISSUER,
             base64Secret,
-            TOKEN_VALIDITY_IN_SECONDS);
+            ACCESS_TOKEN_VALIDITY_IN_SECONDS,
+            REFRESH_TOKEN_VALIDITY_IN_SECONDS);
     }
 
 }
