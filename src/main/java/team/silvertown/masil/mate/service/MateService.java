@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.exception.DuplicateResourceException;
 import team.silvertown.masil.common.exception.ErrorCode;
 import team.silvertown.masil.common.map.KakaoPointMapper;
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
@@ -16,8 +17,10 @@ import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
+import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
 import team.silvertown.masil.mate.dto.MateCursorDto;
 import team.silvertown.masil.mate.dto.request.CreateMateRequest;
+import team.silvertown.masil.mate.dto.response.CreateMateParticipantResponse;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
 import team.silvertown.masil.mate.dto.response.MateDetailResponse;
 import team.silvertown.masil.mate.dto.response.ParticipantResponse;
@@ -47,14 +50,14 @@ public class MateService {
             request.gatheringAt());
 
         if (isParticipating) {
-            throw new BadRequestException(MateErrorCode.OVERGENERATION_IN_SIMILAR_TIME);
+            throw new BadRequestException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME);
         }
 
         Post post = postRepository.findById(request.postId())
             .orElseThrow(getNotFoundException(MateErrorCode.POST_NOT_FOUND));
         Mate mate = createMate(author, post, request);
 
-        createMateParticipant(author, mate, ParticipantStatus.ACCEPTED.name());
+        createMateParticipant(author, mate, ParticipantStatus.ACCEPTED, null);
 
         return new CreateMateResponse(mate.getId());
     }
@@ -87,6 +90,30 @@ public class MateService {
         return getScrollResponse(matesWithCursor, request.getSize());
     }
 
+    @Transactional
+    public CreateMateParticipantResponse applyParticipation(
+        Long userId,
+        Long id,
+        CreateMateParticipantRequest request
+    ) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(getNotFoundException(MateErrorCode.USER_NOT_FOUND));
+        Mate mate = mateRepository.findById(id)
+            .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
+
+        boolean participatesAround = mateParticipantRepository.existsInSimilarTime(user,
+            mate.getGatheringAt());
+
+        if (participatesAround) {
+            throw new DuplicateResourceException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME);
+        }
+
+        MateParticipant mateParticipant = createMateParticipant(user, mate,
+            ParticipantStatus.REQUESTED, request.message());
+
+        return new CreateMateParticipantResponse(mateParticipant.getId());
+    }
+
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
@@ -111,14 +138,20 @@ public class MateService {
         return mateRepository.save(mate);
     }
 
-    private void createMateParticipant(User user, Mate mate, String status) {
+    private MateParticipant createMateParticipant(
+        User user,
+        Mate mate,
+        ParticipantStatus status,
+        String message
+    ) {
         MateParticipant mateParticipant = MateParticipant.builder()
             .user(user)
             .mate(mate)
             .status(status)
+            .message(message)
             .build();
 
-        mateParticipantRepository.save(mateParticipant);
+        return mateParticipantRepository.save(mateParticipant);
     }
 
     private ScrollResponse<SimpleMateResponse> getScrollResponse(

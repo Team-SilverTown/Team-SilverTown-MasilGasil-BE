@@ -9,8 +9,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.mate.domain.MateParticipant.MateParticipantBuilder;
 import team.silvertown.masil.mate.exception.MateErrorCode;
@@ -35,9 +34,8 @@ class MateParticipantTest {
     }
 
     @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "ACCEPTED"})
-    void 메이트_참여자를_생성할_수_있다(String status) {
+    @EnumSource(ParticipantStatus.class)
+    void 메이트_참여자를_생성할_수_있다(ParticipantStatus status) {
         // given
         MateParticipantBuilder builder = MateParticipant.builder()
             .user(user)
@@ -48,8 +46,8 @@ class MateParticipantTest {
         MateParticipant actual = builder.build();
 
         // then
-        ParticipantStatus expected = "ACCEPTED".equals(status) ? ParticipantStatus.ACCEPTED
-            : ParticipantStatus.REQUESTED;
+        ParticipantStatus expected = ParticipantStatus.ACCEPTED == status
+            ? ParticipantStatus.ACCEPTED : ParticipantStatus.REQUESTED;
 
         assertThat(actual.getStatus()).isEqualTo(expected);
     }
