@@ -714,8 +714,8 @@ class UserServiceTest extends LocalstackTest {
             assertThatThrownBy(() -> authService.refresh(UUID.randomUUID()
                 .toString(), UUID.randomUUID()
                 .toString()))
-                .isInstanceOf(DataNotFoundException.class)
-                .hasMessage(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
+                .isInstanceOf(InvalidAuthenticationException.class)
+                .hasMessage(AuthErrorCode.INVALID_JWT_TOKEN.getMessage());
         }
 
         @Test
