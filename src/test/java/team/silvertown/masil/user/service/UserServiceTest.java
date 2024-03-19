@@ -8,9 +8,17 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static team.silvertown.masil.texture.BaseDomainTexture.getRandomInt;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.crypto.SecretKey;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -25,10 +33,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import team.silvertown.masil.auth.exception.AuthErrorCode;
+import team.silvertown.masil.auth.service.AuthService;
+import team.silvertown.masil.auth.service.KakaoOAuthService;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
-import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.auth.jwt.JwtProperties;
+import team.silvertown.masil.auth.jwt.JwtTokenProvider;
 import team.silvertown.masil.image.exception.ImageErrorCode;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.texture.UserAuthorityTexture;
@@ -41,7 +53,7 @@ import team.silvertown.masil.user.domain.Sex;
 import team.silvertown.masil.user.domain.User;
 import team.silvertown.masil.user.domain.UserAgreement;
 import team.silvertown.masil.user.domain.UserAuthority;
-import team.silvertown.masil.user.dto.LoginResponse;
+import team.silvertown.masil.auth.dto.LoginResponse;
 import team.silvertown.masil.user.dto.MeInfoResponse;
 import team.silvertown.masil.user.dto.MyPageInfoResponse;
 import team.silvertown.masil.user.dto.NicknameCheckResponse;
@@ -82,6 +94,12 @@ class UserServiceTest extends LocalstackTest {
 
     @Autowired
     UserAgreementRepository userAgreementRepository;
+
+    @Autowired
+    JwtProperties jwtProperties;
+
+    @Autowired
+    AuthService authService;
 
     @MockBean
     KakaoOAuthService kakaoOAuthService;
@@ -131,21 +149,10 @@ class UserServiceTest extends LocalstackTest {
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
 
             //when
-            LoginResponse tokenResponse = userService.login(VALID_KAKAO_TOKEN);
+            LoginResponse tokenResponse = authService.login(VALID_KAKAO_TOKEN);
 
             //then
-            assertThat(tokenProvider.validateToken(tokenResponse.token())).isTrue();
-        }
-
-        @Test
-        public void 토큰인증과정에서_문제가_생기면_예외가_발생한다() throws Exception {
-            //given
-            given(kakaoOAuthService.getUserInfo(anyString())).willThrow(RuntimeException.class);
-
-            //when, then
-            assertThatThrownBy(() -> userService.login(VALID_KAKAO_TOKEN))
-                .isInstanceOf(InvalidAuthenticationException.class)
-                .hasMessage(UserErrorCode.INVALID_OAUTH2_TOKEN.getMessage());
+            assertThat(tokenProvider.validateToken(tokenResponse.accessToken())).isTrue();
         }
 
         @Test
@@ -155,9 +162,9 @@ class UserServiceTest extends LocalstackTest {
             given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
 
             //when, then
-            assertThatThrownBy(() -> userService.login(VALID_KAKAO_TOKEN))
+            assertThatThrownBy(() -> authService.login(VALID_KAKAO_TOKEN))
                 .isInstanceOf(InvalidAuthenticationException.class)
-                .hasMessage(UserErrorCode.INVALID_PROVIDER.getMessage());
+                .hasMessage(AuthErrorCode.INVALID_PROVIDER.getMessage());
         }
 
     }
@@ -645,6 +652,84 @@ class UserServiceTest extends LocalstackTest {
             assertThatThrownBy(() -> userService.updateProfile(file, savedUser.getId()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ImageErrorCode.NOT_SUPPORTED_CONTENT.getMessage());
+        }
+
+    }
+
+    @Nested
+    class 리프레시_토큰_생성_테스트 {
+
+        JwtParser jwtParser;
+        User user;
+        User anotherUser;
+        UserAuthority userAuthority;
+        UserAuthority anotherUserAuthority;
+
+        private static final String USER_ID_CLAIM = "user_id";
+
+        @BeforeEach
+        void setup() {
+            byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
+            String issuer = jwtProperties.issuer();
+            SecretKey secretKey = Keys.hmacShaKeyFor(keyBytes);
+            jwtParser = Jwts.parser()
+                .verifyWith(secretKey)
+                .requireIssuer(issuer)
+                .build();
+
+            user = UserTexture.createValidUser();
+            anotherUser = UserTexture.createValidUser();
+            userRepository.save(user);
+            userRepository.save(anotherUser);
+            userAuthority = UserAuthorityTexture.generateRestrictAuthority(user);
+            anotherUserAuthority = UserAuthorityTexture.generateRestrictAuthority(anotherUser);
+            userAuthorityRepository.save(userAuthority);
+            userAuthorityRepository.save(anotherUserAuthority);
+        }
+
+        @Test
+        public void 정상적으로_리프레시_토큰을_받아_새로운_accessToken을_생성한다() throws Exception {
+            //given
+            OAuthResponse mockOAuthResponse = new OAuthResponse(VALID_PROVIDER, "123456");
+            given(kakaoOAuthService.getUserInfo(anyString())).willReturn(mockOAuthResponse);
+            LoginResponse tokenResponse = authService.login(VALID_KAKAO_TOKEN);
+            Claims claims = jwtParser.parseSignedClaims(tokenResponse.accessToken())
+                .getPayload();
+            Long loginedUserId = claims.get(USER_ID_CLAIM, Long.class);
+
+            //when
+            String newAccessToken = authService.refresh(tokenResponse.refreshToken(), tokenResponse.accessToken()).substring(7);
+            Claims newClaims = jwtParser.parseSignedClaims(newAccessToken)
+                .getPayload();
+            Long newLoginedUserId = newClaims.get(USER_ID_CLAIM, Long.class);
+
+            //then
+            assertThat(tokenProvider.validateToken(newAccessToken)).isTrue();
+            assertThat(loginedUserId).isEqualTo(newLoginedUserId);
+        }
+
+        @Test
+        public void 유효하지_않은_refreshToken을_전송할_경우_예외가_발생한다() throws Exception {
+            //given, when, then
+            assertThatThrownBy(() -> authService.refresh(UUID.randomUUID()
+                .toString(), UUID.randomUUID()
+                .toString()))
+                .isInstanceOf(InvalidAuthenticationException.class)
+                .hasMessage(AuthErrorCode.INVALID_JWT_TOKEN.getMessage());
+        }
+
+        @Test
+        public void Redis에_refreshToken이_존재하지_않을_경우_예외가_발생한다() throws Exception {
+            //given
+            String accessToken = tokenProvider.createAccessToken(user.getId(),
+                Collections.singletonList(userAuthority.getAuthority()));
+            String refreshToken = tokenProvider.createRefreshToken(user.getId());
+            LoginResponse token = new LoginResponse(accessToken, refreshToken);
+
+                //when, then
+            assertThatThrownBy(() -> authService.refresh(token.refreshToken(), token.accessToken()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
         }
 
     }

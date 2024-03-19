@@ -1,6 +1,7 @@
 package team.silvertown.masil.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.OAuthFlow;
@@ -36,6 +37,12 @@ import org.springframework.context.annotation.Configuration;
                     tokenUrl = "https://kauth.kakao.com/oauth/token"
                 )
             )
+        ),
+        @SecurityScheme(
+            name = "리프레시 토큰",
+            type = SecuritySchemeType.APIKEY,
+            in = SecuritySchemeIn.HEADER,
+            paramName = "Refresh-Token"
         )
     }
 )
