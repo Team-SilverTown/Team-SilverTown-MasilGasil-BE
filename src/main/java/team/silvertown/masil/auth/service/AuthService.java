@@ -10,6 +10,7 @@ import team.silvertown.masil.auth.dto.LoginResponse;
 import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.auth.jwt.JwtTokenProvider;
 import team.silvertown.masil.auth.repository.RefreshTokenRepository;
+import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
@@ -46,9 +47,9 @@ public class AuthService {
             return loginResponse;
         }
 
-        User justSavedUser = userService.createAndSave(provider, oAuthResponse.providerId());
-        LoginResponse loginResponse = returnLoginResponse(justSavedUser);
-        saveRefreshToken(loginResponse, justSavedUser);
+        User newUser = userService.createAndSave(provider, oAuthResponse.providerId());
+        LoginResponse loginResponse = returnLoginResponse(newUser);
+        saveRefreshToken(loginResponse, newUser);
 
         return loginResponse;
     }
@@ -77,7 +78,7 @@ public class AuthService {
 
     private User getUserFromRefreshToken(String refreshToken) {
         RefreshToken tokenInRedis = refreshTokenRepository.findById(refreshToken)
-            .orElseThrow(() -> new DataNotFoundException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
+            .orElseThrow(() -> new BadRequestException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
         Long userId = tokenInRedis.getMemberId();
         return userRepository.findById(userId)
             .orElseThrow(() -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
