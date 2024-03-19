@@ -10,11 +10,6 @@ import team.silvertown.masil.user.domain.UserAuthority;
 
 public class UserValidator extends Validator {
 
-    public static void validateAuthority(List<UserAuthority> authorities) {
-        throwIf(authorities.isEmpty(),
-            () -> new DataNotFoundException(UserErrorCode.AUTHORITY_NOT_FOUND));
-    }
-
     public static void validateProvidedId(String providerId) {
         throwIf(Objects.isNull(providerId) || providerId.isEmpty(),
             () -> new InvalidAuthenticationException(AuthErrorCode.INVALID_PROVIDER_ID));
