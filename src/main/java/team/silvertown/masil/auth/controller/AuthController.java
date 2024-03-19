@@ -57,7 +57,6 @@ public class AuthController {
             @SecurityRequirement(name = "리프레시 토큰")
         }
     )
-
     public ResponseEntity<Void> refresh(
         HttpServletRequest request
     ) {
