@@ -1,4 +1,4 @@
-package team.silvertown.masil.config.jwt;
+package team.silvertown.masil.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -58,13 +58,6 @@ public class JwtTokenProvider {
             .build();
     }
 
-    public LoginResponse createToken(long userId, List<Authority> authorities) {
-        String accessToken = createAccessToken(userId, authorities);
-        String refreshToken = createRefreshToken(userId);
-
-        return new LoginResponse(accessToken, refreshToken);
-    }
-
     public String createAccessToken(long userId, List<Authority> authorities) {
         Date now = new Date();
         Date accessValidity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
@@ -81,7 +74,7 @@ public class JwtTokenProvider {
             .compact();
     }
 
-    private String createRefreshToken(Long userId) {
+    public String createRefreshToken(Long userId) {
         Date now = new Date();
 
         return Jwts.builder()
@@ -107,12 +100,6 @@ public class JwtTokenProvider {
             .toList();
 
         return new UsernamePasswordAuthenticationToken(userId, token, authorities);
-    }
-
-    public Long getUserIdPrincipal(String token){
-        Claims claims = jwtParser.parseSignedClaims(token)
-            .getPayload();
-        return claims.get(USER_ID_CLAIM, Long.class);
     }
 
     public boolean validateToken(String token) {
