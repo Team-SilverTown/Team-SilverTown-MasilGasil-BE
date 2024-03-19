@@ -1,6 +1,7 @@
 package team.silvertown.masil.mate.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -63,12 +64,14 @@ public class MateService {
     }
 
     @Transactional
-    public MateDetailResponse getDetailById(Long id) {
+    public MateDetailResponse getDetailById(Long userId, Long id) {
         Mate mate = mateRepository.findDetailById(id)
             .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
+        boolean isAuthor = Objects.equals(userId, mate.getAuthor().getId());
         List<ParticipantResponse> participants = mateParticipantRepository.findAllByMate(mate)
             .stream()
-            .map(ParticipantResponse::from)
+            .map(isAuthor ? ParticipantResponse::withMessageFrom
+                : ParticipantResponse::withoutMessageFrom)
             .toList();
 
         mate.closeIfPassed();
@@ -184,6 +187,14 @@ public class MateService {
         mate.closeIfPassed();
 
         return SimpleMateResponse.from(mate);
+    }
+
+    private ParticipantResponse getParticipantResponse(
+        boolean isAuthor,
+        MateParticipant mateParticipant
+    ) {
+        return isAuthor ? ParticipantResponse.withMessageFrom(mateParticipant)
+            : ParticipantResponse.withoutMessageFrom(mateParticipant);
     }
 
 }

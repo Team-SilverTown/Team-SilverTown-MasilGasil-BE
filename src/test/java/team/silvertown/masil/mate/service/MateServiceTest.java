@@ -182,10 +182,10 @@ class MateServiceTest {
             MateTexture.createMateParticipant(author, expected, ParticipantStatus.ACCEPTED));
 
         // when
-        MateDetailResponse actual = mateService.getDetailById(expected.getId());
+        MateDetailResponse actual = mateService.getDetailById(author.getId(), expected.getId());
 
         // then
-        ParticipantResponse expectedAuthor = ParticipantResponse.from(savedAuthor);
+        ParticipantResponse expectedAuthor = ParticipantResponse.withoutMessageFrom(savedAuthor);
 
         assertThat(actual)
             .hasFieldOrPropertyWithValue("id", expected.getId())
@@ -200,7 +200,7 @@ class MateServiceTest {
         long invalidId = MateTexture.getRandomId();
 
         // when
-        ThrowingCallable getDetailById = () -> mateService.getDetailById(invalidId);
+        ThrowingCallable getDetailById = () -> mateService.getDetailById(author.getId(), invalidId);
 
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getDetailById)
