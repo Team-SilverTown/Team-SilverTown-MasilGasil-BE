@@ -17,8 +17,8 @@ import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
-import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
 import team.silvertown.masil.mate.dto.MateCursorDto;
+import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
 import team.silvertown.masil.mate.dto.request.CreateMateRequest;
 import team.silvertown.masil.mate.dto.response.CreateMateParticipantResponse;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
@@ -28,6 +28,7 @@ import team.silvertown.masil.mate.dto.response.SimpleMateResponse;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 import team.silvertown.masil.mate.repository.mate.MateRepository;
 import team.silvertown.masil.mate.repository.participant.MateParticipantRepository;
+import team.silvertown.masil.mate.validator.MateValidator;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.repository.PostRepository;
 import team.silvertown.masil.user.domain.User;
@@ -104,14 +105,32 @@ public class MateService {
         boolean participatesAround = mateParticipantRepository.existsInSimilarTime(user,
             mate.getGatheringAt());
 
-        if (participatesAround) {
-            throw new DuplicateResourceException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME);
-        }
+        MateValidator.throwIf(participatesAround,
+            () -> new DuplicateResourceException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME));
 
         MateParticipant mateParticipant = createMateParticipant(user, mate,
             ParticipantStatus.REQUESTED, request.message());
 
         return new CreateMateParticipantResponse(mateParticipant.getId());
+    }
+
+    @Transactional
+    public void acceptParticipation(Long id, Long participantId) {
+        MateParticipant mateParticipant = mateParticipantRepository.findById(participantId)
+            .orElseThrow(getNotFoundException(MateErrorCode.PARTICIPANT_NOT_FOUND));
+        Mate mate = mateRepository.findById(id)
+            .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
+
+        MateValidator.throwIf(!mate.equals(mateParticipant.getMate()),
+            () -> new BadRequestException(MateErrorCode.PARTICIPANT_MATE_NOT_MATCHING));
+
+        boolean participatesAround = mateParticipantRepository.existsInSimilarTime(
+            mateParticipant.getUser(), mate.getGatheringAt());
+
+        MateValidator.throwIf(participatesAround,
+            () -> new DuplicateResourceException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME));
+
+        mateParticipant.acceptParticipant();
     }
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {

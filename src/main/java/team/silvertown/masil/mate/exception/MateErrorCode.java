@@ -24,6 +24,8 @@ public enum MateErrorCode implements ErrorCode {
     MATE_NOT_FOUND(20400, "해당 아이디의 메이트가 존재하지 않습니다"),
 
     PARTICIPATING_AROUND_SIMILAR_TIME(30000, "비슷한 시간대에 참여하는 메이트가 있습니다"),
+    PARTICIPANT_MATE_NOT_MATCHING(30001, "해당 메이트의 메이트 참여자가 아닙니다"),
+    PARTICIPANT_NOT_FOUND(30400, "메이트 참여 정보가 존재하지 않습니다"),
 
     NULL_POST(40000, "메이트 모집의 산책로 포스트를 확인할 수 없습니다"),
     POST_NOT_FOUND(40400, "기존의 산책로 포스트를 찾을 수 없습니다"),
