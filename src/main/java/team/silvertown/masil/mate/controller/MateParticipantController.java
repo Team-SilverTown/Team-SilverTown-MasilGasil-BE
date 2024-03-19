@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
@@ -47,6 +48,24 @@ public class MateParticipantController {
 
         return ResponseEntity.created(uri)
             .body(response);
+    }
+
+    @PutMapping("/api/v1/mates/{id}/participants/{participantId}")
+    @Operation(summary = "메이트 참여 요청 수락")
+    @ApiResponse(
+        responseCode = "204",
+        description = "메이트 참여 요청 수락 성공"
+    )
+    public ResponseEntity<Void> acceptParticipant(
+        @PathVariable
+        Long id,
+        @PathVariable
+        Long participantId
+    ) {
+        mateService.acceptParticipation(id, participantId);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
 }
