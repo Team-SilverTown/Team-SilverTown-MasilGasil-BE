@@ -23,8 +23,7 @@ import team.silvertown.masil.auth.service.AuthService;
 @RequiredArgsConstructor
 @Tag(name = "토큰 관련 API")
 public class AuthController {
-
-    private static final String ACCESS_TOKEN_PREFIX = "Bearer ";
+    
     private static final String REFRESH_TOKEN_HEADER = "Refresh-Token";
 
     private final AuthService authService;
@@ -65,7 +64,7 @@ public class AuthController {
         String newToken = authService.refresh(refreshToken, accessToken);
 
         return ResponseEntity.ok()
-            .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN_PREFIX + newToken)
+            .header(HttpHeaders.AUTHORIZATION, newToken)
             .build();
     }
 

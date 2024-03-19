@@ -25,6 +25,8 @@ import team.silvertown.masil.user.service.UserService;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final String ACCESS_TOKEN_PREFIX = "Bearer ";
+
     private final UserRepository userRepository;
     private final UserService userService;
     private final JwtTokenProvider tokenProvider;
@@ -56,7 +58,7 @@ public class AuthService {
         User user = getUserFromRefreshToken(refreshToken);
         List<Authority> userAuthorities = userService.getUserAuthorities(user);
 
-        return tokenProvider.createAccessToken(user.getId(), userAuthorities);
+        return ACCESS_TOKEN_PREFIX + tokenProvider.createAccessToken(user.getId(), userAuthorities);
     }
 
     private void validateToken(String accessToken, String refreshToken) {
