@@ -116,7 +116,7 @@ public class MateService {
 
     @Transactional
     public void acceptParticipation(Long authorId, Long id, Long participantId) {
-        MateParticipant mateParticipant = mateParticipantRepository.findByIdWithMate(participantId)
+        MateParticipant mateParticipant = mateParticipantRepository.findWithMateById(participantId)
             .orElseThrow(getNotFoundException(MateErrorCode.PARTICIPANT_NOT_FOUND));
 
         MateValidator.validateParticipantAcceptance(authorId, id, mateParticipant);

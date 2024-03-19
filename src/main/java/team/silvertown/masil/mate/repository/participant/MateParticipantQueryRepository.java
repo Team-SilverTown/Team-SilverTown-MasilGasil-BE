@@ -13,6 +13,6 @@ public interface MateParticipantQueryRepository {
 
     List<MateParticipant> findAllByMate(Mate mate);
 
-    Optional<MateParticipant> findByIdWithMate(Long id);
+    Optional<MateParticipant> findWithMateById(Long id);
 
 }
