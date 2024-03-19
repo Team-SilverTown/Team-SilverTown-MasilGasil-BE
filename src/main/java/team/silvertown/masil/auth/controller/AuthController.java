@@ -23,7 +23,7 @@ import team.silvertown.masil.auth.service.AuthService;
 @RequiredArgsConstructor
 @Tag(name = "토큰 관련 API")
 public class AuthController {
-    
+
     private static final String REFRESH_TOKEN_HEADER = "Refresh-Token";
 
     private final AuthService authService;
