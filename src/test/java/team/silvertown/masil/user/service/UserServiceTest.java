@@ -34,11 +34,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.auth.service.AuthService;
+import team.silvertown.masil.auth.service.KakaoOAuthService;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
-import team.silvertown.masil.config.jwt.JwtProperties;
-import team.silvertown.masil.config.jwt.JwtTokenProvider;
+import team.silvertown.masil.auth.jwt.JwtProperties;
+import team.silvertown.masil.auth.jwt.JwtTokenProvider;
 import team.silvertown.masil.image.exception.ImageErrorCode;
 import team.silvertown.masil.security.exception.InvalidAuthenticationException;
 import team.silvertown.masil.texture.UserAuthorityTexture;
@@ -719,10 +720,12 @@ class UserServiceTest extends LocalstackTest {
         @Test
         public void Redis에_refreshToken이_존재하지_않을_경우_예외가_발생한다() throws Exception {
             //given
-            LoginResponse token = tokenProvider.createToken(user.getId(),
+            String accessToken = tokenProvider.createAccessToken(user.getId(),
                 Collections.singletonList(userAuthority.getAuthority()));
+            String refreshToken = tokenProvider.createRefreshToken(user.getId());
+            LoginResponse token = new LoginResponse(accessToken, refreshToken);
 
-            //when, then
+                //when, then
             assertThatThrownBy(() -> authService.refresh(token.refreshToken(), token.accessToken()))
                 .isInstanceOf(DataNotFoundException.class)
                 .hasMessage(UserErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
