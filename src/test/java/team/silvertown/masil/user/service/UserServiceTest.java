@@ -698,7 +698,7 @@ class UserServiceTest extends LocalstackTest {
             Long loginedUserId = claims.get(USER_ID_CLAIM, Long.class);
 
             //when
-            String newAccessToken = authService.refresh(tokenResponse.refreshToken(), tokenResponse.accessToken());
+            String newAccessToken = authService.refresh(tokenResponse.refreshToken(), tokenResponse.accessToken()).substring(7);
             Claims newClaims = jwtParser.parseSignedClaims(newAccessToken)
                 .getPayload();
             Long newLoginedUserId = newClaims.get(USER_ID_CLAIM, Long.class);
@@ -728,7 +728,7 @@ class UserServiceTest extends LocalstackTest {
 
                 //when, then
             assertThatThrownBy(() -> authService.refresh(token.refreshToken(), token.accessToken()))
-                .isInstanceOf(DataNotFoundException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND.getMessage());
         }
 
