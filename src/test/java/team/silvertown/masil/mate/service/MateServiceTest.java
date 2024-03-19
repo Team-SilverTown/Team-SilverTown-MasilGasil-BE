@@ -657,7 +657,7 @@ class MateServiceTest {
     }
 
     @Test
-    void 존재하지_않는_참여자면_예외를_발생시키지_않는다() {
+    void 존재하지_않는_참여자면_메이트_참여자_삭제를_실패한다() {
         // given
         Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
         long invalidId = MateTexture.getRandomId();
@@ -667,7 +667,8 @@ class MateServiceTest {
             mate.getId(), invalidId);
 
         // then
-        assertThatNoException().isThrownBy(delete);
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(delete)
+            .withMessage(MateErrorCode.PARTICIPANT_NOT_FOUND.getMessage());
     }
 
     @Test

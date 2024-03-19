@@ -1,7 +1,6 @@
 package team.silvertown.masil.mate.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -135,16 +134,12 @@ public class MateService {
     public void deleteParticipantById(Long userId, Long id, Long participantId) {
         User user = userRepository.findById(userId)
             .orElseThrow(getNotFoundException(MateErrorCode.USER_NOT_FOUND));
-        Optional<MateParticipant> mateParticipant = mateParticipantRepository.findById(
-            participantId);
+        MateParticipant mateParticipant = mateParticipantRepository.findById(participantId)
+            .orElseThrow(getNotFoundException(MateErrorCode.PARTICIPANT_NOT_FOUND));
 
-        if (mateParticipant.isEmpty()) {
-            return;
-        }
+        MateValidator.validateParticipantDeletion(user, id, mateParticipant);
 
-        MateValidator.validateParticipantDeletion(user, id, mateParticipant.get());
-
-        mateParticipantRepository.delete(mateParticipant.get());
+        mateParticipantRepository.delete(mateParticipant);
     }
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
