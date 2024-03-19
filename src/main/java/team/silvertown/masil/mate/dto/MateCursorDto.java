@@ -1,9 +1,9 @@
 package team.silvertown.masil.mate.dto;
 
-import team.silvertown.masil.mate.dto.response.SimpleMateResponse;
+import team.silvertown.masil.mate.domain.Mate;
 
 public record MateCursorDto(
-    SimpleMateResponse mate,
+    Mate mate,
     String cursor
 ) {
 

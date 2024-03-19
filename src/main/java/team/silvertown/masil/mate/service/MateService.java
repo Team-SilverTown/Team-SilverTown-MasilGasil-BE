@@ -17,8 +17,8 @@ import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.domain.ParticipantStatus;
-import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
 import team.silvertown.masil.mate.dto.MateCursorDto;
+import team.silvertown.masil.mate.dto.request.CreateMateParticipantRequest;
 import team.silvertown.masil.mate.dto.request.CreateMateRequest;
 import team.silvertown.masil.mate.dto.response.CreateMateParticipantResponse;
 import team.silvertown.masil.mate.dto.response.CreateMateResponse;
@@ -62,7 +62,7 @@ public class MateService {
         return new CreateMateResponse(mate.getId());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public MateDetailResponse getDetailById(Long id) {
         Mate mate = mateRepository.findDetailById(id)
             .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
@@ -71,17 +71,19 @@ public class MateService {
             .map(ParticipantResponse::from)
             .toList();
 
+        mate.closeIfPassed();
+
         return MateDetailResponse.from(mate, participants);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ScrollResponse<SimpleMateResponse> getScrollByAddress(NormalListRequest request) {
         List<MateCursorDto> matesWithCursor = mateRepository.findScrollByAddress(request);
 
         return getScrollResponse(matesWithCursor, request.getSize());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ScrollResponse<SimpleMateResponse> getScrollByPost(Long postId, ScrollRequest request) {
         Post post = postRepository.findById(postId)
             .orElseThrow(getNotFoundException(MateErrorCode.POST_NOT_FOUND));
@@ -160,7 +162,7 @@ public class MateService {
     ) {
         List<SimpleMateResponse> mates = matesWithCursor.stream()
             .limit(size)
-            .map(MateCursorDto::mate)
+            .map(this::getSimpleMate)
             .toList();
         String lastCursor = getLastCursor(matesWithCursor, size);
 
@@ -174,6 +176,14 @@ public class MateService {
         }
 
         return null;
+    }
+
+    private SimpleMateResponse getSimpleMate(MateCursorDto mateCursorDto) {
+        Mate mate = mateCursorDto.mate();
+
+        mate.closeIfPassed();
+
+        return SimpleMateResponse.from(mate);
     }
 
 }
