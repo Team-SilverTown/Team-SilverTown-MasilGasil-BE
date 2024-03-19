@@ -115,17 +115,14 @@ public class MateService {
     }
 
     @Transactional
-    public void acceptParticipation(Long id, Long participantId) {
-        MateParticipant mateParticipant = mateParticipantRepository.findById(participantId)
+    public void acceptParticipation(Long authorId, Long id, Long participantId) {
+        MateParticipant mateParticipant = mateParticipantRepository.findByIdWithMate(participantId)
             .orElseThrow(getNotFoundException(MateErrorCode.PARTICIPANT_NOT_FOUND));
-        Mate mate = mateRepository.findById(id)
-            .orElseThrow(getNotFoundException(MateErrorCode.MATE_NOT_FOUND));
 
-        MateValidator.throwIf(!mate.equals(mateParticipant.getMate()),
-            () -> new BadRequestException(MateErrorCode.PARTICIPANT_MATE_NOT_MATCHING));
+        MateValidator.validateParticipantAcceptance(authorId, id, mateParticipant);
 
         boolean participatesAround = mateParticipantRepository.existsInSimilarTime(
-            mateParticipant.getUser(), mate.getGatheringAt());
+            mateParticipant.getUser(), mateParticipant.getMate().getGatheringAt());
 
         MateValidator.throwIf(participatesAround,
             () -> new DuplicateResourceException(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME));

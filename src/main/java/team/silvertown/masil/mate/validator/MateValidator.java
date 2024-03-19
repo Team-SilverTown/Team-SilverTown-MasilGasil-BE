@@ -5,7 +5,10 @@ import java.time.OffsetDateTime;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import team.silvertown.masil.common.exception.BadRequestException;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.validator.Validator;
+import team.silvertown.masil.mate.domain.Mate;
+import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.exception.MateErrorCode;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,6 +46,38 @@ public final class MateValidator extends Validator {
         if (StringUtils.isNotBlank(message)) {
             notOver(message.length(), MAX_MESSAGE_LENGTH, MateErrorCode.MESSAGE_TOO_LONG);
         }
+    }
+
+    public static void validateParticipantAcceptance(
+        Long authorId,
+        Long mateId,
+        MateParticipant mateParticipant
+    ) {
+        Mate mate = mateParticipant.getMate();
+
+        validateAuthForManipulation(authorId, mate);
+        validateParticipantUnderMate(mateId, mate);
+    }
+
+    private static void validateParticipantUnderMate(
+        Long mateId,
+        Mate mate
+    ) {
+        notNull(mateId, MateErrorCode.NULL_MATE);
+
+        boolean isNotMatching = !mateId.equals(mate.getId());
+
+        throwIf(isNotMatching,
+            () -> new BadRequestException(MateErrorCode.PARTICIPANT_MATE_NOT_MATCHING));
+    }
+
+    private static void validateAuthForManipulation(Long authorId, Mate mate) {
+        notNull(authorId, MateErrorCode.NULL_AUTHOR);
+
+        boolean isNotAuthor = !authorId.equals(mate.getAuthor().getId());
+
+        throwIf(isNotAuthor,
+            () -> new ForbiddenException(MateErrorCode.USER_NOT_AUTHORIZED_FOR_MATE));
     }
 
 }
