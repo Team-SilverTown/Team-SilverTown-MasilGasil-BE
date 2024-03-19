@@ -71,9 +71,9 @@ public final class MateValidator extends Validator {
     ) {
         notNull(mateId, MateErrorCode.NULL_MATE);
 
-        boolean isNotMatching = !mateId.equals(mate.getId());
+        boolean isNotMatchingMate = !mateId.equals(mate.getId());
 
-        throwIf(isNotMatching,
+        throwIf(isNotMatchingMate,
             () -> new BadRequestException(MateErrorCode.PARTICIPANT_MATE_NOT_MATCHING));
     }
 
