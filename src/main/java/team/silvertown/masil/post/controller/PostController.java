@@ -21,11 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-<<<<<<< HEAD
 import team.silvertown.masil.common.scroll.OrderType;
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
-=======
->>>>>>> 3f6963a (feat: 메이트 모집 목록 조회 요청 응답 dto 구현)
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
 import team.silvertown.masil.post.dto.response.CreatePostResponse;

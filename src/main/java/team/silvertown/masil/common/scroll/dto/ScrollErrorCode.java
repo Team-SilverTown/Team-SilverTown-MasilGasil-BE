@@ -12,8 +12,4 @@ public enum ScrollErrorCode implements ErrorCode {
 
     private final int code;
     private final String message;
-<<<<<<< HEAD
-=======
-
->>>>>>> 3f6963a (feat: 메이트 모집 목록 조회 요청 응답 dto 구현)
 }
