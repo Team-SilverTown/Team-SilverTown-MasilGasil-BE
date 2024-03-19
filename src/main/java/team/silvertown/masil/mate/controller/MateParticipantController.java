@@ -57,12 +57,14 @@ public class MateParticipantController {
         description = "메이트 참여 요청 수락 성공"
     )
     public ResponseEntity<Void> acceptParticipant(
+        @AuthenticationPrincipal
+        Long authorId,
         @PathVariable
         Long id,
         @PathVariable
         Long participantId
     ) {
-        mateService.acceptParticipation(id, participantId);
+        mateService.acceptParticipation(authorId, id, participantId);
 
         return ResponseEntity.noContent()
             .build();
