@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.common.exception.ErrorResponse;
 import team.silvertown.masil.user.exception.UserErrorCode;
 
@@ -27,8 +28,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ErrorResponse errorResponse = new ErrorResponse(
-            UserErrorCode.INVALID_JWT_TOKEN.getCode(),
-            UserErrorCode.INVALID_JWT_TOKEN.getMessage());
+            AuthErrorCode.INVALID_JWT_TOKEN.getCode(),
+            AuthErrorCode.INVALID_JWT_TOKEN.getMessage());
         response.getOutputStream()
             .println(objectMapper.writeValueAsString(errorResponse));
     }

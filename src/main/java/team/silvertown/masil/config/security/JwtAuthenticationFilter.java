@@ -1,4 +1,4 @@
-package team.silvertown.masil.config.jwt;
+package team.silvertown.masil.config.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import team.silvertown.masil.auth.jwt.JwtTokenProvider;
 
 @Component
 @RequiredArgsConstructor

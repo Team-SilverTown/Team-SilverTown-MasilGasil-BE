@@ -1,4 +1,4 @@
-package team.silvertown.masil.config.jwt;
+package team.silvertown.masil.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -37,7 +37,8 @@ public class JwtTokenProvider {
     private static final String AUTHORITIES_DELIM = " ";
     private static final int MILLS = 1000;
 
-    private final long tokenValidityInMilliseconds;
+    private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
     private final String issuer;
     private final MacAlgorithm algorithm;
     private final SecretKey secretKey;
@@ -46,7 +47,10 @@ public class JwtTokenProvider {
     public JwtTokenProvider(JwtProperties jwtProperties) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.base64Secret());
 
-        this.tokenValidityInMilliseconds = jwtProperties.tokenValidityInSeconds() * MILLS;
+        this.accessTokenValidityInMilliseconds = jwtProperties.accessTokenValidityInSeconds()
+            * MILLS;
+        refreshTokenValidityInMilliseconds = jwtProperties.refreshTokenValidityInSeconds()
+            * MILLS;
         this.issuer = jwtProperties.issuer();
         this.algorithm = Jwts.SIG.HS512;
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
@@ -56,19 +60,31 @@ public class JwtTokenProvider {
             .build();
     }
 
-    public String createToken(long userId, List<Authority> authorities) {
+    public String createAccessToken(long userId, List<Authority> authorities) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + tokenValidityInMilliseconds);
+        Date accessValidity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
         StringJoiner joiner = new StringJoiner(" ");
-
         authorities.forEach(authority -> joiner.add(authority.getAuthority()));
 
         return Jwts.builder()
             .issuer(issuer)
             .issuedAt(now)
-            .expiration(validity)
+            .expiration(accessValidity)
             .claim(USER_ID_CLAIM, userId)
             .claim(AUTHORITIES_CLAIM, joiner.toString())
+            .signWith(secretKey, algorithm)
+            .compact();
+    }
+
+    public String createRefreshToken(Long userId) {
+        Date now = new Date();
+        Date refreshValidity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+            .issuer(issuer)
+            .issuedAt(now)
+            .expiration(refreshValidity)
+            .claim(USER_ID_CLAIM, userId)
             .signWith(secretKey, algorithm)
             .compact();
     }
