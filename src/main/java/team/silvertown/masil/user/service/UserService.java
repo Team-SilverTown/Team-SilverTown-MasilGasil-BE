@@ -190,6 +190,9 @@ public class UserService {
         return User.builder()
             .socialId(providerId)
             .provider(authenticatedProvider)
+            .totalCalories(0)
+            .totalCount(0)
+            .totalDistance(0)
             .isPublic(true)
             .build();
     }
