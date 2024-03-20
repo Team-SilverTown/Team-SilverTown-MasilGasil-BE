@@ -11,6 +11,7 @@ import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.mate.domain.Mate;
 import team.silvertown.masil.mate.domain.MateParticipant;
 import team.silvertown.masil.mate.exception.MateErrorCode;
+import team.silvertown.masil.user.domain.User;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MateValidator extends Validator {
@@ -58,6 +59,22 @@ public final class MateValidator extends Validator {
 
         validateAuthForManipulation(authorId, mate);
         validateParticipantUnderMate(mateId, mate);
+    }
+
+    public static void validateParticipantDeletion(
+        User user,
+        Long mateId,
+        MateParticipant mateParticipant
+    ) {
+        Mate mate = mateParticipant.getMate();
+
+        validateParticipantUnderMate(mateId, mate);
+
+        boolean isNotOwner = !user.equals(mateParticipant.getUser());
+
+        if (isNotOwner) {
+            validateAuthForManipulation(user.getId(), mate);
+        }
     }
 
     public static void validateSoleParticipation(boolean isParticipatingAnotherMate) {

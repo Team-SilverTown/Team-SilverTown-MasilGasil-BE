@@ -126,6 +126,18 @@ public class MateService {
         mateParticipant.acceptParticipant();
     }
 
+    @Transactional
+    public void deleteParticipantById(Long userId, Long id, Long participantId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(getNotFoundException(MateErrorCode.USER_NOT_FOUND));
+        MateParticipant mateParticipant = mateParticipantRepository.findById(participantId)
+            .orElseThrow(getNotFoundException(MateErrorCode.PARTICIPANT_NOT_FOUND));
+
+        MateValidator.validateParticipantDeletion(user, id, mateParticipant);
+
+        mateParticipantRepository.delete(mateParticipant);
+    }
+
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
     }
