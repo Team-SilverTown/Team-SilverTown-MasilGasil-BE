@@ -17,7 +17,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class LikeService {
+public class PostLikeService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;

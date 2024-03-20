@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import team.silvertown.masil.post.dto.SaveLikeDto;
-import team.silvertown.masil.post.service.LikeService;
+import team.silvertown.masil.post.service.PostLikeService;
 
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "산책로 좋아요 API")
-public class LikeController {
+public class PostLikeController {
 
-    private final LikeService likeService;
+    private final PostLikeService postLikeService;
 
     @PutMapping(
         value = "/api/v1/posts/{postId}/likes",
@@ -55,7 +55,7 @@ public class LikeController {
         @RequestBody
         SaveLikeDto request
     ) {
-        SaveLikeDto response = likeService.save(userId, postId, request);
+        SaveLikeDto response = postLikeService.save(userId, postId, request);
 
         return createResponseEntity(response.isCreated(), postId)
             .body(response);

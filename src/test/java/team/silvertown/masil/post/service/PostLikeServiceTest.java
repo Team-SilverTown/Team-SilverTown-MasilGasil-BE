@@ -29,7 +29,7 @@ import team.silvertown.masil.user.repository.UserRepository;
 @SpringBootTest
 @Transactional
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class LikeServiceTest {
+class PostLikeServiceTest {
 
     @Autowired
     EntityManager entityManager;
@@ -41,7 +41,7 @@ class LikeServiceTest {
     PostRepository postRepository;
 
     @Autowired
-    LikeService likeService;
+    PostLikeService postLikeService;
 
     User user;
     Post post;
@@ -61,7 +61,7 @@ class LikeServiceTest {
         SaveLikeDto request = new SaveLikeDto(expected, false);
 
         // when
-        SaveLikeDto response = likeService.save(user.getId(), post.getId(), request);
+        SaveLikeDto response = postLikeService.save(user.getId(), post.getId(), request);
 
         // then
         int postLikesExpected = post.getLikeCount() + (expected ? 1 : 0);
@@ -78,13 +78,13 @@ class LikeServiceTest {
     @ValueSource(booleans = {true, false})
     void 게시글_좋아요_데이터를_수정할_수_있다(boolean expected) {
         // given
-        likeService.save(user.getId(), post.getId(), new SaveLikeDto(!expected, false));
+        postLikeService.save(user.getId(), post.getId(), new SaveLikeDto(!expected, false));
         entityManager.clear();
 
         SaveLikeDto request = new SaveLikeDto(expected, false);
 
         // when
-        SaveLikeDto response = likeService.save(user.getId(), post.getId(), request);
+        SaveLikeDto response = postLikeService.save(user.getId(), post.getId(), request);
 
         // then
         int postLikesExpected = expected ? 1 : 0;
@@ -105,7 +105,7 @@ class LikeServiceTest {
         SaveLikeDto request = new SaveLikeDto(true, false);
 
         // when
-        ThrowingCallable likePost = () -> likeService.save(userId, postId, request);
+        ThrowingCallable likePost = () -> postLikeService.save(userId, postId, request);
 
         // then
         assertThatExceptionOfType(DataNotFoundException.class)
@@ -121,7 +121,7 @@ class LikeServiceTest {
         SaveLikeDto request = new SaveLikeDto(true, false);
 
         // when
-        ThrowingCallable likePost = () -> likeService.save(userId, postId, request);
+        ThrowingCallable likePost = () -> postLikeService.save(userId, postId, request);
 
         // then
         assertThatExceptionOfType(DataNotFoundException.class)
