@@ -2,11 +2,13 @@ package team.silvertown.masil.mate.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.BadRequestException;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.DuplicateResourceException;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
@@ -153,7 +156,7 @@ class MateServiceTest {
         ThrowingCallable create = () -> mateService.create(author.getId(), request);
 
         // then
-        assertThatExceptionOfType(BadRequestException.class).isThrownBy(create)
+        assertThatExceptionOfType(DuplicateResourceException.class).isThrownBy(create)
             .withMessage(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME.getMessage());
     }
 
@@ -182,10 +185,10 @@ class MateServiceTest {
             MateTexture.createMateParticipant(author, expected, ParticipantStatus.ACCEPTED));
 
         // when
-        MateDetailResponse actual = mateService.getDetailById(expected.getId());
+        MateDetailResponse actual = mateService.getDetailById(author.getId(), expected.getId());
 
         // then
-        ParticipantResponse expectedAuthor = ParticipantResponse.from(savedAuthor);
+        ParticipantResponse expectedAuthor = ParticipantResponse.withoutMessageFrom(savedAuthor);
 
         assertThat(actual)
             .hasFieldOrPropertyWithValue("id", expected.getId())
@@ -200,7 +203,7 @@ class MateServiceTest {
         long invalidId = MateTexture.getRandomId();
 
         // when
-        ThrowingCallable getDetailById = () -> mateService.getDetailById(invalidId);
+        ThrowingCallable getDetailById = () -> mateService.getDetailById(author.getId(), invalidId);
 
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getDetailById)
@@ -489,6 +492,237 @@ class MateServiceTest {
         // then
         assertThatExceptionOfType(DuplicateResourceException.class).isThrownBy(apply)
             .withMessage(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME.getMessage());
+    }
+
+    @Test
+    void 메이트_참여자_요청을_수락한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+
+        // when
+        ThrowingCallable accept = () -> mateService.acceptParticipation(author.getId(),
+            mate.getId(), participant.getId());
+
+        // then
+        MateParticipant expected = mateParticipantRepository.findById(participant.getId())
+            .orElseThrow();
+
+        assertThatNoException().isThrownBy(accept);
+        assertThat(expected.getStatus()).isEqualTo(ParticipantStatus.ACCEPTED);
+    }
+
+    @Test
+    void 메이트_참여자가_존재하지_않으면_요청_수락을_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        long invalidId = MateTexture.getRandomId();
+
+        // when
+        ThrowingCallable accept = () -> mateService.acceptParticipation(author.getId(),
+            mate.getId(), invalidId);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(accept)
+            .withMessage(MateErrorCode.PARTICIPANT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 메이트를_확인할_수_없으면_요청_수락을_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+        long invalidId = MateTexture.getRandomId();
+
+        // when
+        ThrowingCallable accept = () -> mateService.acceptParticipation(author.getId(), null,
+            participant.getId());
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(accept)
+            .withMessage(MateErrorCode.NULL_MATE.getMessage());
+    }
+
+    @Test
+    void 메이트가_참여자의_메이트와_다르면_요청_수락을_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        Mate anotherMate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+
+        // when
+        ThrowingCallable accept = () -> mateService.acceptParticipation(author.getId(),
+            anotherMate.getId(), participant.getId());
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(accept)
+            .withMessage(MateErrorCode.PARTICIPANT_MATE_NOT_MATCHING.getMessage());
+    }
+
+    @Test
+    void 토큰_사용자를_확인할_수_없으면_요청_수락을_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+
+        // when
+        ThrowingCallable accept = () -> mateService.acceptParticipation(null, mate.getId(),
+            participant.getId());
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(accept)
+            .withMessage(MateErrorCode.NULL_AUTHOR.getMessage());
+    }
+
+    @Test
+    void 로그인한_사용자가_작성자가_아니면_요청_수락을_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+        long invalidId = MateTexture.getRandomId();
+
+        // when
+        ThrowingCallable accept = () -> mateService.acceptParticipation(invalidId, mate.getId(),
+            participant.getId());
+
+        // then
+        assertThatExceptionOfType(ForbiddenException.class).isThrownBy(accept)
+            .withMessage(MateErrorCode.USER_NOT_AUTHORIZED_FOR_MATE.getMessage());
+    }
+
+    @Test
+    void 비슷한_시기에_이미_참여하는_메이트가_있으면_요청_수락을_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        Mate anotherMate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+        mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, anotherMate, ParticipantStatus.ACCEPTED));
+
+        // when
+        ThrowingCallable accept = () -> mateService.acceptParticipation(author.getId(),
+            mate.getId(), participant.getId());
+
+        // then
+        assertThatExceptionOfType(DuplicateResourceException.class).isThrownBy(accept)
+            .withMessage(MateErrorCode.PARTICIPATING_AROUND_SIMILAR_TIME.getMessage());
+    }
+
+    @Test
+    void 사용자가_본인의_메이트_참여자_삭제를_성공한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+
+        // when
+        mateService.deleteParticipantById(user.getId(), mate.getId(), participant.getId());
+
+        // then
+        Optional<MateParticipant> expected = mateParticipantRepository.findById(
+            participant.getId());
+
+        assertThat(expected).isEmpty();
+    }
+
+    @Test
+    void 메이트_작성자가_다른_사용자의_메이트_참여_삭제를_성공한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+
+        // when
+        mateService.deleteParticipantById(author.getId(), mate.getId(), participant.getId());
+
+        // then
+        Optional<MateParticipant> expected = mateParticipantRepository.findById(
+            participant.getId());
+
+        assertThat(expected).isEmpty();
+    }
+
+    @Test
+    void 존재하지_않는_참여자면_메이트_참여자_삭제를_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        long invalidId = MateTexture.getRandomId();
+
+        // when
+        ThrowingCallable delete = () -> mateService.deleteParticipantById(author.getId(),
+            mate.getId(), invalidId);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(delete)
+            .withMessage(MateErrorCode.PARTICIPANT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 로그인_사용자가_없으면_메이트_참여자_삭제를_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+        long invalidId = MateTexture.getRandomId();
+
+        // when
+        ThrowingCallable delete = () -> mateService.deleteParticipantById(invalidId, mate.getId(),
+            participant.getId());
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(delete)
+            .withMessage(MateErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 메이트와_참여자의_메이트가_다르면_메이트_참여자_삭제를_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+        Mate anotherMate = mateRepository.save(MateTexture.createDependentMate(author, post));
+
+        // when
+        ThrowingCallable delete = () -> mateService.deleteParticipantById(user.getId(),
+            anotherMate.getId(), participant.getId());
+
+        // then
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(delete)
+            .withMessage(MateErrorCode.PARTICIPANT_MATE_NOT_MATCHING.getMessage());
+    }
+
+    @Test
+    void 로그인한_사용자가_메이트_작성자도_아니고_본인도_아니면_삭제를_실패한다() {
+        // given
+        Mate mate = mateRepository.save(MateTexture.createDependentMate(author, post));
+        User user = userRepository.save(UserTexture.createValidUser());
+        MateParticipant participant = mateParticipantRepository.save(
+            MateTexture.createMateParticipant(user, mate, ParticipantStatus.REQUESTED));
+        User anotherUser = userRepository.save(UserTexture.createValidUser());
+
+        // when
+        ThrowingCallable delete = () -> mateService.deleteParticipantById(anotherUser.getId(),
+            mate.getId(), participant.getId());
+
+        //then
+        assertThatExceptionOfType(ForbiddenException.class).isThrownBy(delete)
+            .withMessage(MateErrorCode.USER_NOT_AUTHORIZED_FOR_MATE.getMessage());
     }
 
 }

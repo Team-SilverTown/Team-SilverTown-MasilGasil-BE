@@ -73,10 +73,12 @@ public class MateController {
     )
     @SecurityRequirements
     public ResponseEntity<MateDetailResponse> getDetailById(
+        @AuthenticationPrincipal
+        Long userId,
         @PathVariable
         Long id
     ) {
-        MateDetailResponse response = mateService.getDetailById(id);
+        MateDetailResponse response = mateService.getDetailById(userId, id);
 
         return ResponseEntity.ok(response);
     }

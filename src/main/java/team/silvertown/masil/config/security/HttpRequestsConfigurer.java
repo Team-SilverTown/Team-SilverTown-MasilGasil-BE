@@ -23,7 +23,7 @@ public class HttpRequestsConfigurer
         "/swagger-ui/**",
         "/swagger-resources/**"
     };
-    private static final String AUTH_RESOURCE = "/api/v1/users/login";
+    private static final String AUTH_RESOURCE = "/api/v1/auth/**";
     private static final String[] GET_PERMIT_ALL_RESOURCES = {
         // health check
         "/healthy",

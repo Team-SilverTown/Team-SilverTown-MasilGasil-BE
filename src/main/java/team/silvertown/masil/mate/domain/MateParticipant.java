@@ -61,4 +61,8 @@ public class MateParticipant extends BaseEntity {
         this.status = status;
     }
 
+    public void acceptParticipant() {
+        this.status = ParticipantStatus.ACCEPTED;
+    }
+
 }

@@ -1,4 +1,4 @@
-package team.silvertown.masil.config.jwt;
+package team.silvertown.masil.auth.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -6,7 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record JwtProperties(
     String issuer,
     String base64Secret,
-    long tokenValidityInSeconds
+    long accessTokenValidityInSeconds,
+    long refreshTokenValidityInSeconds
 ) {
 
 }

@@ -8,7 +8,9 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import team.silvertown.masil.auth.dto.LoginResponse;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import team.silvertown.masil.auth.jwt.JwtTokenProvider;
 
 @SpringBootTest
 @DisplayNameGeneration(ReplaceUnderscores.class)
@@ -23,10 +25,12 @@ class JwtTokenProviderTest {
         Long userId = 1L;
 
         //when
-        String token = jwtTokenProvider.createToken(userId, Collections.emptyList());
+        String accessToken = jwtTokenProvider.createAccessToken(userId, Collections.emptyList());
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+        LoginResponse response = new LoginResponse(accessToken, refreshToken);
 
         //then
-        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(token))
+        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(response.accessToken()))
             .isInstanceOf(InsufficientAuthenticationException.class)
             .hasMessage("No authority included in JWT");
     }
