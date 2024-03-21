@@ -53,12 +53,12 @@ public class HttpRequestsConfigurer
             .permitAll()
             .requestMatchers(AUTH_RESOURCE)
             .permitAll()
-            .requestMatchers(HttpMethod.GET, GET_PERMIT_ALL_RESOURCES)
-            .permitAll()
-            .requestMatchers(MessageFormat.format(ADMIN_PANEL, snapAdminProperties.getBaseUrl()))
-            .permitAll()
             .requestMatchers(HttpMethod.GET, USER_ME_RESOURCE)
             .authenticated()
+            .requestMatchers(MessageFormat.format(ADMIN_PANEL, snapAdminProperties.getBaseUrl()))
+            .permitAll()
+            .requestMatchers(HttpMethod.GET, GET_PERMIT_ALL_RESOURCES)
+            .permitAll()
             .anyRequest()
             .authenticated();
     }
