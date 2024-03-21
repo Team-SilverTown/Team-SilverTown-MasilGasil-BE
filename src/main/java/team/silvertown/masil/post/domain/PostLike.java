@@ -32,10 +32,6 @@ public class PostLike extends BaseEntity {
         this.isLike = Objects.nonNull(isLike) && isLike;
     }
 
-    public boolean hasChange(boolean newState) {
-        return isCreated || isLike != newState;
-    }
-
     public void setCreatedTrue() {
         isCreated = true;
     }
