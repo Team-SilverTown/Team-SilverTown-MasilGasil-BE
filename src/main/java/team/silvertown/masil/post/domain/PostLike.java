@@ -36,4 +36,8 @@ public class PostLike extends BaseEntity {
         return isCreated || isLike != newState;
     }
 
+    public void setCreatedTrue() {
+        isCreated = true;
+    }
+
 }

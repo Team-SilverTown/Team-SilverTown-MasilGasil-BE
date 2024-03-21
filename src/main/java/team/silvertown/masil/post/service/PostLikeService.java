@@ -31,9 +31,12 @@ public class PostLikeService {
             .orElseThrow(() -> new DataNotFoundException(PostErrorCode.POST_NOT_FOUND));
         PostLikeId postLikeId = new PostLikeId(userId, postId);
         PostLike postLike = postLikeRepository.findById(postLikeId)
-            .orElseGet(() -> new PostLike(postLikeId, request.isLike(), true));
+            .orElseGet(() -> saveNewPostLike(postLikeId, request));
 
-        updatePostLike(post, postLike, request.isLike());
+        postLike.setIsLike(request.isLike());
+
+        // TODO: 반정규화 필드를 활용한 성능 개선
+        post.setLikeCount(postLikeRepository.countByPostId(post.getId()));
 
         return new SaveLikeDto(postLike.isLike(), postLike.isCreated());
     }
@@ -44,14 +47,13 @@ public class PostLikeService {
         Validator.throwIf(notExistUser, () -> new DataNotFoundException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    private void updatePostLike(Post post, PostLike postLike, boolean newState) {
-        if (postLike.hasChange(newState)) {
-            postLike.setIsLike(newState);
-            postLikeRepository.save(postLike);
-        }
+    private PostLike saveNewPostLike(PostLikeId postLikeId, SaveLikeDto request) {
+        PostLike postLike = new PostLike(postLikeId, request.isLike(), false);
+        PostLike savedPostLike = postLikeRepository.save(postLike);
 
-        // TODO: 반정규화 필드를 활용한 성능 개선
-        post.setLikeCount(postLikeRepository.countByPostId(post.getId()));
+        savedPostLike.setCreatedTrue();
+
+        return savedPostLike;
     }
 
 }
