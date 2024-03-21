@@ -20,6 +20,7 @@ public record ParticipantResponse(
 
         return ParticipantResponse.builder()
             .id(participant.getId())
+            .message(participant.getMessage())
             .userId(user.getId())
             .nickname(user.getNickname())
             .profileUrl(user.getProfileImg())
