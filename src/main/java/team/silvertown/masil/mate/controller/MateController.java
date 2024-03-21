@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.Objects;
@@ -71,7 +70,6 @@ public class MateController {
             schema = @Schema(implementation = MateDetailResponse.class)
         )
     )
-    @SecurityRequirements
     public ResponseEntity<MateDetailResponse> getDetailById(
         @AuthenticationPrincipal
         Long userId,
@@ -115,7 +113,6 @@ public class MateController {
             )
         }
     )
-    @SecurityRequirements
     public ResponseEntity<ScrollResponse<SimpleMateResponse>> getScrollBy(
         @RequestParam(required = false)
         Long postId,
