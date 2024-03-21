@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.Objects;
@@ -72,7 +71,6 @@ public class PostController {
             schema = @Schema(implementation = PostDetailResponse.class)
         )
     )
-    @SecurityRequirements
     public ResponseEntity<PostDetailResponse> getById(
         @PathVariable
         Long id
@@ -119,7 +117,6 @@ public class PostController {
             )
         }
     )
-    @SecurityRequirements()
     public ResponseEntity<ScrollResponse<SimplePostResponse>> getScrollBy(
         @AuthenticationPrincipal
         Long loginId,
