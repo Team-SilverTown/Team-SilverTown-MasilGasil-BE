@@ -12,7 +12,8 @@ import team.silvertown.masil.user.domain.User;
 public final class UserTexture extends BaseDomainTexture {
 
     public static User createValidUser() {
-        String nickname = getRandomSentenceWithMax(20);
+        String nickname = faker.name()
+            .lastName();
         LocalDate birthDate = faker.date()
             .birthdayLocalDate(20, 40);
         int height = getRandomInt(170, 190);
@@ -24,7 +25,8 @@ public final class UserTexture extends BaseDomainTexture {
     }
 
     public static User createWalkedUser() {
-        String nickname = getRandomSentenceWithMax(20);
+        String nickname = faker.name()
+            .lastName();
         LocalDate birthDate = faker.date()
             .birthdayLocalDate(20, 40);
         int height = getRandomInt(170, 190);
@@ -36,7 +38,8 @@ public final class UserTexture extends BaseDomainTexture {
     }
 
     public static User createPrivateUser() {
-        String nickname = getRandomSentenceWithMax(20);
+        String nickname = faker.name()
+            .lastName();
         LocalDate birthDate = faker.date()
             .birthdayLocalDate(20, 40);
         int height = getRandomInt(170, 190);
