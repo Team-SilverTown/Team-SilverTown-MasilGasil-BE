@@ -81,7 +81,6 @@ class MateServiceTest {
     @BeforeEach
     void setUp() {
         author = userRepository.save(UserTexture.createValidUser());
-        // TODO: apply post texture
         post = postRepository.save(PostTexture.createDependentPost(author, 100));
         title = MateTexture.getRandomSentenceWithMax(30);
         content = MateTexture.getRandomSentenceWithMax(1000);
@@ -188,7 +187,7 @@ class MateServiceTest {
         MateDetailResponse actual = mateService.getDetailById(author.getId(), expected.getId());
 
         // then
-        ParticipantResponse expectedAuthor = ParticipantResponse.withoutMessageFrom(savedAuthor);
+        ParticipantResponse expectedAuthor = ParticipantResponse.withMessageFrom(savedAuthor);
 
         assertThat(actual)
             .hasFieldOrPropertyWithValue("id", expected.getId())

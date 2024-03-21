@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.locationtech.jts.geom.LineString;
 import team.silvertown.masil.common.BaseEntity;
 import team.silvertown.masil.common.map.Address;
@@ -73,6 +74,7 @@ public class Post extends BaseEntity {
     private int viewCount;
 
     @Column(name = "like_count", nullable = false)
+    @Setter
     private int likeCount;
 
     @Builder
