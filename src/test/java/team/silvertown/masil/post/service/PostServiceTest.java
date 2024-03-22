@@ -27,6 +27,8 @@ import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
+import team.silvertown.masil.post.domain.PostLike;
+import team.silvertown.masil.post.domain.PostLikeId;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
@@ -34,6 +36,7 @@ import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
+import team.silvertown.masil.post.repository.PostLikeRepository;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
 import team.silvertown.masil.post.repository.PostViewHistoryRepository;
@@ -63,6 +66,9 @@ class PostServiceTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PostLikeRepository postLikeRepository;
 
     @Autowired
     EntityManager entityManager;
@@ -381,6 +387,36 @@ class PostServiceTest {
         assertThat(actual.nextCursor()).isNull();
     }
 
+    @Test
+    void 포스트_목록_조회_시_본인의_좋아요_여부가_나타난다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(21, 99);
+        List<Post> posts = createPosts(totalSize);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.LATEST.name())
+            .size(expectedSize)
+            .build();
+        posts.forEach(post -> {
+            PostLike postLike = new PostLike(new PostLikeId(user.getId(), post.getId()), true,
+                true);
+
+            postLikeRepository.save(postLike);
+        });
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(user.getId(),
+            request);
+
+        // then
+        assertThat(actual.contents())
+            .allMatch(SimplePostResponse::isLiked);
+    }
+
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = " ")
@@ -569,7 +605,7 @@ class PostServiceTest {
             .withMessage(PostErrorCode.AUTHOR_NOT_FOUND.getMessage());
     }
 
-    long createPostsAndGetLastId(int size) {
+    List<Post> createPosts(int size) {
         List<Post> posts = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
@@ -577,7 +613,11 @@ class PostServiceTest {
                 addressDepth3));
         }
 
-        List<Post> saved = postRepository.saveAll(posts);
+        return postRepository.saveAll(posts);
+    }
+
+    long createPostsAndGetLastId(int size) {
+        List<Post> saved = createPosts(size);
 
         return saved.get(saved.size() - 1)
             .getId();
