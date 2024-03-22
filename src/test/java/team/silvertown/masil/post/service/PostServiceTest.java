@@ -152,7 +152,7 @@ class PostServiceTest {
         entityManager.clear();
 
         // when
-        PostDetailResponse actual = postService.getById(expected.getId());
+        PostDetailResponse actual = postService.getById(user.getId(), expected.getId());
 
         // then
         assertThat(actual)
@@ -187,10 +187,10 @@ class PostServiceTest {
 
         // when
         for (int i = 0; i < 10; i++) {
-            postService.getById(expected.getId());
+            postService.getById(user.getId(), expected.getId());
         }
 
-        PostDetailResponse actual = postService.getById(expected.getId());
+        PostDetailResponse actual = postService.getById(user.getId(), expected.getId());
 
         // then
         assertThat(actual)
@@ -211,12 +211,35 @@ class PostServiceTest {
     }
 
     @Test
-    void 사용자가_존재하지_않으면_산책로_포스트_단일_조회를_실패한다() {
+    void 포스트_단일_조회_시_본인의_좋아요_여부가_나타난다() {
+        // given
+        Post post = PostTexture.createDependentPost(user, 10000);
+        Post expected = postRepository.save(post);
+        int pinSize = 10;
+        List<PostPin> postPins = PostTexture.createDependentPostPins(expected, user.getId(),
+            pinSize);
+
+        postPinRepository.saveAll(postPins);
+        entityManager.clear();
+
+        PostLikeId postLikeId = new PostLikeId(user.getId(), expected.getId());
+
+        postLikeRepository.save(new PostLike(postLikeId, true, true));
+
+        // when
+        PostDetailResponse actual = postService.getById(user.getId(), expected.getId());
+
+        // then
+        assertThat(actual.isLiked()).isTrue();
+    }
+
+    @Test
+    void 포스트가_존재하지_않으면_산책로_포스트_단일_조회를_실패한다() {
         // given
         long invalidId = MasilTexture.getRandomId();
 
         // when
-        ThrowingCallable getById = () -> postService.getById(invalidId);
+        ThrowingCallable getById = () -> postService.getById(user.getId(), invalidId);
 
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getById)
