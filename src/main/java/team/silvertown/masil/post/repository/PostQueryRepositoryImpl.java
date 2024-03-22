@@ -10,6 +10,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.core.types.dsl.StringExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.common.util.StringUtils;
 import java.util.List;
@@ -20,6 +21,7 @@ import team.silvertown.masil.common.scroll.OrderType;
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.post.domain.QPost;
+import team.silvertown.masil.post.domain.QPostLike;
 import team.silvertown.masil.post.dto.PostCursorDto;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.user.domain.User;
@@ -34,10 +36,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
     private final QPost post = QPost.post;
+    private final QPostLike postLike = QPostLike.postLike;
 
     @Override
     public List<PostCursorDto> findScrollByAddress(User user, NormalListRequest request) {
-        // TODO: 좋아요 구현 후 로그인한 사용자 본인이 좋아요한 포스트인지 쿼리 추가
         Predicate openness = getOpenness(user, null);
         BooleanBuilder condition = getBasicCondition(request.getScrollRequest(), openness);
 
@@ -57,7 +59,6 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         User author,
         ScrollRequest request
     ) {
-        // TODO: 좋아요 구현 후 로그인한 사용자 본인이 좋아요한 포스트인지 쿼리 추가
         Predicate openness = getOpenness(loginUser, author);
         BooleanBuilder condition = getBasicCondition(request, openness)
             .and(post.user.eq(author));
@@ -89,14 +90,28 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     ) {
         OrderSpecifier<?> orderTarget = decideOrderTarget(request.getOrder());
         StringExpression cursor = getCursor(request.getOrder());
+        JPAQuery<PostCursorDto> query = buildSelectQuery(user, cursor);
 
-        return jpaQueryFactory
-            .select(projectPostCursor(cursor))
-            .from(post)
+        return query
             .where(condition)
             .orderBy(orderTarget, post.id.desc())
             .limit(request.getSize() + 1)
             .fetch();
+    }
+
+    private JPAQuery<PostCursorDto> buildSelectQuery(User user, StringExpression cursor) {
+        JPAQuery<PostCursorDto> query = jpaQueryFactory
+            .select(projectPostCursor(user, cursor))
+            .from(post);
+
+        if (Objects.isNull(user)) {
+            return query;
+        }
+
+        return query
+            .leftJoin(postLike)
+            .on(postLike.id.userId.eq(user.getId())
+                .and(postLike.id.postId.eq(post.id)));
     }
 
     private BooleanExpression getCursorFilter(OrderType order, String cursor) {
@@ -138,10 +153,13 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return post.id.stringValue();
     }
 
-    private ConstructorExpression<PostCursorDto> projectPostCursor(StringExpression cursor) {
+    private ConstructorExpression<PostCursorDto> projectPostCursor(
+        User user,
+        StringExpression cursor
+    ) {
         return Projections.constructor(
             PostCursorDto.class,
-            projectSimplePost(),
+            Objects.isNull(user) ? projectSimplePost() : projectSimplePostWithLike(),
             cursor
         );
     }
@@ -158,6 +176,22 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
             post.viewCount,
             post.likeCount,
             post.thumbnailUrl
+        );
+    }
+
+    private ConstructorExpression<SimplePostResponse> projectSimplePostWithLike() {
+        return Projections.constructor(
+            SimplePostResponse.class,
+            post.id,
+            post.address,
+            post.title,
+            post.content,
+            post.totalTime,
+            post.distance,
+            post.viewCount,
+            post.likeCount,
+            post.thumbnailUrl,
+            postLike.isLike
         );
     }
 
