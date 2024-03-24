@@ -159,27 +159,27 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     ) {
         return Projections.constructor(
             PostCursorDto.class,
-            Objects.isNull(user) ? projectSimplePost() : projectSimplePostWithLike(),
+            projectSimplePost(user),
             cursor
         );
     }
 
-    private ConstructorExpression<SimplePostResponse> projectSimplePost() {
-        return Projections.constructor(
-            SimplePostResponse.class,
-            post.id,
-            post.address,
-            post.title,
-            post.content,
-            post.totalTime,
-            post.distance,
-            post.viewCount,
-            post.likeCount,
-            post.thumbnailUrl
-        );
-    }
+    private ConstructorExpression<SimplePostResponse> projectSimplePost(User user) {
+        if (Objects.isNull(user)) {
+            return Projections.constructor(
+                SimplePostResponse.class,
+                post.id,
+                post.address,
+                post.title,
+                post.content,
+                post.totalTime,
+                post.distance,
+                post.viewCount,
+                post.likeCount,
+                post.thumbnailUrl
+            );
+        }
 
-    private ConstructorExpression<SimplePostResponse> projectSimplePostWithLike() {
         return Projections.constructor(
             SimplePostResponse.class,
             post.id,
