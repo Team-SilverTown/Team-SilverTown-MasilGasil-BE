@@ -27,6 +27,8 @@ import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
+import team.silvertown.masil.post.domain.PostLike;
+import team.silvertown.masil.post.domain.PostLikeId;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.dto.request.CreatePostPinRequest;
 import team.silvertown.masil.post.dto.request.CreatePostRequest;
@@ -34,6 +36,7 @@ import team.silvertown.masil.post.dto.response.CreatePostResponse;
 import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
+import team.silvertown.masil.post.repository.PostLikeRepository;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
 import team.silvertown.masil.post.repository.PostViewHistoryRepository;
@@ -63,6 +66,9 @@ class PostServiceTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PostLikeRepository postLikeRepository;
 
     @Autowired
     EntityManager entityManager;
@@ -146,7 +152,7 @@ class PostServiceTest {
         entityManager.clear();
 
         // when
-        PostDetailResponse actual = postService.getById(expected.getId());
+        PostDetailResponse actual = postService.getById(user.getId(), expected.getId());
 
         // then
         assertThat(actual)
@@ -181,10 +187,10 @@ class PostServiceTest {
 
         // when
         for (int i = 0; i < 10; i++) {
-            postService.getById(expected.getId());
+            postService.getById(user.getId(), expected.getId());
         }
 
-        PostDetailResponse actual = postService.getById(expected.getId());
+        PostDetailResponse actual = postService.getById(user.getId(), expected.getId());
 
         // then
         assertThat(actual)
@@ -205,12 +211,35 @@ class PostServiceTest {
     }
 
     @Test
-    void 사용자가_존재하지_않으면_산책로_포스트_단일_조회를_실패한다() {
+    void 포스트_단일_조회_시_본인의_좋아요_여부가_나타난다() {
+        // given
+        Post post = PostTexture.createDependentPost(user, 10000);
+        Post expected = postRepository.save(post);
+        int pinSize = 10;
+        List<PostPin> postPins = PostTexture.createDependentPostPins(expected, user.getId(),
+            pinSize);
+
+        postPinRepository.saveAll(postPins);
+        entityManager.clear();
+
+        PostLikeId postLikeId = new PostLikeId(user.getId(), expected.getId());
+
+        postLikeRepository.save(new PostLike(postLikeId, true, true));
+
+        // when
+        PostDetailResponse actual = postService.getById(user.getId(), expected.getId());
+
+        // then
+        assertThat(actual.isLiked()).isTrue();
+    }
+
+    @Test
+    void 포스트가_존재하지_않으면_산책로_포스트_단일_조회를_실패한다() {
         // given
         long invalidId = MasilTexture.getRandomId();
 
         // when
-        ThrowingCallable getById = () -> postService.getById(invalidId);
+        ThrowingCallable getById = () -> postService.getById(user.getId(), invalidId);
 
         // then
         assertThatExceptionOfType(DataNotFoundException.class).isThrownBy(getById)
@@ -379,6 +408,36 @@ class PostServiceTest {
 
         assertThat(actual.contents()).hasSize(actualSize);
         assertThat(actual.nextCursor()).isNull();
+    }
+
+    @Test
+    void 포스트_목록_조회_시_본인의_좋아요_여부가_나타난다() {
+        // given
+        int totalSize = PostTexture.getRandomInt(21, 99);
+        List<Post> posts = createPosts(totalSize);
+
+        int expectedSize = 10;
+        NormalListRequest request = NormalListRequest.builder()
+            .depth1(addressDepth1)
+            .depth2(addressDepth2)
+            .depth3(addressDepth3)
+            .order(OrderType.LATEST.name())
+            .size(expectedSize)
+            .build();
+        posts.forEach(post -> {
+            PostLike postLike = new PostLike(new PostLikeId(user.getId(), post.getId()), true,
+                true);
+
+            postLikeRepository.save(postLike);
+        });
+
+        // when
+        ScrollResponse<SimplePostResponse> actual = postService.getScrollByAddress(user.getId(),
+            request);
+
+        // then
+        assertThat(actual.contents())
+            .allMatch(SimplePostResponse::isLiked);
     }
 
     @ParameterizedTest
@@ -569,7 +628,7 @@ class PostServiceTest {
             .withMessage(PostErrorCode.AUTHOR_NOT_FOUND.getMessage());
     }
 
-    long createPostsAndGetLastId(int size) {
+    List<Post> createPosts(int size) {
         List<Post> posts = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
@@ -577,7 +636,11 @@ class PostServiceTest {
                 addressDepth3));
         }
 
-        List<Post> saved = postRepository.saveAll(posts);
+        return postRepository.saveAll(posts);
+    }
+
+    long createPostsAndGetLastId(int size) {
+        List<Post> saved = createPosts(size);
 
         return saved.get(saved.size() - 1)
             .getId();

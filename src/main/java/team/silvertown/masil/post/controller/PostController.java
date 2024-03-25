@@ -72,10 +72,12 @@ public class PostController {
         )
     )
     public ResponseEntity<PostDetailResponse> getById(
+        @AuthenticationPrincipal
+        Long userId,
         @PathVariable
         Long id
     ) {
-        PostDetailResponse response = postService.getById(id);
+        PostDetailResponse response = postService.getById(userId, id);
 
         return ResponseEntity.ok(response);
     }

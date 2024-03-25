@@ -24,10 +24,15 @@ public record PostDetailResponse(
     List<PostPinDetailResponse> pins,
     long authorId,
     String authorName,
-    String thumbnailUrl
+    String thumbnailUrl,
+    boolean isLiked
 ) {
 
-    public static PostDetailResponse from(Post post, List<PostPinDetailResponse> pins) {
+    public static PostDetailResponse from(
+        Post post,
+        List<PostPinDetailResponse> pins,
+        boolean isLiked
+    ) {
         User author = post.getUser();
 
         return PostDetailResponse.builder()
@@ -48,6 +53,7 @@ public record PostDetailResponse(
             .authorId(author.getId())
             .authorName(author.getNickname())
             .thumbnailUrl(post.getThumbnailUrl())
+            .isLiked(isLiked)
             .build();
     }
 

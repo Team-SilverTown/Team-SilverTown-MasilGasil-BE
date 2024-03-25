@@ -15,6 +15,7 @@ import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
+import team.silvertown.masil.post.domain.PostLikeId;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.domain.PostViewHistory;
 import team.silvertown.masil.post.dto.PostCursorDto;
@@ -25,6 +26,7 @@ import team.silvertown.masil.post.dto.response.PostDetailResponse;
 import team.silvertown.masil.post.dto.response.PostPinDetailResponse;
 import team.silvertown.masil.post.dto.response.SimplePostResponse;
 import team.silvertown.masil.post.exception.PostErrorCode;
+import team.silvertown.masil.post.repository.PostLikeRepository;
 import team.silvertown.masil.post.repository.PostPinRepository;
 import team.silvertown.masil.post.repository.PostRepository;
 import team.silvertown.masil.post.repository.PostViewHistoryRepository;
@@ -39,6 +41,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostPinRepository postPinRepository;
     private final PostViewHistoryRepository postViewHistoryRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Transactional
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
@@ -52,14 +55,16 @@ public class PostService {
     }
 
     @Transactional
-    public PostDetailResponse getById(Long id) {
+    public PostDetailResponse getById(Long userId, Long id) {
         Post post = postRepository.findById(id)
             .orElseThrow(getNotFoundException(PostErrorCode.POST_NOT_FOUND));
         List<PostPinDetailResponse> pins = PostPinDetailResponse.listFrom(post);
+        PostLikeId postLikeId = new PostLikeId(userId, id);
+        boolean isLiked = postLikeRepository.existsById(postLikeId);
 
         increasePostViewCount(post);
 
-        return PostDetailResponse.from(post, pins);
+        return PostDetailResponse.from(post, pins, isLiked);
     }
 
     @Transactional(readOnly = true)

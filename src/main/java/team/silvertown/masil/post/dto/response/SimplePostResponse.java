@@ -29,6 +29,22 @@ public final class SimplePostResponse {
         Integer likeCount,
         String thumbnailUrl
     ) {
+        this(id, address, title, content, totalTime, distance, viewCount, likeCount, thumbnailUrl,
+            false);
+    }
+
+    public SimplePostResponse(
+        Long id,
+        Address address,
+        String title,
+        String content,
+        Integer totalTime,
+        Integer distance,
+        Integer viewCount,
+        Integer likeCount,
+        String thumbnailUrl,
+        boolean isLiked
+    ) {
         this.id = id;
         this.address = address;
         this.title = title;
@@ -38,7 +54,7 @@ public final class SimplePostResponse {
         this.viewCount = viewCount;
         this.likeCount = likeCount;
         this.thumbnailUrl = thumbnailUrl;
-        this.isLiked = false;
+        this.isLiked = isLiked;
         this.hasMate = false;
     }
 

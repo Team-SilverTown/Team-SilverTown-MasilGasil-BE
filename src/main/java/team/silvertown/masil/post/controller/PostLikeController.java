@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.Objects;
@@ -34,19 +33,20 @@ public class PostLikeController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Operation(summary = "산책로 포스트 좋아요")
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "좋아요 데이터 변경",
-            content = @Content(schema = @Schema(implementation = SaveLikeDto.class))
-        ),
-        @ApiResponse(
-            responseCode = "201",
-            description = "최초 좋아요 데이터 생성",
-            content = @Content(schema = @Schema(implementation = SaveLikeDto.class))
-        ),
-    })
-    @SecurityRequirements
+    @ApiResponses(
+        {
+            @ApiResponse(
+                responseCode = "200",
+                description = "좋아요 데이터 변경",
+                content = @Content(schema = @Schema(implementation = SaveLikeDto.class))
+            ),
+            @ApiResponse(
+                responseCode = "201",
+                description = "최초 좋아요 데이터 생성",
+                content = @Content(schema = @Schema(implementation = SaveLikeDto.class))
+            ),
+        }
+    )
     public ResponseEntity<SaveLikeDto> save(
         @AuthenticationPrincipal
         Long userId,
