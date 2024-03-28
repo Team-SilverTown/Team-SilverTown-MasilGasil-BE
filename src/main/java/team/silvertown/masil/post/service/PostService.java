@@ -15,6 +15,7 @@ import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
 import team.silvertown.masil.post.domain.Post;
+import team.silvertown.masil.post.domain.PostLike;
 import team.silvertown.masil.post.domain.PostLikeId;
 import team.silvertown.masil.post.domain.PostPin;
 import team.silvertown.masil.post.domain.PostViewHistory;
@@ -60,7 +61,9 @@ public class PostService {
             .orElseThrow(getNotFoundException(PostErrorCode.POST_NOT_FOUND));
         List<PostPinDetailResponse> pins = PostPinDetailResponse.listFrom(post);
         PostLikeId postLikeId = new PostLikeId(userId, id);
-        boolean isLiked = postLikeRepository.existsById(postLikeId);
+        boolean isLiked = postLikeRepository.findById(postLikeId)
+            .orElseGet(() -> new PostLike(null, false, false))
+            .isLike();
 
         increasePostViewCount(post);
 
