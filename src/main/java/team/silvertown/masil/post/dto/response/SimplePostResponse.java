@@ -1,5 +1,7 @@
 package team.silvertown.masil.post.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import lombok.AccessLevel;
 import lombok.Getter;
 import team.silvertown.masil.common.map.Address;
 
@@ -15,8 +17,10 @@ public final class SimplePostResponse {
     private final Integer viewCount;
     private final Integer likeCount;
     private final String thumbnailUrl;
-    private final boolean isLiked;
     private final boolean hasMate;
+
+    @Getter(AccessLevel.NONE)
+    private final boolean isLiked;
 
     public SimplePostResponse(
         Long id,
@@ -56,6 +60,11 @@ public final class SimplePostResponse {
         this.thumbnailUrl = thumbnailUrl;
         this.isLiked = isLiked;
         this.hasMate = false;
+    }
+
+    @JsonGetter("isLiked")
+    public boolean isLiked() {
+        return this.isLiked;
     }
 
 }
