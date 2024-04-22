@@ -1,7 +1,8 @@
 logging:
-  org:
-    hibernate:
-      SQL: debug
+  level:
+    org:
+      hibernate:
+        SQL: debug
   threshold:
     file: ERROR
   file:

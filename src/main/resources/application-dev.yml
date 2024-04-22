@@ -1,7 +1,9 @@
 logging:
-  org:
-    hibernate:
-      SQL: debug
+  level:
+    org:
+      hibernate:
+        SQL: debug
+    root: info
 snapadmin:
   enabled: true
 sentry:
