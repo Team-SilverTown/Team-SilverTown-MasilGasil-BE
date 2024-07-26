@@ -14,7 +14,7 @@ logging:
       total-size-cap: 5MB
 springdoc:
   swagger-ui:
-    enabled: false
+    enabled: true
 sentry:
   enabled: true
   environment: prod

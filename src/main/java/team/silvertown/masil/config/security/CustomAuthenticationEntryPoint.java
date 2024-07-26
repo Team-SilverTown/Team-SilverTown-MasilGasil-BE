@@ -10,11 +10,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import team.silvertown.masil.auth.exception.AuthErrorCode;
 import team.silvertown.masil.common.exception.ErrorResponse;
-import team.silvertown.masil.user.exception.UserErrorCode;
 
 @Configuration
 @RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json;charset=UTF-8";
 
     private final ObjectMapper objectMapper;
 
@@ -24,7 +25,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         HttpServletResponse response,
         AuthenticationException authException
     ) throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType(APPLICATION_JSON_CHARSET_UTF_8);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ErrorResponse errorResponse = new ErrorResponse(
