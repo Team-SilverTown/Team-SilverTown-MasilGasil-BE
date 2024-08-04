@@ -201,7 +201,6 @@ class PostServiceTest {
         ThrowingCallable deleteNotExistPost = () -> postService.deleteById(user.getId(), post.getId() + 1);
 
         // then
-
         assertThatExceptionOfType(DataNotFoundException.class)
             .isThrownBy(deleteNotExistPost)
             .withMessage(PostErrorCode.POST_NOT_FOUND.getMessage());
@@ -218,7 +217,6 @@ class PostServiceTest {
         ThrowingCallable deleteByNotMatchingUser = () -> postService.deleteById(user.getId() + 1, post.getId());
 
         // then
-
         assertThatExceptionOfType(ForbiddenException.class)
             .isThrownBy(deleteByNotMatchingUser)
             .withMessage(PostErrorCode.AUTHOR_NOT_MATCHING.getMessage());
