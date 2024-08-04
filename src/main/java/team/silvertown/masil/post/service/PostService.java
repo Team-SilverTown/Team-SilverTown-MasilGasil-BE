@@ -10,10 +10,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import team.silvertown.masil.common.exception.DataNotFoundException;
 import team.silvertown.masil.common.exception.ErrorCode;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.map.KakaoPointMapper;
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollRequest;
 import team.silvertown.masil.common.scroll.dto.ScrollResponse;
+import team.silvertown.masil.common.validator.Validator;
 import team.silvertown.masil.post.domain.Post;
 import team.silvertown.masil.post.domain.PostLike;
 import team.silvertown.masil.post.domain.PostLikeId;
@@ -70,6 +72,18 @@ public class PostService {
         return PostDetailResponse.from(post, pins, isLiked);
     }
 
+    @Transactional
+    public void deleteById(Long userId, Long id) {
+        Post post = postRepository.findById(id)
+            .orElseThrow(getNotFoundException(PostErrorCode.POST_NOT_FOUND));
+        User author = post.getUser();
+
+        Validator.throwIf(!author.isSameId(userId), getForbiddenException(PostErrorCode.AUTHOR_NOT_MATCHING));
+
+        postPinRepository.deleteAllByPost(post);
+        postRepository.deleteById(id);
+    }
+
     @Transactional(readOnly = true)
     public ScrollResponse<SimplePostResponse> getScrollByAddress(
         Long loginId,
@@ -98,6 +112,10 @@ public class PostService {
 
     private Supplier<DataNotFoundException> getNotFoundException(ErrorCode errorCode) {
         return () -> new DataNotFoundException(errorCode);
+    }
+
+    private Supplier<RuntimeException> getForbiddenException(ErrorCode errorCode) {
+        return () -> new ForbiddenException(errorCode);
     }
 
     private Post createPost(CreatePostRequest request, User user) {
