@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import team.silvertown.masil.common.exception.DataNotFoundException;
+import team.silvertown.masil.common.exception.ForbiddenException;
 import team.silvertown.masil.common.map.KakaoPoint;
 import team.silvertown.masil.common.scroll.OrderType;
 import team.silvertown.masil.common.scroll.dto.NormalListRequest;
@@ -170,6 +172,54 @@ class PostServiceTest {
             .hasFieldOrPropertyWithValue("authorId", user.getId())
             .hasFieldOrPropertyWithValue("authorName", user.getNickname());
         assertThat(actual.pins()).hasSize(pinSize);
+    }
+
+    @Test
+    void 산책로_포스트를_삭제한다() {
+        // given
+        Post post = postRepository.save(PostTexture.createDependentPost(user, 3));
+
+        entityManager.clear();
+
+        // when
+        postService.deleteById(user.getId(), post.getId());
+
+        // then
+        Optional<Post> actual = postRepository.findById(post.getId());
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void 존재하지_않는_산책로_포스트는_삭제에_실패한다() {
+        // given
+        Post post = postRepository.save(PostTexture.createDependentPost(user, 3));
+
+        entityManager.clear();
+
+        // when
+        ThrowingCallable deleteNotExistPost = () -> postService.deleteById(user.getId(), post.getId() + 1);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class)
+            .isThrownBy(deleteNotExistPost)
+            .withMessage(PostErrorCode.POST_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 로그인한_사용자와_산책로_포스트_작성자가_다를_경우_삭제에_실패한다() {
+        // given
+        Post post = postRepository.save(PostTexture.createDependentPost(user, 3));
+
+        entityManager.clear();
+
+        // when
+        ThrowingCallable deleteByNotMatchingUser = () -> postService.deleteById(user.getId() + 1, post.getId());
+
+        // then
+        assertThatExceptionOfType(ForbiddenException.class)
+            .isThrownBy(deleteByNotMatchingUser)
+            .withMessage(PostErrorCode.AUTHOR_NOT_MATCHING.getMessage());
     }
 
     @Test

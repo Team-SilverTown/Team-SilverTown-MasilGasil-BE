@@ -14,6 +14,7 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,6 +81,21 @@ public class PostController {
         PostDetailResponse response = postService.getById(userId, id);
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/api/v1/posts/{id}")
+    @Operation(summary = "산책로 포스트 삭제")
+    @ApiResponse(responseCode = "204")
+    public ResponseEntity<Void> deleteById(
+        @AuthenticationPrincipal
+        Long userId,
+        @PathVariable
+        Long id
+    ) {
+        postService.deleteById(userId, id);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @GetMapping(value = "/api/v1/posts", produces = "application/json")

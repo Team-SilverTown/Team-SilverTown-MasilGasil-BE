@@ -25,6 +25,7 @@ public enum PostErrorCode implements ErrorCode {
     NULL_USER(202_90000, "산책로 포스트 사용자를 확인할 수 없습니다"),
     LOGIN_USER_NOT_FOUND(202_90400, "로그인한 사용자가 존재하지 않습니다"),
     AUTHOR_NOT_FOUND(202_90401, "산책로 포스트의 작성자를 찾을 수 없습니다"),
+    AUTHOR_NOT_MATCHING(202_90402, "사용자와 산책로 포스트의 작성자가 일치하지 않습니다"),
 
     INVALID_IP_ADDRESS(202_16001, "IP 주소가 올바르지 않습니다");
 

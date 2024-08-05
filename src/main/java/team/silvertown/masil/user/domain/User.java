@@ -77,6 +77,10 @@ public class User extends BaseEntity {
     @Column(name = "social_id", length = 50)
     private String socialId;
 
+    public boolean isSameId(Long userId) {
+        return id.equals(userId);
+    }
+
     public void updateNickname(String nickname) {
         UserValidator.validateNickname(nickname, UserErrorCode.INVALID_NICKNAME);
         this.nickname = nickname;
