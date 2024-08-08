@@ -11,6 +11,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -211,6 +212,83 @@ class MasilServiceTest {
         // then
         assertThat(response.masils()).isNotNull();
         assertThat(response.isEmpty()).isTrue();
+    }
+
+    @Test
+    void 비회원_사용자일_경우_마실_삭제에_실패한다() {
+        // given
+        long invalidUserId = MasilTexture.getRandomId();
+        Masil masil = masilRepository.save(MasilTexture.createDependentMasil(user, 10000));
+        List<MasilPin> masilPins = MasilTexture.createDependentMasilPins(masil, user.getId(), 10);
+
+        masilPinRepository.saveAll(masilPins);
+        entityManager.clear();
+
+        masilRepository.save(masil);
+        masilPinRepository.saveAll(masilPins);
+        entityManager.clear();
+
+        // when
+        ThrowingCallable deleteById = () -> masilService.deleteById(invalidUserId, masil.getId());
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class)
+            .isThrownBy(deleteById)
+            .withMessage(MasilErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 존재하지_않는_마실일_경우_삭제에_실패한다() {
+        // given
+        long invalidMasilId = MasilTexture.getRandomId();
+
+        // when
+        ThrowingCallable deleteById = () -> masilService.deleteById(user.getId(), invalidMasilId);
+
+        // then
+        assertThatExceptionOfType(DataNotFoundException.class)
+            .isThrownBy(deleteById)
+            .withMessage(MasilErrorCode.MASIL_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 로그인한_사용자와_마실_소유자가_다르면_마실_삭제에_실패한다() {
+        // given
+        User differntUser = userRepository.save(UserTexture.createValidUser());
+        Masil masil = masilRepository.save(MasilTexture.createDependentMasil(user, 10000));
+        List<MasilPin> masilPins = MasilTexture.createDependentMasilPins(masil, user.getId(), 10);
+
+        masilPinRepository.saveAll(masilPins);
+        entityManager.clear();
+
+        masilPinRepository.saveAll(masilPins);
+        entityManager.clear();
+
+        // when
+        ThrowingCallable deleteById = () -> masilService.deleteById(differntUser.getId(), masil.getId());
+
+        // then
+        assertThatExceptionOfType(ForbiddenException.class)
+            .isThrownBy(deleteById)
+            .withMessage(MasilErrorCode.USER_NOT_AUTHORIZED_FOR_MASIL.getMessage());
+    }
+
+    @Test
+    void 마실_삭제에_성공한다() {
+        // given
+        Masil masil = masilRepository.save(MasilTexture.createDependentMasil(user, 10000));
+        List<MasilPin> masilPins = MasilTexture.createDependentMasilPins(masil, user.getId(), 10);
+
+        masilPinRepository.saveAll(masilPins);
+        entityManager.clear();
+
+        // when
+        masilService.deleteById(user.getId(), masil.getId());
+
+        // then
+        Optional<Masil> actual = masilRepository.findById(masil.getId());
+
+        assertThat(actual).isEmpty();
     }
 
     @ParameterizedTest
