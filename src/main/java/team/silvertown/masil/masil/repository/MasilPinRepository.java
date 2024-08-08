@@ -10,6 +10,6 @@ public interface MasilPinRepository extends JpaRepository<MasilPin, Long> {
 
     @Modifying
     @Query("DELETE FROM MasilPin mp WHERE mp.masil = :masil")
-    void deleteByMasil(Masil masil);
+    void deleteAllByMasil(Masil masil);
 
 }
