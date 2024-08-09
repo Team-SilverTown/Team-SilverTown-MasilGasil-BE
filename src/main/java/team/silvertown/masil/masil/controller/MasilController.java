@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -137,6 +138,21 @@ public class MasilController {
         MasilDetailResponse response = masilService.getById(userId, id);
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/api/v1/masils/{id}")
+    @Operation(summary = "마실 삭제")
+    @ApiResponse(responseCode = "204")
+    public ResponseEntity<Void> deleteById(
+        @AuthenticationPrincipal
+        Long userId,
+        @PathVariable
+        Long id
+    ) {
+        masilService.deleteById(userId, id);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
 }
