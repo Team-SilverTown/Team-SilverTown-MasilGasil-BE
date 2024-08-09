@@ -68,6 +68,19 @@ public class MasilService {
         return MasilDetailResponse.from(masil, pins);
     }
 
+    @Transactional
+    public void deleteById(Long userId, Long id) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(getNotFoundException(MasilErrorCode.USER_NOT_FOUND));
+        Masil masil = masilRepository.findById(id)
+            .orElseThrow(getNotFoundException(MasilErrorCode.MASIL_NOT_FOUND));
+
+        MasilValidator.validateMasilOwner(masil, user);
+
+        masilPinRepository.deleteAllByMasil(masil);
+        masilRepository.delete(masil);
+    }
+
     @Transactional(readOnly = true)
     public RecentMasilResponse getRecent(Long userId, Integer size) {
         User user = userRepository.findById(userId)

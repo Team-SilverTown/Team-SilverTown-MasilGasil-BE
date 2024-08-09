@@ -26,8 +26,9 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
     private static final int DEFAULT_RECENT_SIZE = 10;
 
     private final JPAQueryFactory jpaQueryFactory;
-    private final QMasil masil = QMasil.masil;
+    private final QMasil qMasil = QMasil.masil;
 
+    @Override
     public List<Masil> findRecent(User user, Integer size) {
         int limit = DEFAULT_RECENT_SIZE;
 
@@ -36,10 +37,10 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
         }
 
         return jpaQueryFactory
-            .selectFrom(masil)
-            .where(masil.user.eq(user))
+            .selectFrom(qMasil)
+            .where(qMasil.user.eq(user))
             .limit(limit)
-            .orderBy(masil.id.desc())
+            .orderBy(qMasil.id.desc())
             .fetch();
     }
 
@@ -50,15 +51,15 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
         OffsetDateTime endDateTime
     ) {
         BooleanBuilder condition = new BooleanBuilder();
-        StringTemplate startDate = convertToLocalDate(masil.startedAt);
+        StringTemplate startDate = convertToLocalDate(qMasil.startedAt);
 
-        condition.and(masil.user.eq(user))
-            .and(masil.startedAt.between(startDateTime, endDateTime));
+        condition.and(qMasil.user.eq(user))
+            .and(qMasil.startedAt.between(startDateTime, endDateTime));
 
         return jpaQueryFactory
-            .selectFrom(masil)
+            .selectFrom(qMasil)
             .where(condition)
-            .orderBy(masil.startedAt.asc())
+            .orderBy(qMasil.startedAt.asc())
             .transform(
                 GroupBy.groupBy(startDate)
                     .as(projectDailyDetail())
@@ -80,13 +81,13 @@ public class MasilQueryRepositoryImpl implements MasilQueryRepository {
         return GroupBy.list(
             Projections.constructor(
                 MasilDailyDetailDto.class,
-                masil.id,
-                masil.address,
-                masil.content,
-                masil.thumbnailUrl,
-                masil.distance,
-                masil.totalTime,
-                masil.calories
+                qMasil.id,
+                qMasil.address,
+                qMasil.content,
+                qMasil.thumbnailUrl,
+                qMasil.distance,
+                qMasil.totalTime,
+                qMasil.calories
             )
         );
     }
